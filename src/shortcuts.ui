@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<interface>
+  <requires lib="gtk+" version="3.20"/>
+  <object class="GtkShortcutsWindow" id="shortcuts_overview">
+    <property name="modal">True</property>
+    <child>
+      <object class="GtkShortcutsSection">
+        <property name="visible">True</property>
+        <property name="section-name">shortcuts</property>
+        <property name="max-height">10</property>
+        <child>
+          <object class="GtkShortcutsGroup">
+            <property name="visible">True</property>
+            <property name="title" translatable="yes" context="Shortcut window description">Files</property>
+            <child>
+              <object class="GtkShortcutsShortcut">
+                <property name="visible">True</property>
+                <property name="title" translatable="yes" context="Shortcut window description">New File</property>
+                <property name="accelerator">&lt;Ctrl&gt;T</property>
+              </object>
+            </child>
+            <child>
+              <object class="GtkShortcutsShortcut">
+                <property name="visible">True</property>
+                <property name="title" translatable="yes" context="Shortcut window description">Open File</property>
+                <property name="accelerator">&lt;Ctrl&gt;O</property>
+              </object>
+            </child>
+            <child>
+              <object class="GtkShortcutsShortcut">
+                <property name="visible">True</property>
+                <property name="title" translatable="yes" context="Shortcut window description">Save File</property>
+                <property name="accelerator">&lt;Ctrl&gt;S</property>
+              </object>
+            </child>
+            <child>
+              <object class="GtkShortcutsShortcut">
+                <property name="visible">True</property>
+                <property name="title" translatable="yes" context="Shortcut window description">Save File As...</property>
+                <property name="accelerator">&lt;Ctrl&gt;&lt;Shift&gt;S</property>
+              </object>
+            </child>
+            <child>
+              <object class="GtkShortcutsShortcut">
+                <property name="visible">True</property>
+                <property name="title" translatable="yes" context="Shortcut window description">Save All Files</property>
+                <property name="accelerator">&lt;Ctrl&gt;&lt;Alt&gt;S</property>
+              </object>
+            </child>
+          </object>
+        </child>
+        <child>
+          <object class="GtkShortcutsGroup">
+            <property name="visible">True</property>
+            <property name="title" translatable="yes" context="Shortcut window description">Entries</property>
+            <child>
+              <object class="GtkShortcutsShortcut">
+                <property name="visible">True</property>
+                <property name="title" translatable="yes" context="Shortcut window description">New Entry</property>
+                <property name="accelerator">&lt;Ctrl&gt;N</property>
+              </object>
+            </child>
+            <child>
+              <object class="GtkShortcutsShortcut">
+                <property name="visible">True</property>
+                <property name="title" translatable="yes" context="Shortcut window description">Find Entry</property>
+                <property name="accelerator">&lt;Ctrl&gt;F</property>
+              </object>
+            </child>
+            <child>
+              <object class="GtkShortcutsShortcut">
+                <property name="visible">True</property>
+                <property name="title" translatable="yes" context="Shortcut window description">Copy Entry</property>
+                <property name="accelerator">&lt;Ctrl&gt;&lt;Shift&gt;C</property>
+              </object>
+            </child>
+            <child>
+              <object class="GtkShortcutsShortcut">
+                <property name="visible">True</property>
+                <property name="title" translatable="yes" context="Shortcut window description">Paste Entry</property>
+                <property name="accelerator">&lt;Ctrl&gt;&lt;Shift&gt;V</property>
+              </object>
+            </child>
+          </object>
+        </child>
+        <child>
+          <object class="GtkShortcutsGroup">
+            <property name="visible">True</property>
+            <property name="title" translatable="yes" context="Shortcut window description">Fields</property>
+            <child>
+              <object class="GtkShortcutsShortcut">
+                <property name="visible">True</property>
+                <property name="title" translatable="yes" context="Shortcut window description">Capitalize Field</property>
+                <property name="accelerator">&lt;Alt&gt;U</property>
+              </object>
+            </child>
+            <child>
+              <object class="GtkShortcutsShortcut">
+                <property name="visible">True</property>
+                <property name="title" translatable="yes" context="Shortcut window description">Protect Upper Case</property>
+                <property name="accelerator">&lt;Alt&gt;P</property>
+              </object>
+            </child>
+            <child>
+              <object class="GtkShortcutsShortcut">
+                <property name="visible">True</property>
+                <property name="title" translatable="yes" context="Shortcut window description">Field to Unicode</property>
+                <property name="accelerator">&lt;Alt&gt;O</property>
+              </object>
+            </child>
+            <child>
+              <object class="GtkShortcutsShortcut">
+                <property name="visible">True</property>
+                <property name="title" translatable="yes" context="Shortcut window description">Field to LaTeX</property>
+                <property name="accelerator">&lt;Alt&gt;L</property>
+              </object>
+            </child>
+            <child>
+              <object class="GtkShortcutsShortcut">
+                <property name="visible">True</property>
+                <property name="title" translatable="yes" context="Shortcut window description">Generate Key</property>
+                <property name="accelerator">&lt;Alt&gt;K</property>
+              </object>
+            </child>
+          </object>
+        </child>
+      </object>
+    </child>
+  </object>
+</interface>
+

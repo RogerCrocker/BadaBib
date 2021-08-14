@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop">
+	<id>com.github.rogercrocker.badabib.desktop</id>
+	<metadata_license>CC0-1.0</metadata_license>
+	<project_license>GPL-3.0-or-later</project_license>
+  <summary>BibTex Editor</summary>
+  <description>Bada Bib! is a simple BibTex viewer and editor. It is written in Python and GTK and uses
+python-bibtexparser under the hood.</description>
+  <releases>
+    <release version="0.1" date="2021-08-13">Initial release</release>
+  </releases>
+  <provides>
+    <id>badabib.desktop</id>
+  </provides>
+  <kudos>
+    <kudo>python-bibtexparser <url>https://github.com/sciunto-org/python-bibtexparser</url></kudo>
+    <kudo>watchgod <url>https://github.com/samuelcolvin/watchgod</url></kudo>
+  </kudos>
+  <screenshots>
+    <screenshot type="default">
+      <image>https://wiki.gnome.org/Apps/Tweaks?action=AttachFile&amp;do=get&amp;target=UI.png</image>
+    </screenshot>
+  </screenshots>
+  <url type="homepage">https://github.com/RogerCrocker/BadaBib</url>
+  <url type="bugtracker">https://github.com/RogerCrocker/BadaBib/issues</url>
+</component>

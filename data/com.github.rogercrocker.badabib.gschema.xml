@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist gettext-domain="badabib">
+	<schema id="com.github.rogercrocker.badabib" path="/com/github/rogercrocker/badabib/">
+	  <key type="b" name="align-fields">
+        <default>true</default>
+        <summary>Align fields of bibtex entries.</summary>
+        <description>Align fields of bibtex entries.</description>
+    </key>
+	  <key type="i" name="field-indent">
+        <default>4</default>
+        <summary>Indentation of fields.</summary>
+        <description>Number of spaces used to indent fields in bibtex entries.</description>
+    </key>
+	  <key type="b" name="homogenize-fields">
+        <default>false</default>
+        <summary>Homogenize fields of bibtex entries.</summary>
+        <description>Unify capilization of filed names.</description>
+    </key>
+	  <key type="b" name="homogenize-latex-encoding">
+        <default>false</default>
+        <summary>Homogenize the latex enconding style for bibtex.</summary>
+        <description>Convert latex code to canonical form.</description>
+    </key>
+  	<key type="b" name="parse-on-fly">
+        <default>true</default>
+        <summary>Parsing bibtex on the fly</summary>
+        <description>Enables parsing bibtex source code on the fly.</description>
+    </key>
+    <key type="ai" name="window-geom">
+        <default>[1050, 600, 420]</default>
+        <summary>Window size and itemlist width</summary>
+        <description>Remember the window size and itemlist width.</description>
+    </key>
+    <key type="as" name="open-files">
+        <default>[]</default>
+        <summary>Last opened files</summary>
+        <description>A list of the last opened files.</description>
+    </key>
+    <key type="as" name="open-file-states">
+        <default>[]</default>
+        <summary>States of last opened files</summary>
+        <description>A list of the states of the last opened files.</description>
+    </key>
+    <key type="i" name="num-recent">
+        <default>10</default>
+        <summary>Number of recent files</summary>
+        <description>Number of recently opened files shown.</description>
+    </key>
+    <key type="as" name="recent-files">
+        <default>[]</default>
+        <summary>Recently opened files</summary>
+        <description>A list of the recently opened files.</description>
+    </key>
+    <key type="as" name="recent-file-states">
+        <default>[]</default>
+        <summary>States of recently opened files</summary>
+        <description>A list of the states of recently opened files.</description>
+    </key>
+	  <key type="as" name="editor-layouts">
+        <default>[]</default>
+        <summary>Editor layouts</summary>
+        <description>A list of strings defining the respective editor layouts.</description>
+    </key>
+	  <key type="d" name="undo-delay">
+        <default>0.3</default>
+        <summary>Undo delay</summary>
+        <description>Duration (in seconds) for which changes are grouped in the same undo-action.</description>
+    </key>
+	  <key type="i" name="row-indent">
+        <default>3</default>
+        <summary>Row indentation in itemlist</summary>
+        <description>Number of spaces used to indent labels in itemlist.</description>
+    </key>
+	  <key type="i" name="watcher-sleep-time">
+        <default>400</default>
+        <summary>Watcher Delay</summary>
+        <description>Time between file watcher updates in ms.</description>
+    </key>
+	  <key type="s" name="default-editor">
+        <default>"book"</default>
+        <summary>Default Editor</summary>
+        <description>Editor to show if no entrytype information is available.</description>
+    </key>
+	  <key type="s" name="new-file-name">
+        <default>"New File.bib"</default>
+        <summary>Name of new file</summary>
+        <description>Name given to new files created in BadaBib.</description>
+    </key>
+	</schema>
+</schemalist>

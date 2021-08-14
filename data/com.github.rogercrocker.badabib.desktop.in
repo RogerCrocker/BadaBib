@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=badabib
+Exec=badabib
+Icon=com.github.rogercrocker.badabib
+Terminal=false
+Type=Application
+Categories=GTK;
+StartupNotify=true

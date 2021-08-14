@@ -35,7 +35,7 @@
             "sources" : [
                 {
                     "type" : "git",
-                    "url" : "file:///home/mfauss/Applications/badabib"
+                    "url" : "https://github.com/RogerCrocker/BadaBib"
                 }
             ]
         }

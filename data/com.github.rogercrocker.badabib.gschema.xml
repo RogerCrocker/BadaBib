@@ -77,7 +77,7 @@
         <description>Time between file watcher updates in ms.</description>
     </key>
 	  <key type="s" name="default-editor">
-        <default>"book"</default>
+        <default>"article"</default>
         <summary>Default Editor</summary>
         <description>Editor to show if no entrytype information is available.</description>
     </key>

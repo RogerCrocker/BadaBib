@@ -39,8 +39,8 @@ from .dialogs import AboutDialog
 
 class Application(Gtk.Application):
     def __init__(self, version):
-        super().__init__(application_id="com.github.rogercrocker.badabib",
-                         flags=Gio.ApplicationFlags.FLAGS_NONE)
+        GLib.set_application_name("Bada Bib!")
+        Gtk.Application.__init__(self, application_id="com.github.rogercrocker.badabib")
         self.window = None
         self.version = version
 
@@ -52,7 +52,6 @@ class Application(Gtk.Application):
 
     def do_startup(self):
         Gtk.Application.do_startup(self)
-        GLib.set_prgname("BadaBib!")
         self.add_global_accelerators()
 
     def add_global_accelerators(self):

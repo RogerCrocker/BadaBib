@@ -306,7 +306,7 @@ class AboutDialog(Gtk.AboutDialog):
         )
         self.set_comments(about_comment)
 
-        self.set_logo_icon_name(None)
+        self.set_logo_icon_name("com.github.rogercrocker.badabib")
         self.set_website("https://github.com/RogerCrocker/BadaBib")
         self.set_website_label("GitHub Repository")
         self.set_license_type(Gtk.License.GPL_3_0)

@@ -9,9 +9,6 @@ python-bibtexparser under the hood.</description>
   <releases>
     <release version="0.1" date="2021-08-13">Initial release</release>
   </releases>
-  <provides>
-    <id>badabib.desktop</id>
-  </provides>
   <kudos>
     <kudo>python-bibtexparser <url>https://github.com/sciunto-org/python-bibtexparser</url></kudo>
     <kudo>watchgod <url>https://github.com/samuelcolvin/watchgod</url></kudo>

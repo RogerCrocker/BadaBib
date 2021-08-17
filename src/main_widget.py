@@ -365,22 +365,36 @@ class MainWidget(Gtk.Paned):
 
     def open_file(self, filename, state_string=None, restore=False):
         head, tail = split(filename)
-        bibfile, active = self.store.add_file(filename)
+        bibfile, active, backup = self.store.add_file(filename)
 
         if bibfile:
+            # file exists
             if active:
+                # files is already open
                 itemlist = self.itemlists[filename]
             else:
+                # file is empty
                 if len(bibfile.database.entries) == 0:
                     message = "No BibTeX entries found in file '" + filename + "'\n"
                     WarningDialog(message, window=self.window)
+
+                # could not create backup
+                if not backup:
+                    message = "Bada Bib! could not create a backup for '" + filename + "'\n\n"
+                    message += "Be careful when editing this file!\n\n"
+                    message += "To fix this, try deleting or renaming any .bak-files that were not created by Bada Bib!"
+                    WarningDialog(message, window=self.window)
+
                 itemlist = self.add_itemlist(bibfile, state_string)
                 self.add_watcher(self.window, filename)
+
+            # if a previous session is restored, open first tab instead of last tab
             if restore:
                 self.notebook.set_current_page(0)
             else:
                 self.notebook.set_current_page(itemlist.on_page)
         else:
+            # file does not exist or cannot be read
             message = "Cannot read file '" + filename + "'\n"
             WarningDialog(message, window=self.window)
             remove_from_recent(filename)

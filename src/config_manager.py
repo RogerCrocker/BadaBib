@@ -138,6 +138,13 @@ def set_parse_on_fly(state):
     setting.set_boolean("parse-on-fly", state)
 
 
+def get_create_backup():
+    return setting.get_boolean("create-backup")
+
+def set_create_backup(state):
+    setting.set_boolean("create-backup", state)
+
+
 def get_window_geom():
     return setting.get_value("window-geom")
 

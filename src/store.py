@@ -15,6 +15,9 @@
 
 
 from os.path import split
+from os.path import exists
+
+from shutil import copyfile
 
 from bibtexparser.bparser import BibTexParser
 from bibtexparser.bwriter import BibTexWriter
@@ -27,8 +30,40 @@ from .config_manager import get_homogenize_fields
 from .config_manager import get_align_fields
 from .config_manager import get_field_indent
 from .config_manager import get_new_file_name
+from .config_manager import get_create_backup
 
 from .bibfile import BadaBibFile
+
+
+BACKUP_TAG = "% Bada Bib! Backup File"
+
+
+def has_backup_tag(filename):
+    try:
+        with open(filename, 'r') as file:
+            tag = file.read(len(BACKUP_TAG))
+        return tag == BACKUP_TAG
+    except Exception:
+        return False
+
+
+def backup_file(filename):
+    backup = filename + ".bak"
+    if exists(backup) and not has_backup_tag(backup):
+        return False
+
+    try:
+        if has_backup_tag(filename):
+            copyfile(filename, backup)
+        else:
+            with open(filename, 'r') as original:
+                data = original.read()
+            with open(backup, 'w') as modifed:
+                modifed.write(BACKUP_TAG + "\n\n" + data)
+    except Exception:
+        return False
+
+    return True
 
 
 def get_shortest_unique_names(files):
@@ -75,24 +110,34 @@ class BadaBibStore(object):
         return writer
 
     def add_file(self, name):
+        # check if file is already open
         if name not in self.bibfiles:
             try:
+                # try parsing
                 with open(name) as bibtex_file:
                     parser = self.get_default_parser()
                     try:
                         database = parser.parse_file(bibtex_file)
                     except Exception:
-                        return None, None
+                        return None, None, None
 
+                # create backup, if desired
+                backup = True
+                if get_create_backup():
+                    if exists(name + ".bak"):
+                        backup = backup_file(name + ".bak")
+                    backup = backup and backup_file(name)
+
+                # initialize and return bibfile
                 bibfile = BadaBibFile(self, name, database)
                 self.bibfiles[name] = bibfile
                 self.update_global_strings(bibfile)
                 self.update_short_names()
-                return bibfile, False
+                return bibfile, False, backup
             except FileNotFoundError:
-                return None, None
+                return None, None, None
         else:
-            return self.bibfiles[name], True
+            return self.bibfiles[name], True, True
 
     def rename_file(self, old, new):
         file = self.bibfiles.pop(old)

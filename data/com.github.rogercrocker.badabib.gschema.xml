@@ -26,6 +26,11 @@
         <summary>Parsing bibtex on the fly</summary>
         <description>Enables parsing bibtex source code on the fly.</description>
     </key>
+	  <key type="b" name="create-backup">
+        <default>true</default>
+        <summary>Create backups when opening a file.</summary>
+        <description>Create backups when opening a file.</description>
+    </key>
     <key type="ai" name="window-geom">
         <default>[1050, 600, 420]</default>
         <summary>Window size and itemlist width</summary>

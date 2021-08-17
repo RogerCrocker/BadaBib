@@ -25,6 +25,8 @@ from .config_manager import get_field_indent
 from .config_manager import set_field_indent
 from .config_manager import get_parse_on_fly
 from .config_manager import set_parse_on_fly
+from .config_manager import get_create_backup
+from .config_manager import set_create_backup
 
 
 class PreferencesWindow(Gtk.Window):
@@ -34,9 +36,10 @@ class PreferencesWindow(Gtk.Window):
         self.set_border_width(10)
 
         box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
-        box.pack_start(self.get_align(), False, False, 10)
-        box.pack_start(self.get_indent(), False, False, 10)
-        box.pack_start(self.get_parse(), False, False, 10)
+        box.pack_start(self.get_align(), False, False, 15)
+        box.pack_start(self.get_indent(), False, False, 15)
+        box.pack_start(self.get_parse(), False, False, 15)
+        box.pack_start(self.get_backup(), False, False, 15)
 
         self.add(box)
         self.show_all()
@@ -136,3 +139,30 @@ class PreferencesWindow(Gtk.Window):
         else:
             mode = "offline"
         self.main_window.main_widget.source_view.set_mode(mode)
+
+    def get_backup(self):
+        backup_label = Gtk.Label(xalign=0)
+        backup_label.set_text("Create backups when opening BibTex files.")
+
+        backup_hint = Gtk.Label(xalign=0)
+        backup_hint.set_markup("<small>Highly recommendend!\nBada Bib! is still under development, so it might mess with your files.</small>")
+        backup_hint.set_justify(Gtk.Justification.LEFT)
+
+        backup_switch = Gtk.Switch()
+        backup_switch.set_active(get_create_backup())
+        backup_switch.connect("state-set", self.on_backup_changed)
+
+        vbox1 = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
+        vbox1.pack_start(backup_label, False, False, 0)
+        vbox1.pack_start(backup_hint, False, False, 0)
+
+        vbox2 = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
+        vbox2.pack_start(backup_switch, False, False, 0)
+
+        box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
+        box.pack_start(vbox1, False, False, 10)
+        box.pack_end(vbox2, False, False, 10)
+        return box
+
+    def on_backup_changed(self, _switch, state):
+        set_create_backup(state)

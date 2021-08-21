@@ -16,6 +16,7 @@
 
 from bibtexparser.latexenc import latex_to_unicode
 
+from bibtexparser.bibdatabase import BibDatabase
 from bibtexparser.bibdatabase import BibDataString
 from bibtexparser.bibdatabase import BibDataStringExpression
 from bibtexparser.bibdatabase import UndefinedString
@@ -26,12 +27,16 @@ from bibtexparser.customization import InvalidName
 
 from .customization import prettify_unicode_field
 
+from .config_manager import month_dict
 from .config_manager import StringStatus
 from .config_manager import sort_fields
 
 
 MAX_CHAR = chr(0x10FFFF)
 MIN_CHAR = chr(0)
+
+month_database = BibDatabase()
+month_database.strings = month_dict
 
 
 def expand(value):
@@ -201,8 +206,13 @@ class BadaBibItem(object):
         if field == "ID":
             self.entry[field] = value
         elif value:
-            if isinstance(value, str) and contains_bibstring(value, self.bibfile.database.strings):
-                self.entry[field] = string_to_expression(value, self.bibfile.database)
+            if field == "month":
+                database = month_database
+            else:
+                database = self.bibfile.database
+
+            if isinstance(value, str) and contains_bibstring(value, database.strings):
+                self.entry[field] = string_to_expression(value, database)
             else:
                 self.entry[field] = value
         elif field in self.entry:

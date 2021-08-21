@@ -24,7 +24,6 @@ from bibtexparser.bwriter import BibTexWriter
 from bibtexparser.bibdatabase import BibDatabase
 from bibtexparser.customization import homogenize_latex_encoding
 
-from .config_manager import month_dict
 from .config_manager import get_homogenize_latex
 from .config_manager import get_homogenize_fields
 from .config_manager import get_align_fields
@@ -193,7 +192,6 @@ class BadaBibStore(object):
         global_strings = {}
         for strings in self.string_files.values():
             global_strings = {**strings, **global_strings}
-        global_strings = {**month_dict, **global_strings}
         self.global_strings = global_strings
 
         # update files

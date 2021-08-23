@@ -90,7 +90,7 @@
             <child>
               <object class="GtkShortcutsShortcut">
                 <property name="visible">True</property>
-                <property name="title" translatable="yes" context="Shortcut window description">Capitalize Field</property>
+                <property name="title" translatable="yes" context="Shortcut window description">Capitalize</property>
                 <property name="accelerator">&lt;Alt&gt;U</property>
               </object>
             </child>
@@ -104,14 +104,14 @@
             <child>
               <object class="GtkShortcutsShortcut">
                 <property name="visible">True</property>
-                <property name="title" translatable="yes" context="Shortcut window description">Field to Unicode</property>
+                <property name="title" translatable="yes" context="Shortcut window description">Covert to Unicode</property>
                 <property name="accelerator">&lt;Alt&gt;O</property>
               </object>
             </child>
             <child>
               <object class="GtkShortcutsShortcut">
                 <property name="visible">True</property>
-                <property name="title" translatable="yes" context="Shortcut window description">Field to LaTeX</property>
+                <property name="title" translatable="yes" context="Shortcut window description">Convert to LaTeX</property>
                 <property name="accelerator">&lt;Alt&gt;L</property>
               </object>
             </child>

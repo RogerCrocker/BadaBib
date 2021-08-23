@@ -283,7 +283,7 @@ class Application(Gtk.Application):
             self.quit()
 
     def do_show_shortcuts(self, action=None, data=None):
-        builder = Gtk.Builder.new_from_resource("/com/rogercrocker/badabib/shortcuts.ui")
+        builder = Gtk.Builder.new_from_resource("/com/github/rogercrocker/badabib/shortcuts.ui")
         shortcuts_overview = builder.get_object("shortcuts_overview")
         shortcuts_overview.set_transient_for(self.window)
         shortcuts_overview.show()

@@ -291,7 +291,7 @@ class BadaBibItem(object):
             return self.sort_values[field]
         else:
             # sort entries without "field" to the bottom
-            if self.bibfile.sort_reverse:
+            if self.bibfile.itemlist.sort_reverse:
                 return MIN_CHAR
             else:
                 return MAX_CHAR

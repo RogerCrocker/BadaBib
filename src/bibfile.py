@@ -16,6 +16,8 @@
 
 from os.path import split
 
+from unicodedata import normalize
+
 from .customization import convert_to_unicode
 
 from .config_manager import entrytype_dict
@@ -85,18 +87,19 @@ class BadaBibFile:
         return keys.count(key) == 0
 
     def generate_key_for_item(self, item):
-        # get capilized last name of first author
-        # if the paper has exactly two authors, get both last names.
+        # get last name of first author, covert to ascii, and capitalize
+        # if the paper has exactly two authors, get both last names
         last_names = item.last_name_list()
         if "author" in item.entry and last_names:
             utf_name = convert_to_unicode(last_names[0])
-            ascii_name = utf_name.encode("ascii", "replace").decode("utf-8")
+            ascii_name = normalize("NFKD", utf_name).encode("ascii", "ignore").decode("utf-8")
             key = ascii_name[:1].upper() + ascii_name[1:]
             if len(last_names) == 2:
                 utf_name = convert_to_unicode(last_names[1])
-                ascii_name = utf_name.encode("ascii", "replace").decode("utf-8")
+                ascii_name = normalize("NFKD", utf_name).encode("ascii", "ignore").decode("utf-8")
                 key += ascii_name[:1].upper() + ascii_name[1:]
         else:
+        	# use entrytpye as key otherwise
             key = item.entry["ENTRYTYPE"]
 
         # add year

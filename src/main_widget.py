@@ -445,7 +445,7 @@ class MainWidget(Gtk.Paned):
             if response == Gtk.ResponseType.CANCEL:
                 close = False
             elif response == Gtk.ResponseType.OK:
-                filename = self.window.on_save_clicked()
+                filename = self.save_file(filename)
                 if not filename:
                     close = False
 

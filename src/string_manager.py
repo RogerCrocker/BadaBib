@@ -311,7 +311,7 @@ class StringManagerWindow(Gtk.Window):
         import_hint_label = Gtk.Label()
         import_hint_label.set_margin_bottom(10)
         import_hint_label.set_justify(Gtk.Justification.CENTER)
-        import_hint_label.set_markup("<small>Import strings from .bib files.\nImported strings are read-only and applied in all open files.</small>")
+        import_hint_label.set_markup("<small>Add files here to import their strings.\nImported strings are read-only and available in all open files.</small>")
 
         self.import_list = FileList(self.store.string_files.keys())
         self.import_list.connect("row-selected", self.on_import_file_selected)

@@ -78,12 +78,12 @@ class BadaBibFile:
         return False
 
     def get_duplicate_keys(self):
-        keys = [entry["ID"] for entry in self.database.entries]
+        keys = [item.entry["ID"] for item in self.items if not item.deleted]
         duplicates = [key for key in set(keys) if keys.count(key) > 1]
         return duplicates
 
     def key_is_unique(self, key):
-        keys = [entry["ID"] for entry in self.database.entries]
+        keys = [item.entry["ID"] for item in self.items if not item.deleted]
         return keys.count(key) == 0
 
     def generate_key_for_item(self, item):

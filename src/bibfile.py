@@ -128,7 +128,7 @@ class BadaBibFile:
     def get_sort_key_func(field):
         """Get function that returns the sort key for a given field"""
         def sort_key_func(item):
-            return item.sort_value(field)
+            return item.sort_values[field]
         return sort_key_func
 
     def parse_entry(self, bibtex):

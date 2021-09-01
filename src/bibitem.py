@@ -32,9 +32,6 @@ from .config_manager import StringStatus
 from .config_manager import sort_fields
 
 
-MAX_CHAR = chr(0x10FFFF)
-MIN_CHAR = chr(0)
-
 month_database = BibDatabase()
 month_database.strings = month_dict
 
@@ -279,19 +276,3 @@ class BadaBibItem(object):
         for field in sort_fields:
             self.update_sort_value(field)
 
-    def sort_value(self, field):
-        # sort entries without ID to the top
-        if not self.entry["ID"]:
-            if self.bibfile.itemlist.sort_reverse:
-                return MAX_CHAR
-            else:
-                return MIN_CHAR
-
-        if self.sort_values[field]:
-            return self.sort_values[field]
-        else:
-            # sort entries without "field" to the bottom
-            if self.bibfile.itemlist.sort_reverse:
-                return MIN_CHAR
-            else:
-                return MAX_CHAR

@@ -32,6 +32,8 @@ from .config_manager import SourceViewStatus
 
 row_indent = get_row_indent() * " "
 
+MIN_MAX_CHAR = ('', chr(0x10FFFF))
+
 
 class ItemlistNotebook(Gtk.Notebook):
     def __init__(self):
@@ -290,10 +292,13 @@ class Itemlist(Gtk.ListBox):
 
         self.sort_key = "ID"
         self.sort_reverse = False
-        self.set_sort_func(self.sort_by_field)
-
         self.search_string = ""
         self.fltr = {entytype: True for entytype in entrytype_dict}
+
+        if state_string:
+            self.string_to_state(state_string)
+
+        self.set_sort_func(self.sort_by_field)
         self.set_filter_func(self.filter_by_search)
 
         self.header = TabHeader(self)
@@ -305,10 +310,6 @@ class Itemlist(Gtk.ListBox):
             self.change_buffer = ChangeBuffer()
 
         self.add_rows(bibfile.items)
-
-        if state_string:
-            self.string_to_state(state_string)
-            self.invalidate_filter()
 
     def add_separator(self, row, before):
         if before:
@@ -378,26 +379,27 @@ class Itemlist(Gtk.ListBox):
         self.foreach(lambda row, data : self.remove(row), None)
 
     def sort_by_field(self, row1, row2):
-        field = self.sort_key
-        item1 = row1.item
-        item2 = row2.item
+        items = (row1.item, row2.item)
+        values = [0, 0]
 
-        value1 = item1.sort_value(field)
-        value2 = item2.sort_value(field)
+        for n, item in enumerate(items):
+            if not item.entry["ID"]:
+                # sort entries without ID to the top
+                values[n] = MIN_MAX_CHAR[self.sort_reverse]
+            elif item.sort_values[self.sort_key]:
+                values[n] = item.sort_values[self.sort_key]
+            else:
+                # sort entries without sort key field to the bottom
+                values[n] = MIN_MAX_CHAR[not self.sort_reverse]
 
-        if value1 == value2:
-            value1 = item1.sort_value("ID")
-            value2 = item2.sort_value("ID")
+        # fall back to ID if ordering is ambigious
+        if values[0] == values[1] and values[0] not in MIN_MAX_CHAR:
+            values = [items[0].sort_values["ID"], items[1].sort_values["ID"]]
 
-        if value1 > value2:
-            comp = 1
-        else:
-            comp = -1
+        comp = (1, -1)[values[0] <= values[1]]
+        comp = (comp, -comp)[self.sort_reverse]
 
-        if self.sort_reverse:
-            return -comp
-        else:
-            return comp
+        return comp
 
     def filter_by_search(self, row):
         search = self.search_string.lower()

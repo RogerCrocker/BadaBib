@@ -207,7 +207,7 @@ class Application(Gtk.Application):
         self.window.main_widget.on_close_tab()
 
     def on_new_entry(self, action=None, data=None):
-        self.window.main_widget.on_new_clicked()
+        self.window.main_widget.add_item()
 
     def on_find(self, action=None, data=None):
         self.window.main_widget.search_itemlist()

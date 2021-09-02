@@ -396,10 +396,12 @@ class Itemlist(Gtk.ListBox):
         if values[0] == values[1] and values[0] not in MIN_MAX_CHAR:
             values = [items[0].sort_values["ID"], items[1].sort_values["ID"]]
 
-        comp = (1, -1)[values[0] <= values[1]]
-        comp = (comp, -comp)[self.sort_reverse]
+        comp = 1 if values[0] >= values[1] else -1
 
-        return comp
+        if self.sort_reverse:
+            return -comp
+        else:
+            return comp
 
     def filter_by_search(self, row):
         search = self.search_string.lower()

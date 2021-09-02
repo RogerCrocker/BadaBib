@@ -195,13 +195,13 @@ class Application(Gtk.Application):
         self.window.main_widget.new_file()
 
     def on_save(self, action=None, data=None):
-        self.window.on_save_clicked()
+        self.window.main_widget.save_file()
 
     def on_save_as(self, action=None, data=None):
-        self.window.on_save_as_clicked()
+        self.window.main_widget.save_file_as()
 
     def on_save_all(self, action=None, data=None):
-        self.window.on_save_all_clicked()
+        self.window.main_widget.save_all_files()
 
     def on_close(self, action=None, data=None):
         self.window.main_widget.on_close_tab()
@@ -233,9 +233,7 @@ class Application(Gtk.Application):
         LayoutManagerWindow(self.window)
 
     def do_show_string_manager(self, action=None, data=None):
-        store = self.window.main_widget.store
-        itemlist = self.window.main_widget.get_current_itemlist()
-        StringManagerWindow(self.window, store, itemlist.bibfile.name)
+        StringManagerWindow(self.window)
 
     def do_show_about(self, action=None, data=None):
         AboutDialog(self.window)

@@ -152,7 +152,7 @@ class BadaBibWindow(Gtk.ApplicationWindow):
             self.main_widget.open_file_show_loading(filename)
         dialog.destroy()
 
-    def on_save_as_clicked(self, _widget=None):
+    def on_save_as_clicked(self, _button=None):
         self.main_widget.save_file_as()
 
     def on_save_clicked(self, _button=None):

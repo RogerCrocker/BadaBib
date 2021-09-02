@@ -273,10 +273,10 @@ class ImportToolbar(Gtk.Box):
 
 
 class StringManagerWindow(Gtk.Window):
-    def __init__(self, main_window, store, current_file):
+    def __init__(self, main_window):
         Gtk.Window.__init__(self, transient_for=main_window, title="String Manager")
         self.main_window = main_window
-        self.store = store
+        self.store = main_window.main_widget.store
         self.string_lists = {}
 
         self.paned = Gtk.Paned()
@@ -285,7 +285,7 @@ class StringManagerWindow(Gtk.Window):
         self.add(self.paned)
 
         self.search_bar.set_search_mode(False)
-        self.filelist.select_file(current_file)
+        self.filelist.select_file(main_window.main_widget.get_current_itemlist().bibfile.name)
         self.set_size_request(950, 700)
         self.paned.set_position(400)
         self.show_all()

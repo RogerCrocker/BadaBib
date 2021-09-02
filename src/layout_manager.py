@@ -22,6 +22,7 @@ from gi.repository import Gtk
 from .config_manager import entrytype_dict
 from .config_manager import field_dict
 from .config_manager import default_layout_strings
+from .config_manager import get_default_entrytype
 from .config_manager import set_editor_layout
 from .config_manager import get_editor_layout
 
@@ -116,7 +117,7 @@ class TopToolbar(Gtk.Box):
         self.entrytype_box = Gtk.ComboBoxText()
         for label in entrytype_dict.values():
             self.entrytype_box.append_text(label)
-        self.entrytype_box.set_active(0)
+        self.entrytype_box.set_active(-1)
 
         self.pack_start(self.preview_button, False, False, 5)
         self.pack_start(self.help_button, False, False, 5)
@@ -192,8 +193,13 @@ class LayoutManagerWindow(Gtk.Window):
         self.assemble()
         self.set_size_request(800, 700)
 
-        # select article layout and grab focus
-        self.on_entrytype_changed(self.entrytype_box)
+        # select layout of current entrytype and grab focus
+        item = self.main_window.main_widget.get_current_item()
+        if item is not None:
+            idx = list(entrytype_dict.keys()).index(item.entry["ENTRYTYPE"])
+        else:
+            idx = list(entrytype_dict.keys()).index(get_default_entrytype())
+        self.entrytype_box.set_active(idx)
         self.textview.grab_focus()
 
         self.show_all()

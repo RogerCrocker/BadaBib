@@ -285,7 +285,7 @@ class StringManagerWindow(Gtk.Window):
         self.add(self.paned)
 
         self.search_bar.set_search_mode(False)
-        self.filelist.select_file(main_window.main_widget.get_current_itemlist().bibfile.name)
+        self.filelist.select_file(main_window.main_widget.get_current_file().name)
         self.set_size_request(950, 700)
         self.paned.set_position(400)
         self.show_all()

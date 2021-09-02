@@ -31,7 +31,7 @@ from .config_manager import get_editor_layout
 from .config_manager import get_parse_on_fly
 from .config_manager import SourceViewStatus
 from .config_manager import get_new_file_name
-from .config_manager import get_default_editor
+from .config_manager import get_default_entrytype
 
 from .layout_manager import string_to_layout
 
@@ -59,7 +59,7 @@ from .dialogs import DuplicateKeys
 from .dialogs import EmptyKeys
 
 
-DEFAULT_EDITOR = get_default_editor()
+DEFAULT_EDITOR = get_default_entrytype()
 
 
 class MainWidget(Gtk.Paned):

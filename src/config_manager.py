@@ -174,11 +174,11 @@ def set_watcher_sleep_time(T):
     setting.set_int("watcher-sleep-time", T)
 
 
-def get_default_editor():
-    return setting.get_string("default-editor")
+def get_default_entrytype():
+    return setting.get_string("default-entrytype")
 
-def set_default_editor(entrytype):
-    setting.set_string("default-editor", entrytype)
+def set_default_entrytype(entrytype):
+    setting.set_string("default-entrytype", entrytype)
 
 
 def get_new_file_name():

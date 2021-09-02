@@ -81,10 +81,10 @@
         <summary>Watcher Delay</summary>
         <description>Time between file watcher updates in ms.</description>
     </key>
-	  <key type="s" name="default-editor">
+	  <key type="s" name="default-entrytype">
         <default>"article"</default>
-        <summary>Default Editor</summary>
-        <description>Editor to show if no entrytype information is available.</description>
+        <summary>Default Entrytype</summary>
+        <description>Entrytype created by default. Also used if no entrytype information is available.</description>
     </key>
 	  <key type="s" name="new-file-name">
         <default>"New File.bib"</default>

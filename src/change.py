@@ -17,11 +17,11 @@
 from time import time
 
 from .config_manager import get_undo_delay
-from .config_manager import get_default_editor
+from .config_manager import get_default_entrytype
 
 
 UNDO_DELAY = get_undo_delay()
-DEFAULT_EDITOR = get_default_editor()
+DEFAULT_EDITOR = get_default_entrytype()
 
 
 class Change(object):

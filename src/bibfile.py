@@ -21,7 +21,7 @@ from unicodedata import normalize
 from .customization import convert_to_unicode
 
 from .config_manager import entrytype_dict
-from .config_manager import get_default_editor
+from .config_manager import get_default_entrytype
 
 from .bibitem import BadaBibItem
 
@@ -29,7 +29,7 @@ from .bibitem import BadaBibItem
 UPPERCASE_A_ASCII = 65
 LOWERCASE_A_ASCII = 97
 
-DEFAULT_EDITOR = get_default_editor()
+DEFAULT_EDITOR = get_default_entrytype()
 
 
 class BadaBibFile:

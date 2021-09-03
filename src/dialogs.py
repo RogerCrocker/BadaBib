@@ -48,6 +48,7 @@ class WarningDialog(Gtk.MessageDialog):
             text=text,
             title=title,
         )
+        self.props.use_markup = True
         self.run()
         self.destroy()
 
@@ -59,7 +60,7 @@ class SaveChanges(Gtk.MessageDialog):
             transient_for=window,
             message_type=Gtk.MessageType.QUESTION,
             buttons=Gtk.ButtonsType.NONE,
-            text="Save changes to to file '" + filename + "' before closing?",
+            text="Save changes to file '" + filename + "' before closing?",
             title="Bada Bib! - Unsaved Changes",
         )
         self.add_buttons(
@@ -87,8 +88,9 @@ class FileChanged(Gtk.MessageDialog):
 
 
 class EmptyKeys(Gtk.MessageDialog):
-    def __init__(self, window):
-        text = "Database contains empty keys. Save anyhow?"
+    def __init__(self, window, filename):
+        text = "Entries with empty keys in file '" + filename + "'.\n\n"
+        text += "<b>Save anyhow?</b>"
 
         Gtk.MessageDialog.__init__(
             self,
@@ -97,6 +99,7 @@ class EmptyKeys(Gtk.MessageDialog):
             text=text,
             title="Bada Bib! - Empty Keys",
         )
+        self.props.use_markup = True
         self.add_buttons(
             Gtk.STOCK_NO, Gtk.ResponseType.NO,
             Gtk.STOCK_YES, Gtk.ResponseType.YES,
@@ -104,10 +107,11 @@ class EmptyKeys(Gtk.MessageDialog):
 
 
 class DuplicateKeys(Gtk.MessageDialog):
-    def __init__(self, window, duplicate_keys):
-        text = "Database contains duplicate keys:\n\n"
-        text += "\n".join(duplicate_keys)
-        text += "\n\n" + "Save anyhow?"
+    def __init__(self, window, filename, duplicate_keys):
+        text = "Duplicate keys\n\n"
+        text += "\n".join(duplicate_keys) + "\n\n"
+        text += "in file '" + filename + "'.\n\n"
+        text += "<b>Save anyhow?</b>"
 
         Gtk.MessageDialog.__init__(
             self,
@@ -116,6 +120,7 @@ class DuplicateKeys(Gtk.MessageDialog):
             text=text,
             title="Bada Bib! - Duplicate Keys",
         )
+        self.props.use_markup = True
         self.add_buttons(
             Gtk.STOCK_NO, Gtk.ResponseType.NO,
             Gtk.STOCK_YES, Gtk.ResponseType.YES,

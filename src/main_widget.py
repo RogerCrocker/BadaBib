@@ -381,8 +381,9 @@ class MainWidget(Gtk.Paned):
                 # could not create backup
                 if not backup:
                     message = "Bada Bib! could not create a backup for '" + filename + "'\n\n"
-                    message += "Be careful when editing this file!\n\n"
-                    message += "To fix this, try deleting or renaming any .bak-files that were not created by Bada Bib!"
+                    message += "To fix this, try deleting or renaming any .bak-files that were not created by Bada Bib!\n\n"
+                    message += "<b>Be careful when editing this file!</b>"
+
                     WarningDialog(message, window=self.window)
 
                 itemlist = self.add_itemlist(bibfile, state_string)
@@ -500,7 +501,7 @@ class MainWidget(Gtk.Paned):
 
         has_empty_keys = bibfile.has_empty_keys()
         if has_empty_keys:
-            dialog = EmptyKeys(self.window)
+            dialog = EmptyKeys(self.window, old_filename)
             response = dialog.run()
             dialog.destroy()
             if response != Gtk.ResponseType.YES:
@@ -508,7 +509,7 @@ class MainWidget(Gtk.Paned):
 
         duplicate_keys = bibfile.get_duplicate_keys()
         if duplicate_keys:
-            dialog = DuplicateKeys(self.window, duplicate_keys)
+            dialog = DuplicateKeys(self.window, old_filename, duplicate_keys)
             response = dialog.run()
             dialog.destroy()
             if response != Gtk.ResponseType.YES:

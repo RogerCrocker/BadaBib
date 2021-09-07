@@ -280,8 +280,8 @@ class MenuPopover(Gtk.Popover):
         save_section.append("Save All", "save_all")
 
         settings_section = Gio.Menu()
-        settings_section.append("Customize Editor", "custom_editor")
         settings_section.append("Manage Strings", "manage_strings")
+        settings_section.append("Customize Editor", "custom_editor")
 
         preferences_section = Gio.Menu()
         preferences_section.append("Preferences", "preferences")

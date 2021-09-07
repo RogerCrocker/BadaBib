@@ -56,7 +56,7 @@ class PreferencesWindow(Gtk.Window):
         align_label.set_text("Align fields")
 
         align_hint = Gtk.Label(xalign=0)
-        align_hint.set_markup("""<small>Align fields in the BibTex source code along the "=" sign.</small>""")
+        align_hint.set_markup("""<small>Align fields in the BibTeX source code along the "=" sign.</small>""")
 
         align_switch = Gtk.Switch()
         align_switch.set_active(get_align_fields())
@@ -84,7 +84,7 @@ class PreferencesWindow(Gtk.Window):
         indent_label.set_text("Indentation width")
 
         indent_hint = Gtk.Label(xalign=0)
-        indent_hint.set_markup("<small>Set indentation width of fields in the BibTex source code.</small>")
+        indent_hint.set_markup("<small>Set indentation width of fields in the BibTeX source code.</small>")
 
         indent_spin = Gtk.SpinButton.new_with_range(0, 20, 1)
         indent_spin.set_value(get_field_indent())
@@ -110,10 +110,10 @@ class PreferencesWindow(Gtk.Window):
 
     def get_parse(self):
         parse_label = Gtk.Label(xalign=0)
-        parse_label.set_text("Parse BibTex code on the fly")
+        parse_label.set_text("Parse BibTeX code on the fly")
 
         parse_hint = Gtk.Label(xalign=0)
-        parse_hint.set_markup("<small>Disable if editing the source code of BibTex entries is sluggish.\nThis can be the case if a file contains many strings.</small>")
+        parse_hint.set_markup("<small>Disable if editing the source code of BibTeX entries is sluggish.\nThis can be the case if a file contains many strings.</small>")
         parse_hint.set_justify(Gtk.Justification.LEFT)
 
         parse_switch = Gtk.Switch()
@@ -142,7 +142,7 @@ class PreferencesWindow(Gtk.Window):
 
     def get_backup(self):
         backup_label = Gtk.Label(xalign=0)
-        backup_label.set_text("Create backups when opening BibTex files.")
+        backup_label.set_text("Create backups when opening BibTeX files.")
 
         backup_hint = Gtk.Label(xalign=0)
         backup_hint.set_markup("<small>Highly recommendend!\nBada Bib! is still under development, so it might mess with your files.</small>")

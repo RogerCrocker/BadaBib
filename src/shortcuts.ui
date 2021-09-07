@@ -124,6 +124,26 @@
             </child>
           </object>
         </child>
+        <child>
+          <object class="GtkShortcutsGroup">
+            <property name="visible">True</property>
+            <property name="title" translatable="yes" context="Shortcut window description">Tools</property>
+            <child>
+              <object class="GtkShortcutsShortcut">
+                <property name="visible">True</property>
+                <property name="title" translatable="yes" context="Shortcut window description">Manage Strings</property>
+                <property name="accelerator">&lt;Alt&gt;&lt;Shift&gt;S</property>
+              </object>
+            </child>
+            <child>
+              <object class="GtkShortcutsShortcut">
+                <property name="visible">True</property>
+                <property name="title" translatable="yes" context="Shortcut window description">Configure Editor</property>
+                <property name="accelerator">&lt;Alt&gt;&lt;Shift&gt;E</property>
+              </object>
+            </child>
+          </object>
+        </child>
       </object>
     </child>
   </object>

@@ -150,7 +150,7 @@ class Application(Gtk.Application):
 
         custom_editor_action = Gio.SimpleAction.new("custom_editor", None)
         custom_editor_action.connect("activate", self.do_show_editor_configurator)
-        self.set_accels_for_action("app.custom_editor", ["<Alt>e"])
+        self.set_accels_for_action("app.custom_editor", ["<Alt><Shift>e"])
         self.add_action(custom_editor_action)
 
         copy_action = Gio.SimpleAction.new("copy", None)
@@ -170,7 +170,7 @@ class Application(Gtk.Application):
 
         string_manager_action = Gio.SimpleAction.new("manage_strings", None)
         string_manager_action.connect("activate", self.do_show_string_manager)
-        self.set_accels_for_action("app.manage_strings", ["<Alt>s"])
+        self.set_accels_for_action("app.manage_strings", ["<Alt><Shift>s"])
         self.add_action(string_manager_action)
 
         preferences_action = Gio.SimpleAction.new("preferences", None)

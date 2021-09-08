@@ -3,9 +3,12 @@
 	<id>com.github.rogercrocker.badabib.desktop</id>
 	<metadata_license>CC0-1.0</metadata_license>
 	<project_license>GPL-3.0-or-later</project_license>
-  <summary>BibTex Editor</summary>
-  <description>Bada Bib! is a simple BibTex viewer and editor. It is written in Python and GTK and uses
+  <summary>View and edit BibTeX entries</summary>
+  <description>Simple BibTex viewer and editor. It is written in Python and GTK and uses
 python-bibtexparser under the hood.</description>
+  <requires>
+    <display_length compare="ge">800</display_length>
+  </requires>
   <releases>
     <release version="0.1" date="2021-08-13">Initial release</release>
   </releases>
@@ -15,7 +18,12 @@ python-bibtexparser under the hood.</description>
   </kudos>
   <screenshots>
     <screenshot type="default">
-      <image>https://wiki.gnome.org/Apps/Tweaks?action=AttachFile&amp;do=get&amp;target=UI.png</image>
+      <image>https://github.com/RogerCrocker/BadaBib/blob/master/data/screenshots/editor.png</image>
+      <caption>Main Window</caption>
+    </screenshot>
+    <screenshot type="default">
+      <image>https://github.com/RogerCrocker/BadaBib/blob/master/data/screenshots/string_manager.png</image>
+      <caption>String Manager</caption>
     </screenshot>
   </screenshots>
   <url type="homepage">https://github.com/RogerCrocker/BadaBib</url>

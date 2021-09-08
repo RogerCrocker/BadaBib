@@ -4,13 +4,12 @@
 	<metadata_license>CC0-1.0</metadata_license>
 	<project_license>GPL-3.0-or-later</project_license>
   <summary>View and edit BibTeX entries</summary>
-  <description>Simple BibTex viewer and editor. It is written in Python and GTK and uses
-python-bibtexparser under the hood.</description>
+  <description>A simple BibTex viewer and editor written in Python and GTK, using python-bibtexparser under the hood.</description>
   <requires>
     <display_length compare="ge">800</display_length>
   </requires>
   <releases>
-    <release version="0.1" date="2021-08-13">Initial release</release>
+    <release version="0.1.0" date="2021-09-8">Initial release</release>
   </releases>
   <kudos>
     <kudo>python-bibtexparser <url>https://github.com/sciunto-org/python-bibtexparser</url></kudo>
@@ -21,7 +20,7 @@ python-bibtexparser under the hood.</description>
       <image>https://github.com/RogerCrocker/BadaBib/blob/master/data/screenshots/editor.png</image>
       <caption>Main Window</caption>
     </screenshot>
-    <screenshot type="default">
+    <screenshot>
       <image>https://github.com/RogerCrocker/BadaBib/blob/master/data/screenshots/string_manager.png</image>
       <caption>String Manager</caption>
     </screenshot>

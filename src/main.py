@@ -40,6 +40,7 @@ from .dialogs import AboutDialog
 class Application(Gtk.Application):
     def __init__(self, version):
         GLib.set_application_name("Bada Bib!")
+        GLib.set_prgname('badabib')
         Gtk.Application.__init__(self, application_id="com.github.rogercrocker.badabib")
         self.window = None
         self.version = version

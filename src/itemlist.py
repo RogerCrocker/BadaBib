@@ -383,14 +383,11 @@ class Itemlist(Gtk.ListBox):
         values = [0, 0]
 
         for n, item in enumerate(items):
-            if not item.entry["ID"]:
-                # sort entries without ID to the top
-                values[n] = MIN_MAX_CHAR[self.sort_reverse]
-            elif item.sort_values[self.sort_key]:
+            # sort entries without ID to the top, irrespective of sort order
+            if item.entry["ID"]:
                 values[n] = item.sort_values[self.sort_key]
             else:
-                # sort entries without sort key field to the bottom
-                values[n] = MIN_MAX_CHAR[not self.sort_reverse]
+                values[n] = MIN_MAX_CHAR[self.sort_reverse]
 
         # fall back to ID if ordering is ambigious
         if values[0] == values[1] and values[0] not in MIN_MAX_CHAR:

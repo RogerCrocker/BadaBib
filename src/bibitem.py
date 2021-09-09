@@ -197,7 +197,7 @@ class BadaBibItem(object):
         last_name_str = ""
         for last_name in last_name_list:
             for part in last_name:
-                last_name_str += part.lower()
+                last_name_str += part.lower().strip(" ()[]{}")
 
         return last_name_str
 
@@ -247,31 +247,26 @@ class BadaBibItem(object):
                 self.sort_values["author"] = self.lowercase_last_names()
             else:
                 self.sort_values["author"] = MAX_CHAR
-
-        elif field == "journal":
-            # if "journal" is not defiend, try "booktitle"
-            if "journal" in self.entry:
-                _field = "journal"
-            elif "booktitle" in self.entry:
-                _field = "booktitle"
-            else:
-                _field = None
-
-            if _field:
-                value = expand(self.entry[_field])
-                value = latex_to_unicode(value)
-                value = prettify_unicode_field(_field, value).lower()
-                self.sort_values["journal"] = value
-            else:
-                self.sort_values["journal"] = MAX_CHAR
-
-        elif field in self.entry:
-            value = expand(self.entry[field])
-            value = latex_to_unicode(value)
-            value = prettify_unicode_field(field, value).lower()
-            self.sort_values[field] = value
-
         else:
+            # if "journal" is not defiend, try "booktitle"
+            if field == "journal" and "journal" not in self.entry:
+               _field_ = "booktitle"
+            # if "year" is not defined, try "date"
+            elif field == "year" and "year" not in self.entry:
+                _field_ = "date"
+            else:
+                _field_ = field
+
+            if _field_ in self.entry:
+                value = expand(self.entry[_field_])
+                value = latex_to_unicode(value)
+                value = prettify_unicode_field(_field_, value).lower()
+                self.sort_values[field] = value
+            else:
+                self.sort_values[field] = MAX_CHAR
+
+        # catch existing but empty fields
+        if not self.sort_values[field]:
             self.sort_values[field] = MAX_CHAR
 
     def update_all_sort_values(self):

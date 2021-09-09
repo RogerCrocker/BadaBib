@@ -35,6 +35,8 @@ from .config_manager import sort_fields
 month_database = BibDatabase()
 month_database.strings = month_dict
 
+MAX_CHAR = chr(0x10FFFF)
+
 
 def expand(value):
     """Expand expression to string"""
@@ -244,7 +246,7 @@ class BadaBibItem(object):
             if "author" in self.entry:
                 self.sort_values["author"] = self.lowercase_last_names()
             else:
-                self.sort_values["author"] = None
+                self.sort_values["author"] = MAX_CHAR
 
         elif field == "journal":
             # if "journal" is not defiend, try "booktitle"
@@ -261,7 +263,7 @@ class BadaBibItem(object):
                 value = prettify_unicode_field(_field, value).lower()
                 self.sort_values["journal"] = value
             else:
-                self.sort_values["journal"] = None
+                self.sort_values["journal"] = MAX_CHAR
 
         elif field in self.entry:
             value = expand(self.entry[field])
@@ -270,7 +272,7 @@ class BadaBibItem(object):
             self.sort_values[field] = value
 
         else:
-            self.sort_values[field] = None
+            self.sort_values[field] = MAX_CHAR
 
     def update_all_sort_values(self):
         for field in sort_fields:

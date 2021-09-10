@@ -30,6 +30,7 @@ def add_filters(dialog):
     filter_bibtex = Gtk.FileFilter()
     filter_bibtex.set_name("BibTeX files")
     filter_bibtex.add_pattern("*.bib")
+    filter_bibtex.add_mime_type("application/x-bibtex")
     dialog.add_filter(filter_bibtex)
 
     filter_all = Gtk.FileFilter()

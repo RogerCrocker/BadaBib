@@ -4,5 +4,6 @@ Exec=badabib
 Icon=com.github.rogercrocker.badabib
 Terminal=false
 Type=Application
+MimeType=application/x-bibtex;
 Categories=GTK;
 StartupNotify=true

@@ -1,30 +1,53 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<component type="desktop">
-	<id>com.github.rogercrocker.badabib.desktop</id>
-	<metadata_license>CC0-1.0</metadata_license>
-	<project_license>GPL-3.0-or-later</project_license>
-  <summary>View and edit BibTeX entries</summary>
-  <description>A simple BibTex viewer and editor written in Python and GTK, using python-bibtexparser under the hood.</description>
-  <requires>
-    <display_length compare="ge">800</display_length>
-  </requires>
-  <releases>
-    <release version="0.1.0" date="2021-09-8">Initial release</release>
-  </releases>
-  <kudos>
-    <kudo>python-bibtexparser <url>https://github.com/sciunto-org/python-bibtexparser</url></kudo>
-    <kudo>watchgod <url>https://github.com/samuelcolvin/watchgod</url></kudo>
-  </kudos>
-  <screenshots>
-    <screenshot type="default">
-      <image>https://github.com/RogerCrocker/BadaBib/blob/master/data/screenshots/editor.png</image>
-      <caption>Main Window</caption>
-    </screenshot>
-    <screenshot>
-      <image>https://github.com/RogerCrocker/BadaBib/blob/master/data/screenshots/string_manager.png</image>
-      <caption>String Manager</caption>
-    </screenshot>
-  </screenshots>
-  <url type="homepage">https://github.com/RogerCrocker/BadaBib</url>
-  <url type="bugtracker">https://github.com/RogerCrocker/BadaBib/issues</url>
+<component type="desktop-application">
+    <id>com.github.rogercrocker.badabib</id>
+    <metadata_license>CC0-1.0</metadata_license>
+    <project_license>GPL-3.0-or-later</project_license>
+    <content_rating type="oars-1.1" />
+    <name translatable="no">Bada Bib!</name>
+    <summary>View and edit BibTeX entries</summary>
+
+    <description>
+        <p>A basic BibTex viewer and editor written in Python and GTK, using python-bibtexparser under the hood.</p>
+        <p>Features include:</p>
+        <ul>
+            <li>View, edit, sort, filter, and search BibTeX databases</li>
+            <li>View and edit BibTeX strings or import strings from external files</li>
+            <li>Customizable editor layouts</li>
+            <li>Shortcuts for common actions, such as protecting upper case letters or converting between unicode and LaTeX</li>
+        </ul>
+    </description>
+
+    <launchable type="desktop-id">com.github.rogercrocker.badabib.desktop</launchable>
+
+    <screenshots>
+        <screenshot type="default">
+            <caption>Main Window</caption>
+            <image>https://github.com/RogerCrocker/BadaBib/blob/master/data/screenshots/editor.png</image>
+        </screenshot>
+        <screenshot>
+            <caption>String Manager</caption>
+            <image>https://github.com/RogerCrocker/BadaBib/blob/master/data/screenshots/string_manager.png</image>
+        </screenshot>
+    </screenshots>
+
+    <url type="homepage">https://github.com/RogerCrocker/BadaBib/</url>
+    <url type="bugtracker">https://github.com/RogerCrocker/BadaBib/issues</url>
+
+    <kudos>
+      <kudo>python-bibtexparser <url>https://github.com/sciunto-org/python-bibtexparser</url></kudo>
+      <kudo>watchgod <url>https://github.com/samuelcolvin/watchgod</url></kudo>
+    </kudos>
+
+    <provides>
+        <mediatype>application/x-bibtex</mediatype>
+    </provides>
+
+    <releases>
+        <release version="0.1.0" date="2021-9-11">
+            <description>
+                <p translatable="no">Initial release</p>
+            </description>
+        </release>
+    </releases>
 </component>

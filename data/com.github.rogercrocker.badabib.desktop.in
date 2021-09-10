@@ -6,4 +6,5 @@ Terminal=false
 Type=Application
 MimeType=application/x-bibtex;
 Categories=GTK;
+Keywords=bibtex;biblatex;latex;bibliography
 StartupNotify=true

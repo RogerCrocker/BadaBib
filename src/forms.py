@@ -27,8 +27,6 @@ from .config_manager import month_dict
 from .config_manager import get_parse_on_fly
 
 
-entrytype_list = list(entrytype_dict)
-
 has_entry = ["ENTRYTYPE", "month"]
 has_buffer = ["abstract"]
 is_not_entry = has_entry + has_buffer + ["separator"]
@@ -252,7 +250,7 @@ class EntrytypeBox(Box):
         entry = self.get_child()
         if text in entrytype_dict:
             entry.set_text(entrytype_dict[text])
-            self.set_active(entrytype_list.index(text))
+            self.set_active(list(entrytype_dict).index(text))
         elif text != None:
             entry.set_text(text)
 

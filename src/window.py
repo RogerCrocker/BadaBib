@@ -139,7 +139,7 @@ class BadaBibWindow(Gtk.ApplicationWindow):
 
     def do_delete_event(self, window):
         """invoked by window close button"""
-        close = self.main_widget.close_all_files(quit=True)
+        close = self.main_widget.close_all_files(close_app=True)
         if close:
             self.application.activate_action("quit")
         return True

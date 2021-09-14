@@ -433,7 +433,7 @@ class MainWidget(Gtk.Paned):
         self.itemlists[filename].set_unsaved(True)
         self.remove_watcher(filename)
 
-    def close_file(self, filename, force=False, exit=False):
+    def close_file(self, filename, force=False, close_app=False):
         itemlist = self.itemlists[filename]
         close = True
 
@@ -451,7 +451,7 @@ class MainWidget(Gtk.Paned):
         if force or close:
             bibfile = self.store.bibfiles[filename]
             if not bibfile.created:
-                if exit:
+                if close_app:
                     add_to_open(bibfile)
                 else:
                     add_to_recent(bibfile)
@@ -462,10 +462,10 @@ class MainWidget(Gtk.Paned):
 
         return close
 
-    def close_all_files(self, exit=False):
+    def close_all_files(self, close_app=False):
         files = list(self.store.bibfiles.keys())
         for file in files:
-            close = self.close_file(file, exit=exit)
+            close = self.close_file(file, close_app=close_app)
             if not close:
                 return False
         return True

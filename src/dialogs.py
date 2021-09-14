@@ -55,7 +55,7 @@ class WarningDialog(Gtk.MessageDialog):
 
 
 class SaveChanges(Gtk.MessageDialog):
-    def __init__(self, window, filename, exit=False):
+    def __init__(self, window, filename):
         Gtk.MessageDialog.__init__(
             self,
             transient_for=window,

@@ -148,10 +148,7 @@ class StringList(Gtk.ListBox):
         search_string = self.search_bar.search_entry.get_text().lower()
         macro = expand(row.macro)
         value = expand(row.value)
-        if search_string in macro.lower() or search_string in value.lower():
-            return True
-        else:
-            return False
+        return search_string in macro.lower() or search_string in value.lower()
 
 
 class StringRow(Gtk.ListBoxRow):

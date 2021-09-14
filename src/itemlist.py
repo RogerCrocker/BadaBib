@@ -354,11 +354,11 @@ class Itemlist(Gtk.ListBox):
         if next_row:
             next_row.select()
             return False
-        else:
-            self.unselect_all()
-            window = self.get_toplevel()
-            window.main_widget.source_view.set_status(SourceViewStatus.empty)
-            return True
+
+        self.unselect_all()
+        window = self.get_toplevel()
+        window.main_widget.source_view.set_status(SourceViewStatus.empty)
+        return True
 
     def reselect_current_row(self):
         row = self.get_selected_row()
@@ -397,8 +397,8 @@ class Itemlist(Gtk.ListBox):
 
         if self.sort_reverse:
             return -comp
-        else:
-            return comp
+
+        return comp
 
     def filter_by_search(self, row):
         search = self.search_string.lower()

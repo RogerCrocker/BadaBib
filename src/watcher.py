@@ -36,7 +36,7 @@ from .dialogs import WarningDialog
 WATCHER_SLEEP_TIME = get_watcher_sleep_time()
 
 
-class Watcher(object):
+class Watcher:
     def __init__(self, window, filename):
         self.active = True
         self.window = window
@@ -47,7 +47,7 @@ class Watcher(object):
         self.active = False
 
     def watch_file(self):
-        head, tail = split(self.filename)
+        head, _ = split(self.filename)
         watcher = DefaultWatcher(head)
 
         while self.active:
@@ -81,4 +81,3 @@ class Watcher(object):
         text = "It seems like the file '" + self.filename + "' was deleted, renamed, or moved.\n\nYou are now editing an unsaved copy of the file."
         WarningDialog(text, title, self.window)
         GLib.idle_add(self.window.main_widget.declare_file_created, self.filename)
-    

@@ -68,10 +68,9 @@ class Editor(Gtk.ScrolledWindow):
                 if field == "separator":
                     self.grid.attach(form, left, top, 2 * max_width, 1)
                     break
-                else:
-                    self.add_field_with_form(field, form, left, top, 2 * width)
-                    left += 2 * width
-                    self.forms[field] = form
+                self.add_field_with_form(field, form, left, top, 2 * width)
+                left += 2 * width
+                self.forms[field] = form
             top += 1
             left = 0
         return True

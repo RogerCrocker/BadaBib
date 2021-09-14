@@ -86,7 +86,7 @@ def get_shortest_unique_names(files):
     return names
 
 
-class BadaBibStore(object):
+class BadaBibStore:
     def __init__(self):
         self.bibfiles = {}
         self.string_files = {}
@@ -199,8 +199,8 @@ class BadaBibStore(object):
             files = [file]
         else:
             files = self.bibfiles.values()
-        for file in files:
-            file.database.strings = {**self.global_strings, **file.local_strings}
+        for f in files:
+            f.database.strings = {**self.global_strings, **f.local_strings}
 
     def update_file_strings(self, filename, strings):
         file = self.bibfiles[filename]

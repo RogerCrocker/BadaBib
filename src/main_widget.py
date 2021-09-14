@@ -327,7 +327,7 @@ class MainWidget(Gtk.Paned):
 
     def remove_watcher(self, filename):
         if filename in self.watchers:
-            watcher = self.watchers[filename].stop()
+            self.watchers[filename].stop()
             self.watchers.pop(filename)
 
     def on_source_view_modified(self, _buffer):
@@ -364,9 +364,7 @@ class MainWidget(Gtk.Paned):
         GLib.idle_add(self.open_file, filename, state_string, restore)
 
     def open_file(self, filename, state_string=None, restore=False):
-        head, tail = split(filename)
         bibfile, active, backup = self.store.add_file(filename)
-
         if bibfile:
             # file exists
             if active:
@@ -435,7 +433,7 @@ class MainWidget(Gtk.Paned):
         self.itemlists[filename].set_unsaved(True)
         self.remove_watcher(filename)
 
-    def close_file(self, filename, force=False, quit=False):
+    def close_file(self, filename, force=False, exit=False):
         itemlist = self.itemlists[filename]
         close = True
 
@@ -453,7 +451,7 @@ class MainWidget(Gtk.Paned):
         if force or close:
             bibfile = self.store.bibfiles[filename]
             if not bibfile.created:
-                if quit:
+                if exit:
                     add_to_open(bibfile)
                 else:
                     add_to_recent(bibfile)
@@ -464,10 +462,10 @@ class MainWidget(Gtk.Paned):
 
         return close
 
-    def close_all_files(self, quit=False):
+    def close_all_files(self, exit=False):
         files = list(self.store.bibfiles.keys())
         for file in files:
-            close = self.close_file(file, quit=quit)
+            close = self.close_file(file, exit=exit)
             if not close:
                 return False
         return True
@@ -549,3 +547,4 @@ class MainWidget(Gtk.Paned):
         itemlist.set_unsaved(False)
         itemlist.change_buffer.update_saved_state()
 
+        return new_filename

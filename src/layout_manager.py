@@ -71,14 +71,13 @@ def string_to_layout(string, window):
             if word:
                 if word[0] == "#":
                     break
-                elif word[0] == "-":
+                if word[0] == "-":
                     fields.append("separator")
                     break
+                if word in field_dict:
+                    fields.append(word)
                 else:
-                    if word in field_dict:
-                        fields.append(word)
-                    else:
-                        unknown.append(word)
+                    unknown.append(word)
         if fields:
             layout.append(fields)
 
@@ -335,7 +334,3 @@ class LayoutManagerWindow(Gtk.Window):
         entrytype = self.get_entrytype()
         self.set_text(get_editor_layout(entrytype))
         self.apply_button.set_sensitive(False)
-
-    def check_layout_string(self):
-        text = self.get_text()
-        layout = Editor.get_layout_from_string(text)

@@ -52,15 +52,14 @@ def prettify_unicode_names(value):
     if names:
         pretty_names = [remove_trailing_comma(name) for name in names]
         return " and ".join(pretty_names)
-    else:
-        return ""
+
+    return ""
 
 
 def prettify_unicode_field(field, value):
     if field == "author":
         return prettify_unicode_names(value)
-    else:
-        return prettify_unicode_string(value)
+    return prettify_unicode_string(value)
 
 
 def convert_to_unicode(string, bibstrings=None, n=0):

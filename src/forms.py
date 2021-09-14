@@ -110,7 +110,7 @@ class MultiLine(Gtk.TextView):
         self.editor.track_changes = True
 
     def clear(self):
-        self.set_text("");
+        self.set_text("")
 
     def update_text(self, _=None):
         pass

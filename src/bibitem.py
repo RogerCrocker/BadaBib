@@ -118,7 +118,7 @@ def entries_equal(entry1, entry2):
     return True
 
 
-class BadaBibItem(object):
+class BadaBibItem:
     def __init__(self, bibfile, idx, state=None):
         self.bibfile = bibfile
         self.idx = idx
@@ -183,9 +183,7 @@ class BadaBibItem(object):
         for name in names:
             try:
                 name_parts = splitname(name)["last"]
-                name_str = ""
-                for part in name_parts:
-                    name_str += part
+                name_str = " ".join(name_parts)
                 last_name_list.append(name_str)
             except InvalidName:
                 pass
@@ -250,7 +248,7 @@ class BadaBibItem(object):
         else:
             # if "journal" is not defiend, try "booktitle"
             if field == "journal" and "journal" not in self.entry:
-               _field_ = "booktitle"
+                _field_ = "booktitle"
             # if "year" is not defined, try "date"
             elif field == "year" and "year" not in self.entry:
                 _field_ = "date"
@@ -272,4 +270,3 @@ class BadaBibItem(object):
     def update_all_sort_values(self):
         for field in sort_fields:
             self.update_sort_value(field)
-

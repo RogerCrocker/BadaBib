@@ -24,8 +24,8 @@ UNDO_DELAY = get_undo_delay()
 DEFAULT_EDITOR = get_default_entrytype()
 
 
-class Change(object):
-    class Generic(object):
+class Change:
+    class Generic:
         @property
         def main_widget(self):
             window = self.item.row.get_toplevel()

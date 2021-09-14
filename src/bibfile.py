@@ -56,7 +56,6 @@ class BadaBibFile:
         for idx in range(len(self.database.entries)):
             self.items.append(BadaBibItem(self, idx))
 
-
     def append_item(self, bibtex=None):
         idx = len(self.database.entries)
         if bibtex:
@@ -99,7 +98,7 @@ class BadaBibFile:
                 ascii_name = normalize("NFKD", utf_name).encode("ascii", "ignore").decode("utf-8")
                 key += ascii_name[:1].upper() + ascii_name[1:]
         else:
-        	# use entrytpye as key otherwise
+            # use entrytpye as key otherwise
             key = item.entry["ENTRYTYPE"]
 
         # add year
@@ -180,4 +179,3 @@ class BadaBibFile:
             return strings + "\n\n" + self.entries_to_text()
         else:
             return self.entries_to_text()
-

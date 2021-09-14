@@ -164,5 +164,6 @@ class PreferencesWindow(Gtk.Window):
         box.pack_end(vbox2, False, False, 10)
         return box
 
-    def on_backup_changed(self, _switch, state):
+    @staticmethod
+    def on_backup_changed(_switch, state):
         set_create_backup(state)

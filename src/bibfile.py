@@ -145,8 +145,7 @@ class BadaBibFile:
         # we expect a database with a single entry
         if test_database and len(test_database.entries) == 1:
             return test_database.entries.pop(-1)
-        else:
-            return None
+        return None
 
     def strings_to_text(self):
         # only write local strings to the file
@@ -177,5 +176,4 @@ class BadaBibFile:
         strings = self.strings_to_text()
         if strings:
             return strings + "\n\n" + self.entries_to_text()
-        else:
-            return self.entries_to_text()
+        return self.entries_to_text()

@@ -106,7 +106,8 @@ def entries_equal(entry1, entry2):
 
         if is_expr1 != is_expr2:
             return False
-        elif is_expr1:
+
+        if is_expr1:
             value1 = expression_to_string(entry1[field])
             value2 = expression_to_string(entry2[field])
             if value1 != value2:
@@ -142,10 +143,8 @@ class BadaBibItem:
         if field in self.entry:
             if isinstance(self.entry[field], BibDataStringExpression):
                 return expression_to_string(self.entry[field])
-            else:
-                return self.entry[field]
-        else:
-            return None
+            return self.entry[field]
+        return None
 
     def pretty_field(self, field):
         if field in self.entry:
@@ -153,17 +152,15 @@ class BadaBibItem:
             value = latex_to_unicode(value)
             value = prettify_unicode_field(field, value)
             return value
-        else:
-            return None
+        return None
 
     def bibstring_status(self, field):
         defined = contains_bibstring(self.raw_field(field), self.bibfile.database.strings)
         if defined:
             return StringStatus.defined
-        elif field in self.entry and isinstance(self.entry[field], BibDataStringExpression):
+        if field in self.entry and isinstance(self.entry[field], BibDataStringExpression):
             return StringStatus.undefined
-        else:
-            return StringStatus.none
+        return StringStatus.none
 
     def last_name_list(self):
         if "author" not in self.entry:

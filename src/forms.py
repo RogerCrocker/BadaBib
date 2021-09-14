@@ -89,7 +89,7 @@ class MultiLine(Gtk.TextView):
 
     def deselect(self):
         buffer = self.get_buffer()
-        start, end = buffer.get_bounds()
+        _, end = buffer.get_bounds()
         buffer.select_range(end, end)
 
     def select(self):
@@ -103,7 +103,7 @@ class MultiLine(Gtk.TextView):
 
         self.editor.track_changes = False
         raw_value = item.raw_field(self.field)
-        if raw_value == None:
+        if raw_value is None:
             self.set_text("")
         elif self.get_text() != raw_value:
             self.set_text(raw_value)
@@ -251,7 +251,7 @@ class EntrytypeBox(Box):
         if text in entrytype_dict:
             entry.set_text(entrytype_dict[text])
             self.set_active(list(entrytype_dict).index(text))
-        elif text != None:
+        elif text is not None:
             entry.set_text(text)
 
     def update(self, item):

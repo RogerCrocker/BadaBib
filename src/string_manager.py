@@ -89,7 +89,8 @@ class StringList(Gtk.ListBox):
             self.applicable = applicable
         self.toolbar.set_applicable(self.applicable)
 
-    def add_top_space(self, row, before):
+    @staticmethod
+    def add_top_space(row, before):
         if before:
             row.set_margin_top(0)
         else:
@@ -434,7 +435,8 @@ class StringManagerWindow(Gtk.Window):
         self.store.update_file_strings(filename, string_dict)
         GLib.idle_add(self.refresh_display, file)
 
-    def refresh_display(self, file):
+    @staticmethod
+    def refresh_display(file):
         file.itemlist.refresh()
         file.itemlist.reselect_current_row()
 

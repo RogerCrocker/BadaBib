@@ -18,6 +18,7 @@ from bibtexparser.latexenc import latex_to_unicode
 from bibtexparser.latexenc import string_to_latex
 
 from bibtexparser.customization import getnames
+from bibtexparser.customization import InvalidName
 
 
 def remove_trailing_comma(name):

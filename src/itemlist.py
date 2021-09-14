@@ -82,7 +82,8 @@ class ItemlistNotebook(Gtk.Notebook):
             if isinstance(page, Gtk.Image):
                 self.remove_page(n)
 
-    def update_pagenumbers(self, notebook, _itemlist, _page):
+    @staticmethod
+    def update_pagenumbers(notebook, _itemlist, _page):
         n_pages = notebook.get_n_pages()
         for page in range(n_pages):
             try:
@@ -266,11 +267,11 @@ class Row(Gtk.ListBoxRow):
             self.link_image.clear()
 
     def select(self):
-        if not self.is_selected() and self.item.bibfile.itemlist != None:
+        if not self.is_selected() and self.item.bibfile.itemlist is not None:
             self.item.bibfile.itemlist.select_row(self)
 
     def unselect(self):
-        if self.is_selected() and self.item.bibfile.itemlist != None:
+        if self.is_selected() and self.item.bibfile.itemlist is not None:
             self.item.bibfile.itemlist.unselect_row(self)
 
     def get_next(self, increment):
@@ -311,7 +312,8 @@ class Itemlist(Gtk.ListBox):
 
         self.add_rows(bibfile.items)
 
-    def add_separator(self, row, before):
+    @staticmethod
+    def add_separator(row, before):
         if before:
             row.set_header(Gtk.Separator())
         else:

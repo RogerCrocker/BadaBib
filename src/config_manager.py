@@ -115,12 +115,14 @@ class SourceViewStatus(Enum):
 def get_align_fields():
     return setting.get_boolean("align-fields")
 
+
 def set_align_fields(state):
     setting.set_boolean("align-fields", state)
 
 
 def get_field_indent():
     return setting.get_int("field-indent")
+
 
 def set_field_indent(n):
     setting.set_int("field-indent", n)
@@ -129,12 +131,14 @@ def set_field_indent(n):
 def get_homogenize_fields():
     return setting.get_boolean("homogenize-fields")
 
+
 def get_homogenize_latex():
     return setting.get_boolean("homogenize-latex-encoding")
 
 
 def get_parse_on_fly():
     return setting.get_boolean("parse-on-fly")
+
 
 def set_parse_on_fly(state):
     setting.set_boolean("parse-on-fly", state)
@@ -143,12 +147,14 @@ def set_parse_on_fly(state):
 def get_create_backup():
     return setting.get_boolean("create-backup")
 
+
 def set_create_backup(state):
     setting.set_boolean("create-backup", state)
 
 
 def get_window_geom():
     return setting.get_value("window-geom")
+
 
 def set_window_geom(lis):
     g_variant = GLib.Variant("ai", lis)
@@ -158,12 +164,14 @@ def set_window_geom(lis):
 def get_undo_delay():
     return setting.get_double("undo-delay")
 
+
 def set_undo_delay(d):
     setting.set_double("undo-delay", d)
 
 
 def get_row_indent():
     return setting.get_int("row-indent")
+
 
 def set_row_indent(indent):
     setting.set_int("row-indent", indent)
@@ -172,12 +180,14 @@ def set_row_indent(indent):
 def get_watcher_sleep_time():
     return setting.get_int("watcher-sleep-time")
 
+
 def set_watcher_sleep_time(T):
     setting.set_int("watcher-sleep-time", T)
 
 
 def get_default_entrytype():
     return setting.get_string("default-entrytype")
+
 
 def set_default_entrytype(entrytype):
     setting.set_string("default-entrytype", entrytype)
@@ -186,6 +196,7 @@ def set_default_entrytype(entrytype):
 def get_new_file_name():
     return setting.get_string("new-file-name")
 
+
 def set_new_file_name(name):
     setting.set_string("new-file-name", name)
 
@@ -193,7 +204,8 @@ def set_new_file_name(name):
 def get_open_files():
     files = setting.get_value("open-files")
     states = setting.get_value("open-file-states")
-    return {file: state for file, state in zip(files, states)}
+    return dict(zip(files, states))
+
 
 def set_open_files(open_files):
     g_variant_files = GLib.Variant("as", list(open_files.keys()))
@@ -201,10 +213,12 @@ def set_open_files(open_files):
     setting.set_value("open-files", g_variant_files)
     setting.set_value("open-file-states", g_variant_states)
 
+
 def add_to_open(badabib_file):
     open_files = get_open_files()
     open_files[badabib_file.name] = badabib_file.itemlist.state_to_string()
     set_open_files(open_files)
+
 
 def reset_open_files():
     set_open_files({})
@@ -213,6 +227,7 @@ def reset_open_files():
 def get_num_recent():
     return setting.get_int("num-recent")
 
+
 def set_num_recent(n):
     setting.set_int("num-recent", n)
 
@@ -220,13 +235,15 @@ def set_num_recent(n):
 def get_recent_files():
     files = setting.get_value("recent-files")
     states = setting.get_value("recent-file-states")
-    return {file: state for file, state in zip(files, states)}
+    return dict(zip(files, states))
+
 
 def set_recent_files(recent_files):
     g_variant_files = GLib.Variant("as", list(recent_files.keys()))
     g_variant_states = GLib.Variant("as", list(recent_files.values()))
     setting.set_value("recent-files", g_variant_files)
     setting.set_value("recent-file-states", g_variant_states)
+
 
 def add_to_recent(badabib_file):
     recent_files = get_recent_files()
@@ -239,6 +256,7 @@ def add_to_recent(badabib_file):
         recent_files.pop(first_file)
 
     set_recent_files(recent_files)
+
 
 def remove_from_recent(filename):
     recent_files = get_recent_files()
@@ -258,6 +276,7 @@ def get_editor_layout(entrytype):
             return layouts[idx]
 
     return default_layout_strings[entrytype]
+
 
 def set_editor_layout(entrytype, layout):
     layouts = list(setting.get_value("editor-layouts"))

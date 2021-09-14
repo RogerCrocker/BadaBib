@@ -138,7 +138,7 @@ class ChangeBuffer:
         n = len(self.buffer) - 1 - self.index
         if self.saved_index > self.index:
             self.saved_index = -1
-        for i in range(n):
+        for _ in range(n):
             self.buffer.pop()
 
     def add_change(self, change):

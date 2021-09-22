@@ -21,6 +21,6 @@ Main Window
 String Manager
 ![String Manager](/data/screenshots/string_manager.png)
 
-Icon by svgrepo.com
+Icon by [svgrepo.com](https://www.svgrepo.com/)
 
 

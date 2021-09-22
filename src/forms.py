@@ -113,13 +113,13 @@ class MultiLine(Gtk.TextView):
         self.set_text("")
 
     def update_text(self, _=None):
-        pass
+        pass  # implemented by child class
 
     def update_icon(self, _=None):
-        pass
+        pass  # not implemented
 
     def set_icon(self, _=None):
-        pass
+        pass  # not implemented
 
 
 class SingleLine(Gtk.Entry):

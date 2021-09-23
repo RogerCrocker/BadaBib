@@ -127,6 +127,10 @@ class BadaBibStore:
                         backup = backup_file(name + ".bak")
                     backup = backup and backup_file(name)
 
+                # remove backup tags, if present
+                while BACKUP_TAG in database.comments:
+                    database.comments.remove(BACKUP_TAG)
+
                 # initialize and return bibfile
                 bibfile = BadaBibFile(self, name, database)
                 self.bibfiles[name] = bibfile

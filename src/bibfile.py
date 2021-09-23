@@ -147,6 +147,11 @@ class BadaBibFile:
             return test_database.entries.pop(-1)
         return None
 
+    def comments_to_text(self):
+        text = self.writer._comments_to_bibtex(self.database)
+        text = text.replace("\n\n", "\n")
+        return text
+
     def strings_to_text(self):
         # only write local strings to the file
         all_strings = self.database.strings
@@ -173,7 +178,11 @@ class BadaBibFile:
         return text
 
     def to_text(self):
+        comments = self.comments_to_text()
         strings = self.strings_to_text()
+        text = ""
+        if comments:
+            text += comments + "\n\n"
         if strings:
-            return strings + "\n\n" + self.entries_to_text()
-        return self.entries_to_text()
+            text += strings + "\n\n"
+        return text + self.entries_to_text()

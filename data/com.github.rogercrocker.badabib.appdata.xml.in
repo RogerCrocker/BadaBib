@@ -8,7 +8,7 @@
     <summary>View and edit BibTeX entries</summary>
 
     <description>
-        <p>A basic BibTex viewer and editor written in Python and GTK, using python-bibtexparser under the hood.</p>
+        <p>A basic BibTeX viewer and editor written in Python and GTK, using python-bibtexparser under the hood.</p>
         <p>Features include:</p>
         <ul>
             <li>View, edit, sort, filter, and search BibTeX databases</li>
@@ -44,7 +44,7 @@
     </provides>
 
     <releases>
-        <release version="0.1.0" date="2021-9-11">
+        <release version="0.1.0" date="2021-9-24">
             <description>
                 <p translatable="no">Initial release</p>
             </description>

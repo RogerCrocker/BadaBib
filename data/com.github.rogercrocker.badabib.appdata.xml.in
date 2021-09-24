@@ -34,11 +34,6 @@
     <url type="homepage">https://github.com/RogerCrocker/BadaBib/</url>
     <url type="bugtracker">https://github.com/RogerCrocker/BadaBib/issues</url>
 
-    <kudos>
-      <kudo>python-bibtexparser <url>https://github.com/sciunto-org/python-bibtexparser</url></kudo>
-      <kudo>watchgod <url>https://github.com/samuelcolvin/watchgod</url></kudo>
-    </kudos>
-
     <provides>
         <mediatype>application/x-bibtex</mediatype>
     </provides>

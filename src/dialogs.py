@@ -128,30 +128,24 @@ class DuplicateKeys(Gtk.MessageDialog):
         )
 
 
-class FileChooser(Gtk.FileChooserDialog):
-    def __init__(self):
-        Gtk.FileChooserDialog.__init__(
+class FileChooser(Gtk.FileChooserNative):
+    def __init__(self, window):
+        Gtk.FileChooserNative.__init__(
             self,
             title="Bada Bib! - Please choose a file",
+            transient_for=window,
             action=Gtk.FileChooserAction.OPEN,
-        )
-        self.add_buttons(
-            Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
-            Gtk.STOCK_OPEN, Gtk.ResponseType.OK,
         )
         add_filters(self)
 
 
-class SaveDialog(Gtk.FileChooserDialog):
-    def __init__(self):
-        Gtk.FileChooserDialog.__init__(
+class SaveDialog(Gtk.FileChooserNative):
+    def __init__(self, window):
+        Gtk.FileChooserNative.__init__(
             self,
             title="Bada Bib! - Please choose a file name",
+            transient_for=window,
             action=Gtk.FileChooserAction.SAVE,
-        )
-        self.add_buttons(
-            Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
-            Gtk.STOCK_SAVE, Gtk.ResponseType.OK,
         )
         self.set_do_overwrite_confirmation(True)
         add_filters(self)

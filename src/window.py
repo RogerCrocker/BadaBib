@@ -25,11 +25,8 @@ from .config_manager import reset_open_files
 from .config_manager import get_recent_files
 
 from .dialogs import FileChooser
-from .dialogs import SaveDialog
-from .dialogs import WarningDialog
 from .dialogs import MenuPopover
 from .dialogs import RecentModel
-from .dialogs import DuplicateKeys
 
 from .store import BadaBibStore
 
@@ -145,9 +142,9 @@ class BadaBibWindow(Gtk.ApplicationWindow):
         return True
 
     def on_open_clicked(self, _button=None):
-        dialog = FileChooser()
+        dialog = FileChooser(self)
         response = dialog.run()
-        if response == Gtk.ResponseType.OK:
+        if response == Gtk.ResponseType.ACCEPT:
             filename = dialog.get_filename()
             self.main_widget.open_file_show_loading(filename)
         dialog.destroy()

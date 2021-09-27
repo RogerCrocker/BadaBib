@@ -441,9 +441,9 @@ class StringManagerWindow(Gtk.Window):
         file.itemlist.reselect_current_row()
 
     def import_strings(self, _button):
-        dialog = FileChooser()
+        dialog = FileChooser(self)
         response = dialog.run()
-        if response == Gtk.ResponseType.OK:
+        if response == Gtk.ResponseType.ACCEPT:
             filename = dialog.get_filename()
             dialog.destroy()
 

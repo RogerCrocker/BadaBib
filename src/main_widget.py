@@ -514,10 +514,10 @@ class MainWidget(Gtk.Paned):
                 return None
 
         if not new_filename:
-            dialog = SaveDialog()
+            dialog = SaveDialog(self.window)
             dialog.set_current_name(split(bibfile.name)[1])
             response = dialog.run()
-            if response == Gtk.ResponseType.OK:
+            if response == Gtk.ResponseType.ACCEPT:
                 new_filename = dialog.get_filename()
                 dialog.destroy()
                 new_filename = new_filename.strip()

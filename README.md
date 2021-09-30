@@ -1,6 +1,8 @@
 # Bada Bib!
 Bada Bib! is a simple BibTeX Viewer and Editor written in Python and GTK. It is build around the [python-bibtexparser](https://github.com/sciunto-org/python-bibtexparser) library, which it uses for parsing and writing BibTeX entries.
 
+<a href='https://www.flathub.org/apps/details/com.github.rogercrocker.badabib'><img width='240' alt='Download on Flathub' src='https://flathub.org/assets/badges/flathub-badge-en.png'/></a>
+
 ## Features
 * View, edit, sort, filter, and search BibTeX databases.
 * View and edit BibTeX strings or import strings from external files.

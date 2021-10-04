@@ -47,14 +47,16 @@ def expand(value):
     return expanded
 
 
-def contains_bibstring(string, bibstrings):
-    if not string:
-        return False
+def get_n_strings_raw(raw_value, bibstrings):
+    if not raw_value:
+        return 0
+    return sum(word.lower() in bibstrings for word in raw_value.split(" "))
 
-    for word in string.split(" "):
-        if word.lower() in bibstrings:
-            return True
-    return False
+
+def get_n_strings(value):
+    if not isinstance(value, BibDataStringExpression):
+        return 0
+    return sum(isinstance(word, BibDataString) for word in value.expr)
 
 
 def string_to_expression(string, database):
@@ -155,10 +157,14 @@ class BadaBibItem:
         return None
 
     def bibstring_status(self, field):
-        defined = contains_bibstring(self.raw_field(field), self.bibfile.database.strings)
-        if defined:
-            return StringStatus.defined
-        if field in self.entry and isinstance(self.entry[field], BibDataStringExpression):
+        if field not in self.entry:
+            return StringStatus.none
+
+        n_strings = get_n_strings(self.entry[field])
+        n_strings_raw = get_n_strings_raw(self.raw_field(field), self.bibfile.database.strings)
+        if n_strings > 0:
+            if n_strings == n_strings_raw:
+                return StringStatus.defined
             return StringStatus.undefined
         return StringStatus.none
 
@@ -205,7 +211,7 @@ class BadaBibItem:
             else:
                 database = self.bibfile.database
 
-            if isinstance(value, str) and contains_bibstring(value, database.strings):
+            if isinstance(value, str) and get_n_strings_raw(value, database.strings):
                 self.entry[field] = string_to_expression(value, database)
             else:
                 self.entry[field] = value

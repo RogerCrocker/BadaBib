@@ -421,7 +421,7 @@ class MainWidget(Gtk.Paned):
         state_string = itemlist.state_to_string()
 
         self.close_file(filename, True)
-        self.open_file(filename, state_string)
+        self.open_file_show_loading(filename, state_string)
 
         new_page = self.notebook.get_current_page()
         if new_page != old_page:

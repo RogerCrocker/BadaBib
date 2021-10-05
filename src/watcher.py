@@ -82,4 +82,3 @@ class Watcher:
         WarningDialog(text, title, self.window)
         sleep(0.2)  # give dialog time to close
         GLib.idle_add(self.window.main_widget.declare_file_created, self.filename)
-

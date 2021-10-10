@@ -39,14 +39,23 @@
     </provides>
 
     <releases>
+        <release version="0.1.2" date="2021-10-10">
+            <description>
+                <p>Bugfix release:</p>
+                <ul>
+                  <li>Warn about fields containing defined and undefined strings</li>
+                  <li>Work around possible race condition in file watcher</li>
+              </ul>
+            </description>
+        </release>
         <release version="0.1.1" date="2021-9-27">
             <description>
-                <p translatable="no">Use native file chooser</p>
+                <p>Use native file chooser</p>
             </description>
         </release>
         <release version="0.1.0" date="2021-9-24">
             <description>
-                <p translatable="no">Initial release</p>
+                <p>Initial release</p>
             </description>
         </release>
     </releases>

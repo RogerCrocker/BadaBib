@@ -205,14 +205,14 @@ class FilterPopover(Gtk.Popover):
     def on_switch_clicked(self, switch, state, entrytype):
         if self.track_changes:
             if switch == self.switches[-1]:
-                for switch in self.switches:
-                    switch.set_state(state)
+                for s in self.switches:
+                    s.set_state(state)
             else:
                 self.itemlist.fltr[entrytype] = state
                 self.track_changes = False
                 if not state and self.switches[-1].get_state():
                     self.switches[-1].set_state(False)
-                elif all([self.itemlist.fltr[entrytype] for entrytype in entrytype_dict]):
+                elif all(self.itemlist.fltr.values()):
                     self.switches[-1].set_state(True)
                 self.track_changes = True
 

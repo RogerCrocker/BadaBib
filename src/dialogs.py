@@ -154,7 +154,9 @@ class SaveDialog(Gtk.FileChooserNative):
 class FilterPopover(Gtk.Popover):
     def __init__(self, button, itemlist):
         Gtk.Popover.__init__(self)
+        self.set_border_width(5)
         self.switches = []
+        self.track_changes = True
         self.itemlist = itemlist
         self.assemble()
         self.set_relative_to(button)
@@ -164,37 +166,57 @@ class FilterPopover(Gtk.Popover):
     def assemble(self):
         switch_grid = Gtk.Grid()
         switch_grid.set_row_spacing(3)
-        switch_grid.set_column_spacing(3)
+        switch_grid.set_column_spacing(5)
 
-        for n, entrytype in enumerate(entrytype_dict):
+        all_active = True
+        all_count = 0
+
+        for n, entrytype in enumerate(entrytype_dict, start=1):
+            active = self.itemlist.fltr[entrytype]
+            if not active:
+                all_active = False
             switch = Gtk.Switch()
-            switch.set_active(self.itemlist.fltr[entrytype])
+            switch.set_active(active)
             switch.connect("state-set", self.on_switch_clicked, entrytype)
             self.switches.append(switch)
 
-            label = Gtk.Label(label=entrytype_dict[entrytype])
+            count = self.itemlist.bibfile.count(entrytype)
+            all_count += count
+            label_text = entrytype_dict[entrytype] + " (" + str(count) + ")"
+            label = Gtk.Label(label=label_text)
 
             switch_grid.attach(label, 0, n, 1, 1)
             switch_grid.attach(switch, 1, n, 1, 1)
 
-        invert = Gtk.Button.new_with_label("Invert")
-        invert.connect("clicked", self.on_invert_clicked)
-        invert_box = Gtk.Box()
-        invert_box.set_center_widget(invert)
+        # All switch
+        switch = Gtk.Switch()
+        switch.set_active(all_active)
+        switch.connect("state-set", self.on_switch_clicked, None)
+        self.switches.append(switch)
 
-        vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
-        vbox.pack_start(switch_grid, False, False, 0)
-        vbox.pack_start(invert_box, False, False, 5)
+        label_text = "All (" + str(all_count) + ")"
+        label = Gtk.Label(label=label_text)
 
-        self.add(vbox)
+        switch_grid.attach(label, 0, 0, 1, 1)
+        switch_grid.attach(switch, 1, 0, 1, 1)
 
-    def on_switch_clicked(self, _switch, state, entrytype):
-        self.itemlist.fltr[entrytype] = state
-        GLib.idle_add(self.itemlist.invalidate_filter)
+        self.add(switch_grid)
 
-    def on_invert_clicked(self, _button):
-        for switch in self.switches:
-            switch.set_state(not switch.get_state())
+    def on_switch_clicked(self, switch, state, entrytype):
+        if self.track_changes:
+            if switch == self.switches[-1]:
+                for switch in self.switches:
+                    switch.set_state(state)
+            else:
+                self.itemlist.fltr[entrytype] = state
+                self.track_changes = False
+                if not state and self.switches[-1].get_state():
+                    self.switches[-1].set_state(False)
+                elif all([self.itemlist.fltr[entrytype] for entrytype in entrytype_dict]):
+                    self.switches[-1].set_state(True)
+                self.track_changes = True
+
+            GLib.idle_add(self.itemlist.invalidate_filter)
 
 
 class SortPopover(Gtk.Popover):

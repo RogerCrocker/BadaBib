@@ -66,6 +66,9 @@ class BadaBibFile:
         self.items.append(item)
         return item
 
+    def count(self, entrytype):
+        return sum(item.entry["ENTRYTYPE"] == entrytype for item in self.items)
+
     def update_filename(self, name):
         self.name = name
         self.head, self.tail = split(name)

@@ -173,20 +173,23 @@ class FilterPopover(Gtk.Popover):
 
         for n, entrytype in enumerate(entrytype_dict, start=1):
             active = self.itemlist.fltr[entrytype]
-            if not active:
+            if not active and all_active:
                 all_active = False
-            switch = Gtk.Switch()
-            switch.set_active(active)
-            switch.connect("state-set", self.on_switch_clicked, entrytype)
-            self.switches.append(switch)
-
             count = self.itemlist.bibfile.count(entrytype)
-            all_count += count
-            label_text = entrytype_dict[entrytype] + " (" + str(count) + ")"
-            label = Gtk.Label(label=label_text)
 
-            switch_grid.attach(label, 0, n, 1, 1)
-            switch_grid.attach(switch, 1, n, 1, 1)
+            if count > 0:
+                all_count += count
+
+                switch = Gtk.Switch()
+                switch.set_active(active)
+                switch.connect("state-set", self.on_switch_clicked, entrytype)
+                self.switches.append(switch)
+
+                label_text = entrytype_dict[entrytype] + " (" + str(count) + ")"
+                label = Gtk.Label(label=label_text)
+
+                switch_grid.attach(label, 0, n, 1, 1)
+                switch_grid.attach(switch, 1, n, 1, 1)
 
         # All switch
         switch = Gtk.Switch()

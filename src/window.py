@@ -23,6 +23,7 @@ from .config_manager import set_window_geom
 from .config_manager import get_open_files
 from .config_manager import reset_open_files
 from .config_manager import get_recent_files
+from .config_manager import set_recent_files
 
 from .dialogs import FileChooser
 from .dialogs import MenuPopover
@@ -69,6 +70,10 @@ class BadaBibWindow(Gtk.ApplicationWindow):
     def update_recent_file_menu(self):
         recent_files = get_recent_files()
         self.recent_button.set_menu_model(RecentModel(recent_files))
+
+    def clear_recent_file_menu(self):
+        set_recent_files({})
+        self.recent_button.set_menu_model(RecentModel({}))
 
     def assemble_headerbar(self, *args, **kwargs):
         headerbar = Gtk.HeaderBar(*args, **kwargs)

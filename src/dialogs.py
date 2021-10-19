@@ -192,16 +192,21 @@ class FilterPopover(Gtk.Popover):
                 switch_grid.attach(switch, 1, n, 1, 1)
 
         # All switch
-        switch = Gtk.Switch()
-        switch.set_active(all_active)
-        switch.connect("state-set", self.on_switch_clicked, None)
-        self.switches.append(switch)
+        if all_count > 0:
+            switch = Gtk.Switch()
+            switch.set_active(all_active)
+            switch.connect("state-set", self.on_switch_clicked, None)
+            self.switches.append(switch)
 
-        label_text = "All (" + str(all_count) + ")"
-        label = Gtk.Label(label=label_text)
+            label_text = "All (" + str(all_count) + ")"
+            label = Gtk.Label(label=label_text)
 
-        switch_grid.attach(label, 0, 0, 1, 1)
-        switch_grid.attach(switch, 1, 0, 1, 1)
+            switch_grid.attach(label, 0, 0, 1, 1)
+            switch_grid.attach(switch, 1, 0, 1, 1)
+        else:
+            label = Gtk.Label(label="Empty File")
+            label.set_sensitive(False)
+            switch_grid.attach(label, 0, 0, 1, 1)
 
         self.add(switch_grid)
 
@@ -274,8 +279,8 @@ class SortPopover(Gtk.Popover):
 class RecentModel(Gio.Menu):
     def __init__(self, recent_files):
         Gio.Menu.__init__(self)
-        menu_section = Gio.Menu()
 
+        menu_section = Gio.Menu()
         if not recent_files:
             menu_item = Gio.MenuItem()
             menu_item.set_label("No recently opened Files")
@@ -290,7 +295,14 @@ class RecentModel(Gio.Menu):
                 menu_item.set_action_and_target_value("app.open_file", filename)
                 menu_section.prepend_item(menu_item)
 
-        self.append_section(None, menu_section)
+            menu_item = Gio.MenuItem()
+            menu_item.set_label("Clear History")
+            menu_item.set_action_and_target_value("app.clear_recent", None)
+            clear_section = Gio.Menu()
+            clear_section.prepend_item(menu_item)
+            self.append_section(None, clear_section)
+
+        self.prepend_section(None, menu_section)
 
 
 class MenuPopover(Gtk.Popover):

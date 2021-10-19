@@ -91,6 +91,10 @@ class Application(Gtk.Application):
         self.set_accels_for_action("app.close", ["<Control>w"])
         self.add_action(close_action)
 
+        clear_recent_action = Gio.SimpleAction.new("clear_recent", None)
+        clear_recent_action.connect("activate", self.on_clear_recent)
+        self.add_action(clear_recent_action)
+
         # Entries
         new_entry_action = Gio.SimpleAction.new("new_entry", None)
         new_entry_action.connect("activate", self.on_new_entry)
@@ -185,6 +189,9 @@ class Application(Gtk.Application):
         dummy_action = Gio.SimpleAction.new("dummy", None)
         dummy_action.set_enabled(False)
         self.add_action(dummy_action)
+
+    def on_clear_recent(self, action=None, data=None):
+        self.window.clear_recent_file_menu()
 
     def on_open(self, action=None, data=None):
         self.window.on_open_clicked()

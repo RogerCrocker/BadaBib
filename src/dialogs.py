@@ -225,6 +225,7 @@ class FilterPopover(Gtk.Popover):
 class SortPopover(Gtk.Popover):
     def __init__(self, sort_button, itemlist):
         Gtk.Popover.__init__(self)
+        self.set_border_width(5)
         self.itemlist = itemlist
         self.assemble()
         self.set_relative_to(sort_button)

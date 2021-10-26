@@ -21,6 +21,20 @@ from bibtexparser.customization import getnames
 from bibtexparser.customization import InvalidName
 
 
+SEPARATORS = ["-",      # minus
+              "－",     # fullwidth minus
+              "‐",      # hyphen
+              "‑",      # non-breaking hyphen
+              "–",      # En dash
+              "—",      # Em dash
+              "⸺",    # Two-Em dash
+              "⸻",   # Three-Em dash
+              "‒",      # Figure dash
+              "―"]      # horizontal bar
+# compare https://c.r74n.com/unicode/dashes and
+# https://github.com/sciunto-org/python-bibtexparser/blob/master/bibtexparser/customization.py
+
+
 def remove_trailing_comma(name):
     if name and name[-2] == ",":
         return name[:-2]
@@ -148,3 +162,13 @@ def protect(string, bibstrings, n=0):
         return None
     protected = [protect_word(word, bibstrings) for word in string.split(" ")]
     return " ".join(protected)
+
+
+def correct_hyphen(string, bibstrings, n=0):
+    string_out = string
+    for separator in SEPARATORS:
+        if separator in string_out:
+            parts = [part.strip().strip(separator) for part in string_out.split(separator)]
+            parts = list(filter(None, parts))  # remove empty strings
+            string_out = '--'.join(parts)
+    return string_out

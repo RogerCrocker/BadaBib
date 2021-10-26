@@ -25,6 +25,7 @@ from .customization import capitalize
 from .customization import protect
 from .customization import convert_to_unicode
 from .customization import convert_to_latex
+from .customization import correct_hyphen
 
 from .window import BadaBibWindow
 
@@ -131,6 +132,11 @@ class Application(Gtk.Application):
         key_action.connect("activate", self.do_generate_key)
         self.set_accels_for_action("app.key", ["<Alt>k"])
         self.add_action(key_action)
+
+        correct_hyphen_action = Gio.SimpleAction.new("correct_hyphen", None)
+        correct_hyphen_action.connect("activate", self.do_correct_hyphen)
+        self.set_accels_for_action("app.correct_hyphen", ["<Alt>h"])
+        self.add_action(correct_hyphen_action)
 
         # Window
         undo_action = Gio.SimpleAction.new("undo", None)
@@ -260,6 +266,13 @@ class Application(Gtk.Application):
         except AttributeError:
             pass
 
+    def do_correct_hyphen(self, action=None, data=None):
+        form = self.window.get_focus()
+        # try:
+        form.apply(correct_hyphen)
+        # except AttributeError:
+            # print("attribute error")
+
     def do_to_unicode(self, action=None, data=None):
         form = self.window.get_focus()
         try:
@@ -275,6 +288,9 @@ class Application(Gtk.Application):
             pass
 
     def do_generate_key(self, action=None, data=None):
+        self.window.main_widget.generate_key()
+
+    def do_double_hyphen(self, action=None, data=None):
         self.window.main_widget.generate_key()
 
     def on_undo(self, action=None, data=None):

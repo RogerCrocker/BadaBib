@@ -98,7 +98,7 @@ class EmptyKeys(Gtk.MessageDialog):
             transient_for=window,
             message_type=Gtk.MessageType.QUESTION,
             text=text,
-            title="Bada Bib! - Empty Keys",
+            title="Bada Bib! - Empty keys",
         )
         self.props.use_markup = True
         self.add_buttons(
@@ -119,7 +119,7 @@ class DuplicateKeys(Gtk.MessageDialog):
             transient_for=window,
             message_type=Gtk.MessageType.QUESTION,
             text=text,
-            title="Bada Bib! - Duplicate Keys",
+            title="Bada Bib! - Duplicate keys",
         )
         self.props.use_markup = True
         self.add_buttons(
@@ -283,7 +283,7 @@ class RecentModel(Gio.Menu):
         menu_section = Gio.Menu()
         if not recent_files:
             menu_item = Gio.MenuItem()
-            menu_item.set_label("No recently opened Files")
+            menu_item.set_label("No recently opened files")
             menu_item.set_action_and_target_value("app.dummy", None)
             menu_section.prepend_item(menu_item)
         else:
@@ -296,7 +296,7 @@ class RecentModel(Gio.Menu):
                 menu_section.prepend_item(menu_item)
 
             menu_item = Gio.MenuItem()
-            menu_item.set_label("Clear History")
+            menu_item.set_label("Clear history")
             menu_item.set_action_and_target_value("app.clear_recent", None)
             clear_section = Gio.Menu()
             clear_section.prepend_item(menu_item)
@@ -310,17 +310,17 @@ class MenuPopover(Gtk.Popover):
         Gtk.Popover.__init__(self)
 
         save_section = Gio.Menu()
-        save_section.append("Save All", "save_all")
+        save_section.append("Save all", "save_all")
 
         settings_section = Gio.Menu()
-        settings_section.append("Manage Strings", "manage_strings")
-        settings_section.append("Customize Editor", "custom_editor")
+        settings_section.append("Manage strings", "manage_strings")
+        settings_section.append("Customize editor", "custom_editor")
 
         preferences_section = Gio.Menu()
         preferences_section.append("Preferences", "preferences")
 
         about_section = Gio.Menu()
-        about_section.append("Keyboard Shortcuts", "shortcuts")
+        about_section.append("Keyboard shortcuts", "shortcuts")
         about_section.append("About Bada Bib!", "about")
 
         menu = Gio.Menu()

@@ -47,6 +47,7 @@ class BadaBibWindow(Gtk.ApplicationWindow):
 
         self.recent_button = Gtk.MenuButton()
         self.recent_button.set_use_popover(False)
+        self.recent_button.set_tooltip_text("Recently opened files")
 
         self.assemble_headerbar()
         self.update_recent_file_menu()
@@ -81,7 +82,7 @@ class BadaBibWindow(Gtk.ApplicationWindow):
         headerbar.props.title = "Bada Bib! - BibTeX Editor"
 
         open_button = Gtk.Button.new_with_label("Open")
-        open_button.set_tooltip_text("Open File")
+        open_button.set_tooltip_text("Open file")
         open_button.connect("clicked", self.on_open_clicked)
 
         open_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
@@ -91,16 +92,16 @@ class BadaBibWindow(Gtk.ApplicationWindow):
         headerbar.pack_start(open_box)
 
         new_button = Gtk.Button.new_from_icon_name("document-new-symbolic", Gtk.IconSize.BUTTON)
-        new_button.set_tooltip_text("New File")
+        new_button.set_tooltip_text("New file")
         new_button.connect("clicked", self.on_new_clicked)
         headerbar.pack_start(new_button)
 
         undo_button = Gtk.Button.new_from_icon_name("edit-undo-symbolic", Gtk.IconSize.BUTTON)
-        undo_button.set_tooltip_text("Undo Change")
+        undo_button.set_tooltip_text("Undo change")
         undo_button.connect("clicked", self.on_undo_clicked)
 
         redo_button = Gtk.Button.new_from_icon_name("edit-redo-symbolic", Gtk.IconSize.BUTTON)
-        redo_button.set_tooltip_text("Redo Change")
+        redo_button.set_tooltip_text("Redo change")
         redo_button.connect("clicked", self.on_redo_clicked)
 
         undo_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
@@ -117,11 +118,11 @@ class BadaBibWindow(Gtk.ApplicationWindow):
         headerbar.pack_end(menu_button)
 
         save_button = Gtk.Button.new_with_label("Save")
-        save_button.set_tooltip_text("Save current File")
+        save_button.set_tooltip_text("Save current file")
         save_button.connect("clicked", self.on_save_clicked)
 
         save_as_button = Gtk.Button.new_from_icon_name("document-save-as-symbolic", Gtk.IconSize.BUTTON)
-        save_as_button.set_tooltip_text("Save current file As...")
+        save_as_button.set_tooltip_text("Save current file as...")
         save_as_button.connect("clicked", self.on_save_as_clicked)
 
         save_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)

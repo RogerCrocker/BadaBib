@@ -201,7 +201,7 @@ class Row(Gtk.ListBoxRow):
     def update_field(self, field):
         if field in ["ID", "ENTRYTYPE"]:
             self.update_id()
-        elif field == "author":
+        elif field in ["author", "editor"]:
             self.update_author()
         elif field == "title":
             self.update_title()

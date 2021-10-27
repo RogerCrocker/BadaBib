@@ -35,12 +35,6 @@ SEPARATORS = ["-",      # minus
 # https://github.com/sciunto-org/python-bibtexparser/blob/master/bibtexparser/customization.py
 
 
-def remove_trailing_comma(name):
-    if name and name[-2] == ",":
-        return name[:-2]
-    return name
-
-
 def prettify_unicode_string(value):
     return (
         value.replace("\n", " ")
@@ -65,7 +59,7 @@ def prettify_unicode_names(value):
         return value
 
     if names:
-        pretty_names = [remove_trailing_comma(name) for name in names]
+        pretty_names = [name.rstrip(" ,") for name in names]
         return " and ".join(pretty_names)
 
     return ""

@@ -39,6 +39,15 @@
     </provides>
 
     <releases>
+        <release version="0.2.0" date="2021-10-30">
+            <description>
+                <ul>
+                  <li>New filter dialog</li>
+                  <li>Add option to clear list of recent files</li>
+                  <li>Add shortcut to replace hyphen with n-dash</li>
+              </ul>
+            </description>
+        </release>
         <release version="0.1.2" date="2021-10-10">
             <description>
                 <p>Bugfix release:</p>

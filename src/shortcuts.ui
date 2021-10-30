@@ -118,6 +118,13 @@
             <child>
               <object class="GtkShortcutsShortcut">
                 <property name="visible">True</property>
+                <property name="title" translatable="yes" context="Shortcut window description">Replace hyphen with n-dash</property>
+                <property name="accelerator">&lt;Alt&gt;H</property>
+              </object>
+            </child>
+            <child>
+              <object class="GtkShortcutsShortcut">
+                <property name="visible">True</property>
                 <property name="title" translatable="yes" context="Shortcut window description">Generate Key</property>
                 <property name="accelerator">&lt;Alt&gt;K</property>
               </object>

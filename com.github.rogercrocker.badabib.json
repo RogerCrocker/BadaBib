@@ -31,9 +31,9 @@
 	    "sources": [
 		{
 		    "type": "file",
-		    "url": "https://files.pythonhosted.org/packages/c1/47/dfc9c342c9842bbe0036c7f763d2d6686bcf5eb1808ba3e170afdb282210/pyparsing-2.4.7.tar.gz",
-		    "sha256": "c203ec8783bf771a155b207279b9bccb8dea02d8f0c9e5f8ead507bc3246ecc1"
-		},
+            	    "url": "https://files.pythonhosted.org/packages/bf/6f/509e501ff67a335186c8adcdc3ee62195919731b22796b0690658a76bb6f/pyparsing-3.0.4.tar.gz",
+            	    "sha256": "e0df773d7fa2240322daae7805626dfc5f2d5effb34e1a7be2702c99cfb9f6b1"
+        	},
 		{
 		    "type": "file",
 		    "url": "https://files.pythonhosted.org/packages/45/0b/38b06fd9b92dc2b68d58b75f900e97884c45bedd2ff83203d933cf5851c9/future-0.18.2.tar.gz",
@@ -68,8 +68,8 @@
                 {
                     "type" : "git",
                     "url" : "https://github.com/RogerCrocker/BadaBib.git",
-                    "tag": "v0.1.1",
-                    "commit": "343cca8d5589432ba54e8894545cc2432efc6e1f"
+                    "tag": "v0.2.0",
+                    "commit": "180ab2e69b2c754938c5a682e460ae32e6e39133"
                 }
             ]
         }

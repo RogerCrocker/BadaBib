@@ -135,10 +135,13 @@ class FileChooser(Gtk.FileChooserDialog):
             transient_for=window,
             action=Gtk.FileChooserAction.OPEN,
         )
-        self.add_buttons(
-            Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
-            Gtk.STOCK_OPEN, Gtk.ResponseType.ACCEPT,
-        )
+        # cancel button
+        self.add_button(Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL)
+
+        # accept button (suggested action -> blue)
+        accept_button = self.add_button(Gtk.STOCK_OPEN, Gtk.ResponseType.ACCEPT)
+        accept_button.get_style_context().add_class(Gtk.STYLE_CLASS_SUGGESTED_ACTION)
+
         add_filters(self)
 
 
@@ -150,10 +153,13 @@ class SaveDialog(Gtk.FileChooserDialog):
             transient_for=window,
             action=Gtk.FileChooserAction.SAVE,
         )
-        self.add_buttons(
-            Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
-            Gtk.STOCK_SAVE, Gtk.ResponseType.ACCEPT,
-        )
+        # cancel button
+        self.add_button(Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL)
+
+        # accept button (suggested action -> blue)
+        accept_button = self.add_button(Gtk.STOCK_SAVE, Gtk.ResponseType.ACCEPT)
+        accept_button.get_style_context().add_class(Gtk.STYLE_CLASS_SUGGESTED_ACTION)
+
         self.set_do_overwrite_confirmation(True)
         add_filters(self)
 

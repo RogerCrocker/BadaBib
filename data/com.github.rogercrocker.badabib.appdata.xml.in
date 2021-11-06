@@ -39,6 +39,14 @@
     </provides>
 
     <releases>
+        <release version="0.2.1" date="2021-11-6">
+            <description>
+                <p>Bugfix release:</p>
+                  <ul>
+                    <li>Use GTK file chooser in all environments. The native file choosers can cause problems with file names and backups.</li>
+                  </ul>
+            </description>
+        </release>
         <release version="0.2.0" date="2021-10-30">
             <description>
                 <ul>

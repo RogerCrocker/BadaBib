@@ -268,10 +268,10 @@ class Application(Gtk.Application):
 
     def do_correct_hyphen(self, action=None, data=None):
         form = self.window.get_focus()
-        # try:
-        form.apply(correct_hyphen)
-        # except AttributeError:
-            # print("attribute error")
+        try:
+            form.apply(correct_hyphen)
+        except AttributeError:
+            pass
 
     def do_to_unicode(self, action=None, data=None):
         form = self.window.get_focus()

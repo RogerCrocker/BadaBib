@@ -285,8 +285,8 @@ class MainWidget(Gtk.Paned):
             self.source_view.form.set_sensitive(True)
             self.source_view.form.set_text(row.item.bibtex)
 
-    def on_close_tab(self, button):
-        itemlist = button.get_parent().itemlist
+    def on_close_tab(self, _button=None):
+        itemlist = self.get_current_itemlist()
         self.close_file(itemlist.bibfile.name)
         if self.notebook.get_n_pages() == 0:
             self.new_file()

@@ -300,9 +300,7 @@ class Application(Gtk.Application):
         self.window.on_redo_clicked()
 
     def on_quit(self, action=None, data=None):
-        handled = self.window.on_application_shutdown()
-        if not handled:
-            self.quit()
+        self.window.on_application_shutdown()
 
     def do_show_shortcuts(self, action=None, data=None):
         builder = Gtk.Builder.new_from_resource("/com/github/rogercrocker/badabib/shortcuts.ui")

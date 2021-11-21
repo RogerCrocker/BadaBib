@@ -11,6 +11,33 @@
         <child>
           <object class="GtkShortcutsGroup">
             <property name="visible">True</property>
+            <property name="title" translatable="yes" context="Shortcut window description">General</property>
+            <child>
+              <object class="GtkShortcutsShortcut">
+                <property name="visible">True</property>
+                <property name="title" translatable="yes" context="Shortcut window description">Quit</property>
+                <property name="accelerator">&lt;Ctrl&gt;Q</property>
+              </object>
+            </child>
+            <child>
+              <object class="GtkShortcutsShortcut">
+                <property name="visible">True</property>
+                <property name="title" translatable="yes" context="Shortcut window description">Manage Strings</property>
+                <property name="accelerator">&lt;Alt&gt;&lt;Shift&gt;S</property>
+              </object>
+            </child>
+            <child>
+              <object class="GtkShortcutsShortcut">
+                <property name="visible">True</property>
+                <property name="title" translatable="yes" context="Shortcut window description">Configure Editor</property>
+                <property name="accelerator">&lt;Alt&gt;&lt;Shift&gt;E</property>
+              </object>
+            </child>
+          </object>
+        </child>
+        <child>
+          <object class="GtkShortcutsGroup">
+            <property name="visible">True</property>
             <property name="title" translatable="yes" context="Shortcut window description">Files</property>
             <child>
               <object class="GtkShortcutsShortcut">
@@ -24,6 +51,13 @@
                 <property name="visible">True</property>
                 <property name="title" translatable="yes" context="Shortcut window description">Open File</property>
                 <property name="accelerator">&lt;Ctrl&gt;O</property>
+              </object>
+            </child>
+            <child>
+              <object class="GtkShortcutsShortcut">
+                <property name="visible">True</property>
+                <property name="title" translatable="yes" context="Shortcut window description">Close File</property>
+                <property name="accelerator">&lt;Ctrl&gt;W</property>
               </object>
             </child>
             <child>
@@ -127,26 +161,6 @@
                 <property name="visible">True</property>
                 <property name="title" translatable="yes" context="Shortcut window description">Generate Key</property>
                 <property name="accelerator">&lt;Alt&gt;K</property>
-              </object>
-            </child>
-          </object>
-        </child>
-        <child>
-          <object class="GtkShortcutsGroup">
-            <property name="visible">True</property>
-            <property name="title" translatable="yes" context="Shortcut window description">Tools</property>
-            <child>
-              <object class="GtkShortcutsShortcut">
-                <property name="visible">True</property>
-                <property name="title" translatable="yes" context="Shortcut window description">Manage Strings</property>
-                <property name="accelerator">&lt;Alt&gt;&lt;Shift&gt;S</property>
-              </object>
-            </child>
-            <child>
-              <object class="GtkShortcutsShortcut">
-                <property name="visible">True</property>
-                <property name="title" translatable="yes" context="Shortcut window description">Configure Editor</property>
-                <property name="accelerator">&lt;Alt&gt;&lt;Shift&gt;E</property>
               </object>
             </child>
           </object>

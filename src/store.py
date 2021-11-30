@@ -94,7 +94,8 @@ class BadaBibStore:
 
     @staticmethod
     def get_default_parser():
-        parser = BibTexParser(interpolate_strings=False)
+        parser = BibTexParser(interpolate_strings=False,
+                              ignore_nonstandard_types=False)
         if get_homogenize_latex():
             parser.customization = homogenize_latex_encoding
         if get_homogenize_fields():

@@ -37,6 +37,7 @@ entrytype_dict = {
     "manual": "Manual",
     "masterthesis": "Master Thesis",
     "misc": "Misc.",
+    "online": "Online",
     "phdthesis": "Ph.D. Thesis",
     "proceedings": "Proceedings",
     "techreport": "Tech Report",

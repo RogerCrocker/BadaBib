@@ -193,6 +193,21 @@ keywords
 """
 
 
+layout_string_online = """
+# Editor layout for entrytype 'online'
+
+ID ENTRYTYPE
+---
+author
+title
+publisher
+year month
+url
+note
+keywords
+"""
+
+
 layout_string_phdthesis = """
 # Editor layout for entrytype 'phdthesis'
 
@@ -268,6 +283,7 @@ default_layout_strings = {
     "manual": layout_string_manual,
     "masterthesis": layout_string_matherthesis,
     "misc": layout_string_misc,
+    "online": layout_string_online,
     "phdthesis": layout_string_phdthesis,
     "proceedings": layout_string_proceedings,
     "techreport": layout_string_techreport,

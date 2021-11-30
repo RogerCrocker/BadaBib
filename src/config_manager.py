@@ -268,7 +268,7 @@ def remove_from_recent(filename):
 
 def get_editor_layout(entrytype):
     if entrytype not in entrytype_dict:
-        return None
+        return default_layout_strings[get_default_entrytype()]
 
     layouts = setting.get_value("editor-layouts")
     if layouts:

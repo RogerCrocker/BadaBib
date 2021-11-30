@@ -194,10 +194,11 @@ class LayoutManagerWindow(Gtk.Window):
 
         # select layout of current entrytype and grab focus
         item = self.main_window.main_widget.get_current_item()
-        if item is not None:
+        # if item is not None:
+        try:
             idx = list(entrytype_dict.keys()).index(item.entry["ENTRYTYPE"])
-        else:
-            idx = list(entrytype_dict.keys()).index(get_default_entrytype())
+        except (AttributeError, ValueError):
+             idx = list(entrytype_dict.keys()).index(get_default_entrytype())
         self.entrytype_box.set_active(idx)
         self.textview.grab_focus()
 

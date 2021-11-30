@@ -194,7 +194,8 @@ class SingleLine(Gtk.Entry):
             icon_name = "dialog-warning-symbolic"
         else:
             icon_name = None
-        self.set_icon_from_icon_name(Gtk.EntryIconPosition.SECONDARY, icon_name)
+        pos = Gtk.EntryIconPosition.SECONDARY
+        self.set_icon_from_icon_name(pos, icon_name)
 
     def clear(self):
         self.set_text("")
@@ -253,6 +254,19 @@ class EntrytypeBox(Box):
             self.set_active(list(entrytype_dict).index(text))
         elif text is not None:
             entry.set_text(text)
+            self.set_icon(text != "")  # warn about non-empty, non-standard types
+
+    def set_icon(self, status):
+        if status:
+            icon_name = "dialog-warning-symbolic"
+            tooltip = "This entry type is non-standard and might not be fully supported by BadaBib!"
+        else:
+            icon_name = None
+            tooltip = None
+        pos = Gtk.EntryIconPosition.SECONDARY
+        entry = self.get_child()
+        entry.set_icon_from_icon_name(pos, icon_name)
+        entry.set_icon_tooltip_text(pos, tooltip)
 
     def update(self, item):
         window = self.get_toplevel()

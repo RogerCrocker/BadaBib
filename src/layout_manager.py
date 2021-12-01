@@ -198,7 +198,7 @@ class LayoutManagerWindow(Gtk.Window):
         try:
             idx = list(entrytype_dict.keys()).index(item.entry["ENTRYTYPE"])
         except (AttributeError, ValueError):
-             idx = list(entrytype_dict.keys()).index(get_default_entrytype())
+            idx = list(entrytype_dict.keys()).index(get_default_entrytype())
         self.entrytype_box.set_active(idx)
         self.textview.grab_focus()
 

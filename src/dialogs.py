@@ -182,27 +182,43 @@ class FilterPopover(Gtk.Popover):
         switch_grid.set_column_spacing(5)
 
         all_active = True
-        all_count = 0
+        all_count = self.itemlist.bibfile.count_all()
+        n = 1
+        count = []
 
-        for n, entrytype in enumerate(entrytype_dict, start=1):
+        for entrytype in entrytype_dict:
             active = self.itemlist.fltr[entrytype]
             if not active and all_active:
                 all_active = False
-            count = self.itemlist.bibfile.count(entrytype)
+            count.append(self.itemlist.bibfile.count(entrytype))
 
-            if count > 0:
-                all_count += count
-
+            if count[-1] > 0:
                 switch = Gtk.Switch()
                 switch.set_active(active)
                 switch.connect("state-set", self.on_switch_clicked, entrytype)
                 self.switches.append(switch)
 
-                label_text = entrytype_dict[entrytype] + " (" + str(count) + ")"
+                label_text = entrytype_dict[entrytype] + " (" + str(count[-1]) + ")"
                 label = Gtk.Label(label=label_text)
 
                 switch_grid.attach(label, 0, n, 1, 1)
                 switch_grid.attach(switch, 1, n, 1, 1)
+
+                n += 1
+
+        # Other switch
+        delta_count = all_count - sum(count)
+        if delta_count > 0:
+            switch = Gtk.Switch()
+            switch.set_active(self.itemlist.fltr["other"])
+            switch.connect("state-set", self.on_switch_clicked, "other")
+            self.switches.append(switch)
+
+            label_text = "Other (" + str(delta_count) + ")"
+            label = Gtk.Label(label=label_text)
+
+            switch_grid.attach(label, 0, n, 1, 1)
+            switch_grid.attach(switch, 1, n, 1, 1)
 
         # All switch
         if all_count > 0:

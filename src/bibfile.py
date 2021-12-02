@@ -67,7 +67,10 @@ class BadaBibFile:
         return item
 
     def count(self, entrytype):
-        return sum(item.entry["ENTRYTYPE"] == entrytype for item in self.items)
+        return sum(item.entry["ENTRYTYPE"] == entrytype for item in self.items if not item.deleted)
+
+    def count_all(self):
+        return sum(not item.deleted for item in self.items)
 
     def update_filename(self, name):
         self.name = name

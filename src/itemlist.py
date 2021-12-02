@@ -32,6 +32,8 @@ from .config_manager import SourceViewStatus
 
 row_indent = get_row_indent() * " "
 
+entrytypes = list(entrytype_dict.keys()) + ["other"]
+
 MIN_MAX_CHAR = ('', chr(0x10FFFF))
 
 
@@ -294,7 +296,7 @@ class Itemlist(Gtk.ListBox):
         self.sort_key = "ID"
         self.sort_reverse = False
         self.search_string = ""
-        self.fltr = {entytype: True for entytype in entrytype_dict}
+        self.fltr = {entrytype: True for entrytype in entrytypes}
 
         if state_string:
             self.string_to_state(state_string)
@@ -409,7 +411,7 @@ class Itemlist(Gtk.ListBox):
         if item.deleted:
             return False
         if item.entry["ENTRYTYPE"] not in self.fltr:
-            return True
+            return self.fltr["other"]
         if not self.fltr[item.entry["ENTRYTYPE"]]:
             return False
         if not item.entry["ID"]:
@@ -451,7 +453,7 @@ class Itemlist(Gtk.ListBox):
 
         self.sort_key = values.pop(0)
         self.sort_reverse = values.pop(0) == "True"
-        for entrytype in entrytype_dict:
+        for entrytype in entrytypes:
             if values:
                 value = values.pop(0)
             else:

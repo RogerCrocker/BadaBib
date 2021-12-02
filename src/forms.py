@@ -259,7 +259,7 @@ class EntrytypeBox(Box):
     def set_icon(self, status):
         if status:
             icon_name = "dialog-warning-symbolic"
-            tooltip = "This entry type is non-standard and might not be fully supported by BadaBib!"
+            tooltip = "This entry type is non-standard and might not be fully supported by Bada Bib!"
         else:
             icon_name = None
             tooltip = None

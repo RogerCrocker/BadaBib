@@ -44,7 +44,7 @@
                 <ul>
                   <li>Fix "quit" and "close file" shortcuts </li>
                   <li>Add "@online" to list of known entry types </li>
-                  <li>Add rudimentaty support for custom entry types</li>
+                  <li>Add rudimentary support for custom entry types</li>
               </ul>
             </description>
         </release>

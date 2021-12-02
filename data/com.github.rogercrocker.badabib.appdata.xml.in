@@ -39,6 +39,15 @@
     </provides>
 
     <releases>
+        <release version="0.3.0" date="2021-12-2">
+            <description>
+                <ul>
+                  <li>Fix "quit" and "close file" shortcuts </li>
+                  <li>Add "@online" to list of known entry types </li>
+                  <li>Add rudimentaty support for custom entry types</li>
+              </ul>
+            </description>
+        </release>
         <release version="0.2.1" date="2021-11-6">
             <description>
                 <p>Bugfix release:</p>

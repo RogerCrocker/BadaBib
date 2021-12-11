@@ -9,7 +9,7 @@
         "--share=ipc",
         "--socket=fallback-x11",
         "--socket=wayland",
-        "--filesystem=home"
+	"--filesystem=home"
     ],
     "cleanup" : [
         "/include",
@@ -32,9 +32,9 @@
 	    "sources": [
 		{
 		    "type": "file",
-            	    "url": "https://files.pythonhosted.org/packages/bf/6f/509e501ff67a335186c8adcdc3ee62195919731b22796b0690658a76bb6f/pyparsing-3.0.4.tar.gz",
-            	    "sha256": "e0df773d7fa2240322daae7805626dfc5f2d5effb34e1a7be2702c99cfb9f6b1"
-        	},
+		    "url": "https://files.pythonhosted.org/packages/a0/34/895006117f6fce0b4de045c87e154ee4a20c68ec0a4c9a36d900888fb6bc/pyparsing-3.0.6-py3-none-any.whl",
+		    "sha256": "04ff808a5b90911829c55c4e26f75fa5ca8a2f5f36aa3a51f68e27033341d3e4"
+		},
 		{
 		    "type": "file",
 		    "url": "https://files.pythonhosted.org/packages/45/0b/38b06fd9b92dc2b68d58b75f900e97884c45bedd2ff83203d933cf5851c9/future-0.18.2.tar.gz",
@@ -56,8 +56,8 @@
 	    "sources": [
 		{
 		    "type": "file",
-		    "url": "https://files.pythonhosted.org/packages/fc/95/ae723eb1450763e1b2b9e70488054099c661f3b65f0c41d86b868cd6eb16/watchgod-0.7.tar.gz",
-		    "sha256": "48140d62b0ebe9dd9cf8381337f06351e1f2e70b2203fa9c6eff4e572ca84f29"
+		    "url": "https://files.pythonhosted.org/packages/57/35/9a8da3fb6681e6eba662b2d249eea58cebf575e392271efac3344c172c5f/watchgod-0.7-py3-none-any.whl",
+		    "sha256": "d6c1ea21df37847ac0537ca0d6c2f4cdf513562e95f77bb93abbcf05573407b7"
 		}
 	    ]
 	},
@@ -69,10 +69,11 @@
                 {
                     "type" : "git",
                     "url" : "https://github.com/RogerCrocker/BadaBib.git",
-                    "tag": "v0.2.0",
-                    "commit": "180ab2e69b2c754938c5a682e460ae32e6e39133"
+                    "tag": "v0.3.0",
+                    "commit": "a2930ae6119b1b0c07e320f14740fc9f04d30779"
                 }
             ]
         }
     ]
 }
+

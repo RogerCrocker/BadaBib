@@ -77,14 +77,14 @@ class MainWidget(Gtk.Paned):
 
         self.assemble_left_pane()
         self.assemble_right_pane()
-        self.restore_windwo_geom()
+        self.restore_window_geom()
 
         self.show_all()
 
         self.add_editor(DEFAULT_EDITOR)
         self.outer_stack.set_visible_child_name("editor")
 
-    def restore_windwo_geom(self):
+    def restore_window_geom(self):
         window_geom = get_window_geom()
         self.set_position(window_geom[2])
 

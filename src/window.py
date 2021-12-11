@@ -140,12 +140,11 @@ class BadaBibWindow(Gtk.ApplicationWindow):
         set_window_geom([width, height, position])
         self.destroy()
 
-    def do_delete_event(self, window):
+    def do_delete_event(self, window=None):
         """invoked by window close button"""
         close = self.main_widget.close_all_files(close_app=True)
         if close:
-            self.application.activate_action("quit")
-        return True
+            self.on_application_shutdown()
 
     def on_open_clicked(self, _button=None):
         dialog = FileChooser(self)

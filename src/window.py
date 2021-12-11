@@ -145,6 +145,7 @@ class BadaBibWindow(Gtk.ApplicationWindow):
         close = self.main_widget.close_all_files(close_app=True)
         if close:
             self.on_application_shutdown()
+        return True
 
     def on_open_clicked(self, _button=None):
         dialog = FileChooser(self)

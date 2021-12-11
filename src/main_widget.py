@@ -323,12 +323,13 @@ class MainWidget(Gtk.Paned):
         watcher = Watcher(window, filename)
         thread = Thread(target=watcher.watch_file)
         thread.start()
-        self.watchers[filename] = watcher
+        self.watchers[filename] = watcher, thread
 
     def remove_watcher(self, filename):
         if filename in self.watchers:
-            self.watchers[filename].stop()
-            self.watchers.pop(filename)
+            watcher, thread = self.watchers.pop(filename)
+            watcher.stop()
+            thread.join()
 
     def on_source_view_modified(self, _buffer):
         if get_parse_on_fly():
@@ -433,22 +434,30 @@ class MainWidget(Gtk.Paned):
         self.itemlists[filename].set_unsaved(True)
         self.remove_watcher(filename)
 
-    def close_file(self, filename, force=False, close_app=False):
+    def confirm_close_file(self, filename):
         itemlist = self.itemlists[filename]
-        close = True
+        if itemlist.unsaved:
+            self.notebook.set_current_page(itemlist.on_page)
 
-        if itemlist.unsaved and not force:
             dialog = SaveChanges(self.window, filename)
             response = dialog.run()
             dialog.destroy()
+
             if response == Gtk.ResponseType.CANCEL:
-                close = False
+                return False
             elif response == Gtk.ResponseType.OK:
                 filename = self.save_file(filename)
                 if not filename:
-                    close = False
+                    return False
+        return True
 
-        if force or close:
+    def close_file(self, filename, force=False, close_app=False):
+        if force:
+            close = True
+        else:
+            close = self.confirm_close_file(filename)
+
+        if close:
             bibfile = self.store.bibfiles[filename]
             if not bibfile.created:
                 if close_app:
@@ -465,9 +474,13 @@ class MainWidget(Gtk.Paned):
     def close_all_files(self, close_app=False):
         files = list(self.store.bibfiles.keys())
         for file in files:
-            close = self.close_file(file, close_app=close_app)
+            close = self.confirm_close_file(file)
             if not close:
                 return False
+
+        for file in files:
+            self.close_file(file, force=True, close_app=True)
+
         return True
 
     def save_file(self, filename=None):

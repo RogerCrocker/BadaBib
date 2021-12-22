@@ -18,10 +18,6 @@ gi.require_version("Gtk", "3.0")
 
 from gi.repository import Gtk
 
-from .config_manager import get_window_geom
-from .config_manager import set_window_geom
-from .config_manager import get_open_files
-from .config_manager import reset_open_files
 from .config_manager import get_recent_files
 from .config_manager import set_recent_files
 
@@ -33,6 +29,8 @@ from .store import BadaBibStore
 
 from .main_widget import MainWidget
 
+from .session_manager import SessionManager
+
 
 class BadaBibWindow(Gtk.ApplicationWindow):
     __gtype_name__ = "BadabibWindow"
@@ -43,6 +41,7 @@ class BadaBibWindow(Gtk.ApplicationWindow):
 
         self.store = BadaBibStore()
         self.main_widget = MainWidget(self, self.store)
+        self.session_manager = SessionManager(self, self.main_widget)
         self.add(self.main_widget)
 
         self.recent_button = Gtk.MenuButton()
@@ -51,22 +50,7 @@ class BadaBibWindow(Gtk.ApplicationWindow):
 
         self.assemble_headerbar()
         self.update_recent_file_menu()
-        self.restore_window_geom()
-        self.show_all()
-        self.restore_open_files()
-
-    def restore_window_geom(self):
-        window_geom = get_window_geom()
-        self.set_default_size(window_geom[0], window_geom[1])
-
-    def restore_open_files(self):
-        open_files = get_open_files()
-        if open_files:
-            for file, state in open_files.items():
-                self.main_widget.open_file_show_loading(file, state, True)
-            reset_open_files()
-        else:
-            self.main_widget.new_file()
+        self.session_manager.restore()
 
     def update_recent_file_menu(self):
         recent_files = get_recent_files()
@@ -133,26 +117,21 @@ class BadaBibWindow(Gtk.ApplicationWindow):
 
         self.set_titlebar(headerbar)
 
-    def on_application_shutdown(self, _widget=None):
-        """invoked by app.quit action"""
-        width, height = self.get_size()
-        position = self.main_widget.get_position()
-        set_window_geom([width, height, position])
-        self.destroy()
-
     def do_delete_event(self, window=None):
         """invoked by window close button"""
+        self.session_manager.save()
         close = self.main_widget.close_all_files(close_app=True)
         if close:
-            self.on_application_shutdown()
+            self.destroy()
         return True
 
     def on_open_clicked(self, _button=None):
         dialog = FileChooser(self)
+        dialog.set_select_multiple(True)
         response = dialog.run()
         if response == Gtk.ResponseType.ACCEPT:
-            filename = dialog.get_filename()
-            self.main_widget.open_file_show_loading(filename)
+            filenames = dialog.get_filenames()
+            self.main_widget.open_files(filenames)
         dialog.destroy()
 
     def on_save_as_clicked(self, _button=None):

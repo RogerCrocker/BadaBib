@@ -203,7 +203,7 @@ class Application(Gtk.Application):
         self.window.on_open_clicked()
 
     def on_open_file(self, _action, glib_filename):
-        self.window.main_widget.open_file_show_loading(glib_filename.unpack())
+        self.window.main_widget.open_files(glib_filename.unpack())
 
     def on_new_file(self, action=None, data=None):
         self.window.main_widget.new_file()

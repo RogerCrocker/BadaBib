@@ -43,6 +43,7 @@ badabib_sources = [
   'default_layouts.py',
   'bibfile.py',
   'string_manager.py',
+  'session_manager.py',
   'preferences.py',
   'watcher.py',
 ]

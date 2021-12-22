@@ -69,20 +69,20 @@ class ItemlistNotebook(Gtk.Notebook):
                 return True
         return False
 
-    def add_loading_page(self):
-        image = Gtk.Image.new_from_icon_name("preferences-system-time-symbolic", Gtk.IconSize.DIALOG)
-        image.show()
+    def add_loading_pages(self, N):
+        for n in range(N):
+            image = Gtk.Image.new_from_icon_name("preferences-system-time-symbolic", Gtk.IconSize.DIALOG)
+            image.show()
 
-        page = self.append_page(image, None)
-        self.set_tab_label_text(image, "Loading...")
-        self.set_current_page(page)
+            self.append_page(image, None)
+            self.set_tab_label_text(image, "Loading...")
 
-    def remove_loading_page(self):
-        n_pages = self.get_n_pages()
-        for n in range(n_pages):
-            page = self.get_nth_page(n)
-            if isinstance(page, Gtk.Image):
-                self.remove_page(n)
+    def remove_loading_pages(self, N):
+        for _ in range(N):
+            for n in range(self.get_n_pages()):
+                if isinstance(self.get_nth_page(n), Gtk.Image):
+                    self.remove_page(n)
+                    break
 
     @staticmethod
     def update_pagenumbers(notebook, _itemlist, _page):

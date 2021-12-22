@@ -215,14 +215,12 @@ def set_open_files(open_files):
     setting.set_value("open-file-states", g_variant_states)
 
 
-def add_to_open(badabib_file):
-    open_files = get_open_files()
-    open_files[badabib_file.name] = badabib_file.itemlist.state_to_string()
-    set_open_files(open_files)
+def get_open_tab():
+    return setting.get_string("open-tab")
 
 
-def reset_open_files():
-    set_open_files({})
+def set_open_tab(filename):
+    setting.set_string("open-tab", filename)
 
 
 def get_num_recent():

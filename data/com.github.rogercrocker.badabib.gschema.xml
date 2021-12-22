@@ -46,6 +46,11 @@
         <summary>States of last opened files</summary>
         <description>A list of the states of the last opened files.</description>
     </key>
+	  <key type="s" name="open-tab">
+        <default>""</default>
+        <summary>Currently viewed file</summary>
+        <description>Name of file that was being edited when closing the app.</description>
+    </key>
     <key type="i" name="num-recent">
         <default>10</default>
         <summary>Number of recent files</summary>

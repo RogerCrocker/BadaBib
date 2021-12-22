@@ -109,7 +109,7 @@ class BadaBibStore:
         writer.indent = get_field_indent() * " "
         return writer
 
-    def add_file(self, name):
+    def _add_file(self, name):
         # check if file is already open
         if name not in self.bibfiles:
             try:
@@ -142,6 +142,9 @@ class BadaBibStore:
                 return None, None, None
         else:
             return self.bibfiles[name], True, True
+
+    def add_file(self, name, return_values, idx):
+        return_values[idx] = self._add_file(name)
 
     def rename_file(self, old, new):
         file = self.bibfiles.pop(old)

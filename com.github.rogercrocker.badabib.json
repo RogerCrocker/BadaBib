@@ -69,8 +69,8 @@
                 {
                     "type" : "git",
                     "url" : "https://github.com/RogerCrocker/BadaBib.git",
-                    "tag": "v0.3.0",
-                    "commit": "a2930ae6119b1b0c07e320f14740fc9f04d30779"
+                    "tag": "v0.4.0",
+                    "commit": "1228806225b42d5e2119f5e8ae7834f4918e7fff"
                 }
             ]
         }

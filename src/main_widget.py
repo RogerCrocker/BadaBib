@@ -464,8 +464,7 @@ class MainWidget(Gtk.Paned):
         while True:
             if filename in self.itemlists and self.notebook.get_n_pages() == n_pages:
                 break
-            else:
-                sleep(0.05)
+            sleep(0.05)
 
         new_page = self.notebook.get_nth_page(n_pages-1)
         self.notebook.reorder_child(new_page, page)

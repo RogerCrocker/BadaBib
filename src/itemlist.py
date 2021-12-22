@@ -70,7 +70,7 @@ class ItemlistNotebook(Gtk.Notebook):
         return False
 
     def add_loading_pages(self, N):
-        for n in range(N):
+        for _ in range(N):
             image = Gtk.Image.new_from_icon_name("preferences-system-time-symbolic", Gtk.IconSize.DIALOG)
             image.show()
 

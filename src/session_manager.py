@@ -78,4 +78,3 @@ class SessionManager:
     def save_open_tab(self):
         current_file = self.main_widget.get_current_file()
         set_open_tab(current_file.name)
-

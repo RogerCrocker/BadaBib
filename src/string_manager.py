@@ -309,7 +309,7 @@ class StringManagerWindow(Gtk.Window):
         import_hint_label = Gtk.Label()
         import_hint_label.set_margin_bottom(10)
         import_hint_label.set_justify(Gtk.Justification.CENTER)
-        import_hint_label.set_markup("<small>Add files here to import their strings.\nImported strings are read-only and available in all open files.</small>")
+        import_hint_label.set_markup("<small>Add files with string definitions here.\nImported strings are read-only and available in all open files.</small>")
 
         self.import_list = FileList(self.store.string_files.keys())
         self.import_list.connect("row-selected", self.on_import_file_selected)
@@ -427,10 +427,13 @@ class StringManagerWindow(Gtk.Window):
         string_list.delete_empty_rows()
         string_dict, duplicates = string_list.to_dict()
         if duplicates:
-            message = "The following strings are defined multiple times:\n\n"
-            for macro in duplicates:
-                message += "- " + macro + "\n"
-            message += "\nHaving duplicate strings is feasible, but ususally not intended."
+            message = (
+                "The following strings are defined multiple times:"
+                + "\n\n"
+                + "\n".join(duplicates)
+                + "\n\n"
+                + "Having duplicate strings is feasible, but ususally not intended."
+            )
             WarningDialog(message, window=self)
         self.store.update_file_strings(filename, string_dict)
         GLib.idle_add(self.refresh_display, file)
@@ -448,7 +451,7 @@ class StringManagerWindow(Gtk.Window):
             dialog.destroy()
 
             if filename in self.store.bibfiles or filename in self.store.string_files:
-                message = "File '" + filename + "' is already open."
+                message = "File '{}' is already open.".format(filename)
                 WarningDialog(message, window=self)
                 return
 
@@ -456,7 +459,7 @@ class StringManagerWindow(Gtk.Window):
             if success:
                 if len(self.store.string_files[filename]) == 0:
                     self.store.string_files.pop(filename)
-                    message = "File '" + filename + "' does not contain strings."
+                    message = "File '{}' does not contain strings.".format(filename)
                     WarningDialog(message, window=self)
                     return
 
@@ -465,7 +468,7 @@ class StringManagerWindow(Gtk.Window):
                 for file in self.store.bibfiles.values():
                     GLib.idle_add(self.refresh_display, file)
             else:
-                message = "Cannot read file '" + filename + "'\n"
+                message = "Cannot read file '{}'.".format(filename)
                 WarningDialog(message, window=self)
 
         dialog.destroy()

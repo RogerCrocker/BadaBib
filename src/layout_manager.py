@@ -81,26 +81,26 @@ def string_to_layout(string, window):
         if fields:
             layout.append(fields)
 
+    if not layout:
+        WarningDialog("Empty layout, please add fields.", title, window)
+        return []
+
+    if unknown:
+        message += "Unknown fields: " + ", ".join(unknown)
+
     duplicated = []
     all_fields = [field for row in layout for field in row if field != "separator"]
     for field in set(all_fields):
         if all_fields.count(field) > 1:
             duplicated.append(field)
 
-    if unknown:
-        message += "Unknown fields: "
-        message += ", ".join(unknown) + "\n"
-
     if duplicated:
-        message += "Duplicated fields: "
-        message += ", ".join(duplicated) + "\n"
+        if message:
+            message += "\n\n"
+        message += "Duplicated fields: " + ", ".join(duplicated)
 
     if message:
         WarningDialog(message, title, window)
-        return []
-
-    if not layout:
-        WarningDialog("Empty layout, please add fields.", title, window)
         return []
 
     return layout

@@ -401,14 +401,18 @@ class MainWidget(Gtk.Paned):
                 else:
                     # file is empty
                     if len(bibfile.database.entries) == 0:
-                        message = "No BibTeX entries found in file '" + filename + "'\n"
+                        message = "No BibTeX entries found in file '{}'.".format(filename)
                         messages.append(message)
 
                     # could not create backup
                     if not backup:
-                        message = "Bada Bib! could not create a backup for '" + filename + "'\n\n"
-                        message += "To fix this, try deleting or renaming any .bak-files that were not created by Bada Bib!\n\n"
-                        message += "<b>Be careful when editing this file!</b>"
+                        message = (
+                            "Bada Bib! could not create a backup for '{}'".format(filename)
+                            + "\n\n"
+                            + "To fix this, try deleting or renaming any .bak-files that were not created by Bada Bib!"
+                            + "\n\n"
+                            + "<b>Be careful when editing this file!</b>"
+                        )
                         messages.append(message)
 
                     # add itemlist and watcher
@@ -425,7 +429,7 @@ class MainWidget(Gtk.Paned):
                 if not self.store.bibfiles:
                     self.new_file()
 
-                message = "Cannot read file '" + filename + "'\n"
+                message = "Cannot read file '{}'.".format(filename)
                 messages.append(message)
 
         # display warnings, if any
@@ -435,7 +439,7 @@ class MainWidget(Gtk.Paned):
     def import_strings(self, filename):
         success = self.store.import_strings(filename)
         if not success:
-            message = "Cannot read file '" + filename + "'\n"
+            message = "Cannot read file '{}'.".format(filename)
             WarningDialog(message, window=self.window)
 
     def new_file(self):

@@ -70,7 +70,7 @@ class Watcher:
         dialog = FileChanged(self.window, self.filename)
         response = dialog.run()
         dialog.destroy()
-        sleep(0.2)  # give dialog time to close
+        sleep(0.3)  # give dialog time to close
         if response == Gtk.ResponseType.YES:
             GLib.idle_add(self.window.main_widget.declare_file_created, self.filename)
         else:
@@ -78,7 +78,11 @@ class Watcher:
 
     def file_deleted_or_moved(self):
         title = "Bada Bib! - File Deleted or Moved on Disk"
-        text = "It seems like the file '" + self.filename + "' was deleted, renamed, or moved.\n\nYou are now editing an unsaved copy of the file."
-        WarningDialog(text, title, self.window)
-        sleep(0.2)  # give dialog time to close
+        message = (
+            "It seems like the file '{}' was deleted, renamed, or moved.".format(self.filename)
+            + "\n\n"
+            + "You are now editing an unsaved copy of this file."
+        )
+        WarningDialog(message, title, self.window)
+        sleep(0.3)  # give dialog time to close
         GLib.idle_add(self.window.main_widget.declare_file_created, self.filename)

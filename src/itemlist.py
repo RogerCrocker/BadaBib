@@ -216,50 +216,51 @@ class Row(Gtk.ListBoxRow):
         self.select()
 
     def update_id(self):
-        string = row_indent
+        label = row_indent
         if "ID" in self.item.entry:
-            string += self.item.entry["ID"]
-        self.id_label.set_markup("<b>" + string + "</b> (" + self.item.pretty_field("ENTRYTYPE") + ")")
+            label += self.item.entry["ID"]
+        label = "<b>{}</b> ({})".format(label, self.item.pretty_field("ENTRYTYPE"))
+        self.id_label.set_markup(label)
         self.changed()
 
     def update_author(self):
-        string = row_indent
+        label = row_indent
         if "author" in self.item.entry:
-            string += self.item.pretty_field("author")
+            label += self.item.pretty_field("author")
         if "editor" in self.item.entry:
-            if string != row_indent:
-                string += ", "
-            string += "Ed: " + self.item.pretty_field("editor")
-        self.author_label.set_markup(string)
+            if label != row_indent:
+                label += ", "
+            label += "Ed: {}".format(self.item.pretty_field("editor"))
+        self.author_label.set_markup(label)
         self.changed()
 
     def update_title(self):
-        string = row_indent
+        label = row_indent
         if "title" in self.item.entry:
-            string += self.item.pretty_field("title")
-        self.title_label.set_markup(string)
+            label += self.item.pretty_field("title")
+        self.title_label.set_markup(label)
         self.changed()
 
     def update_journal(self):
-        string = row_indent
+        label = row_indent
         if "journal" in self.item.entry:
-            string += "<i>" + self.item.pretty_field("journal") + "</i>"
+            label += "<i>{}</i>".format(self.item.pretty_field("journal"))
         if "booktitle" in self.item.entry:
-            if string != row_indent:
-                string += ", "
-            string += "<i>" + self.item.pretty_field("booktitle") + "</i>"
-        self.journal_label.set_markup(string)
+            if label != row_indent:
+                label += ", "
+            label += "<i>{}</i>".format(self.item.pretty_field("booktitle"))
+        self.journal_label.set_markup(label)
         self.changed()
 
     def update_publisher(self):
-        string = row_indent
+        label = row_indent
         if "publisher" in self.item.entry:
-            string += self.item.pretty_field("publisher")
+            label += self.item.pretty_field("publisher")
         if "year" in self.item.entry:
-            if string != row_indent:
-                string += ", "
-            string += self.item.pretty_field("year")
-        self.publisher_label.set_markup(string)
+            if label != row_indent:
+                label += ", "
+            label += self.item.pretty_field("year")
+        self.publisher_label.set_markup(label)
         self.changed()
 
     def update_link(self):
@@ -441,9 +442,9 @@ class Itemlist(Gtk.ListBox):
         return True
 
     def state_to_string(self):
-        string = self.sort_key + "|" + str(self.sort_reverse)
+        string = "{}|{}".format(self.sort_key, self.sort_reverse)
         for value in self.fltr.values():
-            string += "|" + str(value)
+            string += "|{}".format(value)
         return string
 
     def string_to_state(self, text):

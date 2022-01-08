@@ -60,7 +60,7 @@ class SaveChanges(Gtk.MessageDialog):
             transient_for=window,
             message_type=Gtk.MessageType.QUESTION,
             buttons=Gtk.ButtonsType.NONE,
-            text="Save changes to file '" + filename + "' before closing?",
+            text="Save changes to file '{}' before closing?".format(filename),
             title="Bada Bib! - Unsaved Changes",
         )
         self.add_buttons(
@@ -78,7 +78,7 @@ class FileChanged(Gtk.MessageDialog):
             transient_for=window,
             flags=0,
             message_type=Gtk.MessageType.QUESTION,
-            text="File '" + filename + "' changed on disk.",
+            text="File '{}' changed on disk.".format(filename),
             title="Bada Bib! - File Changed on Disk",
         )
         self.add_buttons(
@@ -89,8 +89,11 @@ class FileChanged(Gtk.MessageDialog):
 
 class EmptyKeys(Gtk.MessageDialog):
     def __init__(self, window, filename):
-        text = "Entries with empty keys in file '" + filename + "'.\n\n"
-        text += "<b>Save anyhow?</b>"
+        text = (
+            "Entries with empty keys in file '{}'".format(filename)
+            + "\n\n"
+            + "Save anyhow?"
+        )
 
         Gtk.MessageDialog.__init__(
             self,
@@ -108,10 +111,14 @@ class EmptyKeys(Gtk.MessageDialog):
 
 class DuplicateKeys(Gtk.MessageDialog):
     def __init__(self, window, filename, duplicate_keys):
-        text = "Duplicate keys\n\n"
-        text += "\n".join(duplicate_keys) + "\n\n"
-        text += "in file '" + filename + "'.\n\n"
-        text += "<b>Save anyhow?</b>"
+        text = (
+            "Duplicate keys\n\n"
+            + "\n".join(duplicate_keys)
+            + "\n\n"
+            + "in file '{}'".format(filename)
+            + "\n\n"
+            + "Save anyhow?"
+        )
 
         Gtk.MessageDialog.__init__(
             self,
@@ -320,7 +327,9 @@ class RecentModel(Gio.Menu):
             for file, label in short_names.items():
                 filename = GLib.Variant.new_string(file)
                 menu_item = Gio.MenuItem()
-                menu_item.set_label(label.replace("_", "__"))  # gio.menu swallows underscores
+                menu_item.set_label(
+                    label.replace("_", "__")
+                )  # gio.menu swallows underscores
                 menu_item.set_action_and_target_value("app.open_file", filename)
                 menu_section.prepend_item(menu_item)
 
@@ -364,9 +373,11 @@ class MenuPopover(Gtk.Popover):
 class AboutDialog(Gtk.AboutDialog):
     def __init__(self, window):
         Gtk.AboutDialog.__init__(self, modal=True, transient_for=window)
-        self.set_program_name(self.get_program_name() + " " + window.application.version)
+        self.set_program_name(
+            self.get_program_name() + " " + window.application.version
+        )
 
-        about_comment = "GTK " + " %d.%d.%d" % (
+        about_comment = "GTK {}.{}.{}".format(
             Gtk.get_major_version(),
             Gtk.get_minor_version(),
             Gtk.get_micro_version(),

@@ -22,8 +22,6 @@ from .config_manager import set_open_files
 from .config_manager import get_open_tab
 from .config_manager import set_open_tab
 
-from .dialogs import WarningDialog
-
 
 NEW_FILE_NAME = get_new_file_name()
 

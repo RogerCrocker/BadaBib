@@ -50,6 +50,19 @@ class FileList(Gtk.ListBox):
             for filename in filenames:
                 self.add_row(filename)
 
+    def add_loading_rows(self, N):
+        for n in range(N):
+            self.add_row(str(n), "Loading...")
+
+    def remove_loading_rows(self):
+        loading_rows = []
+        for row in self.rows.values():
+            if row.shortname == "Loading...":
+                loading_rows.append(row)
+
+        for row in loading_rows:
+            self.remove(row)
+
     def select_file(self, filename):
         self.select_row(self.rows[filename])
 
@@ -58,9 +71,12 @@ class FileRow(Gtk.ListBoxRow):
     def __init__(self, filename, shortname=None):
         Gtk.ListBoxRow.__init__(self)
         self.filename = filename
-        if not shortname:
-            shortname = filename
-        self.label = Gtk.Label(xalign=0, label=shortname)
+        if shortname is None:
+            self.shortname = filename
+        else:
+            self.shortname = shortname
+
+        self.label = Gtk.Label(xalign=0, label=self.shortname)
         self.label.set_margin_start(5)
         self.add(self.label)
 
@@ -445,33 +461,39 @@ class StringManagerWindow(Gtk.Window):
 
     def import_strings(self, _button):
         dialog = FileChooser(self)
+        dialog.set_select_multiple(True)
         response = dialog.run()
+
         if response == Gtk.ResponseType.ACCEPT:
-            filename = dialog.get_filename()
-            dialog.destroy()
-
-            if filename in self.store.bibfiles or filename in self.store.string_files:
-                message = "File '{}' is already open.".format(filename)
-                WarningDialog(message, window=self)
-                return
-
-            success = self.main_window.store.import_strings(filename)
-            if success:
-                if len(self.store.string_files[filename]) == 0:
-                    self.store.string_files.pop(filename)
-                    message = "File '{}' does not contain strings.".format(filename)
-                    WarningDialog(message, window=self)
-                    return
-
-                row = self.import_list.add_row(filename)
-                self.import_list.select_row(row)
-                for file in self.store.bibfiles.values():
-                    GLib.idle_add(self.refresh_display, file)
-            else:
-                message = "Cannot read file '{}'.".format(filename)
-                WarningDialog(message, window=self)
+            filenames = dialog.get_filenames()
+            self.import_list.add_loading_rows(len(filenames))
+            self.import_list.show_all()
+            GLib.idle_add(self.import_strings_thread, filenames)
 
         dialog.destroy()
+
+    def import_strings_thread(self, filenames):
+        return_values = [self.main_window.store.import_strings(filename) for filename in filenames]
+        self.import_list.remove_loading_rows()
+
+        first = True
+        for filename, return_value in zip(filenames,  return_values):
+            if return_value == "failure":
+                message = "Cannot read file '{}'.".format(filename)
+                WarningDialog(message, window=self)
+            elif return_value == "empty":
+                message = "File '{}' does not contain string definitions.".format(filename)
+                WarningDialog(message, window=self)
+            elif return_value == "success":
+                if filename in self.import_list:
+                    row = self.import_list.rows[filename]
+                else:
+                    row = self.import_list.add_row(filename)
+                if first:
+                    self.import_list.select_row(row)
+                    first = False
+
+        self.import_list.show_all()
 
     def remove_imported_strings(self, _button):
         row = self.import_list.get_selected_row()

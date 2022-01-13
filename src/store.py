@@ -183,18 +183,23 @@ class BadaBibStore:
             file.short_name = names[filename]
 
     def import_strings(self, filename):
-        try:
-            with open(filename) as string_file:
-                parser = self.get_default_parser()
-                try:
-                    database = parser.parse_file(string_file)
-                    self.string_files[filename] = database.strings
-                    self.update_global_strings()
-                    return True
-                except Exception:
-                    return False
-        except FileNotFoundError:
-            return False
+        if filename not in self.string_files:
+            try:
+                with open(filename) as string_file:
+                    parser = self.get_default_parser()
+                    try:
+                        database = parser.parse_file(string_file)
+                        if len(database.strings) == 0:
+                            return "empty"
+                        self.string_files[filename] = database.strings
+                        self.update_global_strings()
+                        return "success"
+                    except Exception:
+                        return "failure"
+            except FileNotFoundError:
+                return "failure"
+        else:
+            return "success"
 
     def update_global_strings(self, file=None):
         global_strings = {}

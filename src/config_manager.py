@@ -153,6 +153,14 @@ def set_create_backup(state):
     setting.set_boolean("create-backup", state)
 
 
+def get_remember_strings():
+    return setting.get_boolean("remember-strings")
+
+
+def set_remember_strings(state):
+    setting.set_boolean("remember-strings", state)
+
+
 def get_window_geom():
     return setting.get_value("window-geom")
 
@@ -262,6 +270,15 @@ def remove_from_recent(filename):
     if filename in recent_files:
         recent_files.pop(filename)
     set_recent_files(recent_files)
+
+
+def get_string_imports():
+    return setting.get_value("string-imports")
+
+
+def set_string_imports(string_files):
+    g_variant_files = GLib.Variant("as", list(string_files.keys()))
+    setting.set_value("string-imports", g_variant_files)
 
 
 def get_editor_layout(entrytype):

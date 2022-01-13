@@ -14,6 +14,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
+from .config_manager import get_remember_strings
 from .config_manager import get_window_geom
 from .config_manager import set_window_geom
 from .config_manager import get_new_file_name
@@ -21,7 +22,10 @@ from .config_manager import get_open_files
 from .config_manager import set_open_files
 from .config_manager import get_open_tab
 from .config_manager import set_open_tab
+from .config_manager import get_string_imports
+from .config_manager import set_string_imports
 
+from .dialogs import WarningDialog
 
 NEW_FILE_NAME = get_new_file_name()
 
@@ -34,10 +38,13 @@ class SessionManager:
     def restore(self):
         self.restore_window_geom()
         self.window.show_all()
+        if get_remember_strings():
+            self.restore_string_imports()
         self.restore_open_files()
 
     def save(self):
         self.save_window_geom()
+        self.save_string_imports()
         self.save_open_files()
         self.save_open_tab()
 
@@ -76,3 +83,19 @@ class SessionManager:
     def save_open_tab(self):
         current_file = self.main_widget.get_current_file()
         set_open_tab(current_file.name)
+
+    def restore_string_imports(self):
+        string_imports = get_string_imports()
+        return_values = [self.window.store.import_strings(filename) for filename in string_imports]
+        for filename, return_value in zip(string_imports,  return_values):
+            if return_value == "failure":
+                message = "Importing strings failed: Cannot read file '{}'.".format(filename)
+                WarningDialog(message, window=self.window)
+            elif return_value == "empty":
+                message = "Importing strings failed: File '{}' does not contain string definitions.".format(filename)
+                WarningDialog(message, window=self.window)
+
+    def save_string_imports(self):
+        set_string_imports(self.window.store.string_files)
+
+    

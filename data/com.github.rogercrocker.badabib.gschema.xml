@@ -31,6 +31,11 @@
         <summary>Create backups when opening a file.</summary>
         <description>Create backups when opening a file.</description>
     </key>
+	  <key type="b" name="remember-strings">
+        <default>false</default>
+        <summary>Remember imported strings between sessions.</summary>
+        <description>Reopen imported string files on startup.</description>
+    </key>
     <key type="ai" name="window-geom">
         <default>[1050, 600, 420]</default>
         <summary>Window size and itemlist width</summary>
@@ -40,6 +45,11 @@
         <default>[]</default>
         <summary>Last opened files</summary>
         <description>A list of the last opened files.</description>
+    </key>
+	  <key type="as" name="string-imports">
+        <default>[]</default>
+        <summary>Currently imported string files</summary>
+        <description>A list of the currently imported string files.</description>
     </key>
     <key type="as" name="open-file-states">
         <default>[]</default>

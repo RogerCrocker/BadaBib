@@ -27,6 +27,8 @@ from .config_manager import get_parse_on_fly
 from .config_manager import set_parse_on_fly
 from .config_manager import get_create_backup
 from .config_manager import set_create_backup
+from .config_manager import get_remember_strings
+from .config_manager import set_remember_strings
 
 
 class PreferencesWindow(Gtk.Window):
@@ -38,6 +40,7 @@ class PreferencesWindow(Gtk.Window):
         box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
         box.pack_start(self.get_align(), False, False, 15)
         box.pack_start(self.get_indent(), False, False, 15)
+        box.pack_start(self.get_strings(), False, False, 15)
         box.pack_start(self.get_parse(), False, False, 15)
         box.pack_start(self.get_backup(), False, False, 15)
 
@@ -167,3 +170,31 @@ class PreferencesWindow(Gtk.Window):
     @staticmethod
     def on_backup_changed(_switch, state):
         set_create_backup(state)
+
+    def get_strings(self):
+        strings_label = Gtk.Label(xalign=0)
+        strings_label.set_text("Remember imported strings between sessions.")
+
+        strings_hint = Gtk.Label(xalign=0)
+        strings_hint.set_markup("<small>Enable to remember imported string definitions between session.</small>")
+        strings_hint.set_justify(Gtk.Justification.LEFT)
+
+        strings_switch = Gtk.Switch()
+        strings_switch.set_active(get_remember_strings())
+        strings_switch.connect("state-set", self.on_strings_changed)
+
+        vbox1 = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
+        vbox1.pack_start(strings_label, False, False, 0)
+        vbox1.pack_start(strings_hint, False, False, 0)
+
+        vbox2 = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
+        vbox2.pack_start(strings_switch, False, False, 0)
+
+        box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
+        box.pack_start(vbox1, False, False, 10)
+        box.pack_end(vbox2, False, False, 10)
+        return box
+
+    @staticmethod
+    def on_strings_changed(_switch, state):
+        set_remember_strings(state)

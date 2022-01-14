@@ -430,12 +430,6 @@ class MainWidget(Gtk.Paned):
         for message in messages:
             WarningDialog(message, window=self.window)
 
-    def import_strings(self, filename):
-        success = self.store.import_strings(filename)
-        if not success:
-            message = "Cannot read file '{}'.".format(filename)
-            WarningDialog(message, window=self.window)
-
     def new_file(self):
         bibfile = self.store.new_file()
         itemlist = self.add_itemlist(bibfile)

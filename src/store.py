@@ -109,42 +109,47 @@ class BadaBibStore:
         writer.indent = get_field_indent() * " "
         return writer
 
-    def _add_file(self, name):
+    def add_file(self, name):
         # check if file is already open
-        if name not in self.bibfiles:
-            try:
-                # try parsing
-                with open(name) as bibtex_file:
-                    parser = self.get_default_parser()
-                    try:
-                        database = parser.parse_file(bibtex_file)
-                    except Exception:
-                        return None, None, None
+        if name in self.bibfiles:
+            return ["file_open"]
 
-                # create backup, if desired
-                backup = True
-                if get_create_backup():
-                    if exists(name + ".bak"):
-                        backup = backup_file(name + ".bak")
-                    backup = backup and backup_file(name)
+        try:
+            # try parsing
+            with open(name) as bibtex_file:
+                parser = self.get_default_parser()
+                try:
+                    database = parser.parse_file(bibtex_file)
+                except Exception:
+                    return ["parsing_error"]
 
-                # remove backup tags, if present
-                while BACKUP_TAG in database.comments:
-                    database.comments.remove(BACKUP_TAG)
+            # create backup, if desired
+            backup = True
+            if get_create_backup():
+                if exists(name + ".bak"):
+                    backup = backup_file(name + ".bak")
+                backup = backup and backup_file(name)
 
-                # initialize and return bibfile
-                bibfile = BadaBibFile(self, name, database)
-                self.bibfiles[name] = bibfile
-                self.update_global_strings(bibfile)
-                self.update_short_names()
-                return bibfile, False, backup
-            except FileNotFoundError:
-                return None, None, None
-        else:
-            return self.bibfiles[name], True, True
+            # remove backup tags, if present
+            while BACKUP_TAG in database.comments:
+                database.comments.remove(BACKUP_TAG)
 
-    def add_file(self, name, return_values, idx):
-        return_values[idx] = self._add_file(name)
+            # initialize bibfile
+            bibfile = BadaBibFile(self, name, database)
+            self.bibfiles[name] = bibfile
+            self.update_global_strings(bibfile)
+            self.update_short_names()
+
+            status = []
+            if not backup:
+                status.append("no_backup")
+            if len(bibfile.database.entries) == 0:
+                status.append("empty")
+
+            return status
+
+        except FileNotFoundError:
+            return ["file_error"]
 
     def rename_file(self, old, new):
         file = self.bibfiles.pop(old)
@@ -195,9 +200,9 @@ class BadaBibStore:
                         self.update_global_strings()
                         return "success"
                     except Exception:
-                        return "failure"
+                        return "parse_error"
             except FileNotFoundError:
-                return "failure"
+                return "file_error"
         else:
             return "success"
 

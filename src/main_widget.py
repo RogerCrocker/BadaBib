@@ -175,8 +175,8 @@ class MainWidget(Gtk.Paned):
     def get_current_editor(self):
         return self.editor_stack.get_visible_child()
 
-    def add_itemlist(self, bibfile, state_string=None, change_buffer=None):
-        itemlist = Itemlist(bibfile, state_string, change_buffer)
+    def add_itemlist(self, bibfile, state=None, change_buffer=None):
+        itemlist = Itemlist(bibfile, state, change_buffer)
         itemlist.connect("row-selected", self.on_row_selected)
         itemlist.connect("key-press-event", self.on_itemlist_key_pressed)
         itemlist.header.close_button.connect("clicked", self.on_close_tab)
@@ -353,7 +353,7 @@ class MainWidget(Gtk.Paned):
             watcher.stop()
             thread.join()
 
-    def open_files(self, filenames, state_strings=None, select_file=None):
+    def open_files(self, filenames, states=None, select_file=None):
         # make sure 'filenames' is a list
         if isinstance(filenames, str):
             filenames = [filenames]
@@ -364,8 +364,8 @@ class MainWidget(Gtk.Paned):
             self.close_file(get_new_file_name())
 
         # initialize empty state string list
-        if not state_strings:
-            state_strings = N * [None]
+        if not states:
+            states = N * [None]
 
         # add loading pages and select first one
         n_pages = self.notebook.get_n_pages()
@@ -373,67 +373,58 @@ class MainWidget(Gtk.Paned):
         self.notebook.set_current_page(n_pages)
 
         # open files in thread
-        GLib.idle_add(self._open_files, filenames, state_strings, select_file)
+        GLib.idle_add(self.open_files_thread, filenames, states, select_file)
 
-    def _open_files(self, filenames, state_strings, select_file):
-        N = len(filenames)
-        messages = []
-        threads = N * [None]
-        return_values = N * [None]
-
+    def open_files_thread(self, filenames, states, select_file):
         # read databases
-        for n, filename in enumerate(filenames):
-            threads[n] = Thread(target=self.store.add_file, args=(filename, return_values, n))
-            threads[n].start()
-
-        # wait for all threads to finish
-        for thread in threads:
-            thread.join()
+        statuses = [self.store.add_file(filename) for filename in filenames]
 
         # remove loading pages
-        self.notebook.remove_loading_pages(N)
+        self.notebook.remove_loading_pages()
 
         # add itemlists
-        for n, filename in enumerate(filenames):
-            bibfile, active, backup = return_values[n]
-            if bibfile:
-                # file exists
-                if active:
-                    # files is already open
-                    itemlist = self.itemlists[filename]
-                else:
-                    # file is empty
-                    if len(bibfile.database.entries) == 0:
-                        message = "No BibTeX entries found in file '{}'.".format(filename)
-                        messages.append(message)
+        first = True
+        messages = []
+        for filename, status, state in zip(filenames, statuses, states):
 
-                    # could not create backup
-                    if not backup:
-                        message = (
-                            "Bada Bib! could not create a backup for '{}'".format(filename)
-                            + "\n\n"
-                            + "To fix this, try deleting or renaming any .bak-files that were not created by Bada Bib!"
-                            + "\n\n"
-                            + "<b>Be careful when editing this file!</b>"
-                        )
-                        messages.append(message)
-
-                    # add itemlist and watcher
-                    itemlist = self.add_itemlist(bibfile, state_strings[n])
-                    self.add_watcher(self.window, filename)
-
-                # select first or requested page
-                if n == 0 or itemlist.bibfile.name == select_file:
-                    self.notebook.set_current_page(itemlist.on_page)
-            else:
-                # file does not exist or cannot be read
+            # file does not exist or cannot be read
+            if "file_error" in status or "parse_error" in status:
                 remove_from_recent(filename)
                 self.window.update_recent_file_menu()
                 if not self.store.bibfiles:
                     self.new_file()
-
                 message = "Cannot read file '{}'.".format(filename)
                 messages.append(message)
+                continue
+
+            # file is empty
+            if "empty" in status:
+                message = "No BibTeX entries found in file '{}'.".format(filename)
+                messages.append(message)
+
+            # could not create backup
+            if "no_backup" in status:
+                message = (
+                    "Bada Bib! could not create a backup for '{}'".format(filename)
+                    + "\n\n"
+                    + "To fix this, try deleting or renaming any .bak-files that were not created by Bada Bib!"
+                    + "\n\n"
+                    + "<b>Be careful when editing this file!</b>"
+                )
+                messages.append(message)
+
+            if "file_open" in status:
+                # get itemlist if file is already open
+                itemlist = self.itemlists[filename]
+            else:
+                # or add itemlist and watcher
+                itemlist = self.add_itemlist(self.store.bibfiles[filename], state)
+                self.add_watcher(self.window, filename)
+
+            # select first or requested page
+            if first or self.store.bibfiles[filename].name == select_file:
+                self.notebook.set_current_page(itemlist.on_page)
+                first = False
 
         # display warnings, if any
         for message in messages:
@@ -452,7 +443,7 @@ class MainWidget(Gtk.Paned):
 
     def reload_file(self, filename):
         itemlist = self.itemlists[filename]
-        state_string = itemlist.state_to_string()
+        state = itemlist.state_to_string()
         page = itemlist.on_page
         n_pages = self.notebook.get_n_pages()
 
@@ -462,7 +453,7 @@ class MainWidget(Gtk.Paned):
         self.notebook.set_current_page(page)
 
         self.close_file(filename, True)
-        GLib.idle_add(self._open_files, [filename], state_string, None)
+        GLib.idle_add(self._open_files, [filename], state, None)
 
         thread = Thread(target=self.move_new_tab, args=(filename, page, n_pages))
         thread.start()

@@ -59,9 +59,11 @@ class Watcher:
             for change in changes:
                 if change == (Change.deleted, self.filename):
                     self.file_deleted_or_moved()
+                    self.active = False
                     break
                 if change == (Change.modified, self.filename):
                     self.file_changed()
+                    self.active = False
                     break
 
             sleep(self.sleep_time)

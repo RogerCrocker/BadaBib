@@ -55,11 +55,7 @@ class FileList(Gtk.ListBox):
             self.add_row(str(n), "Loading...")
 
     def remove_loading_rows(self):
-        loading_rows = []
-        for row in self.rows.values():
-            if row.shortname == "Loading...":
-                loading_rows.append(row)
-
+        loading_rows = [row for row in self.rows.values() if row.shortname == "Loading..."]
         for row in loading_rows:
             self.remove(row)
 
@@ -473,18 +469,27 @@ class StringManagerWindow(Gtk.Window):
         dialog.destroy()
 
     def import_strings_thread(self, filenames):
-        return_values = [self.main_window.store.import_strings(filename) for filename in filenames]
+        # read databases
+        statuses = [self.main_window.store.import_strings(filename) for filename in filenames]
+
+        # remove loading rows
         self.import_list.remove_loading_rows()
 
+        # add file rows
         first = True
-        for filename, return_value in zip(filenames,  return_values):
-            if return_value == "failure":
+        for filename, status in zip(filenames,  statuses):
+
+            # file does not exist or cannot be read
+            if status in ("file_error", "parse_error"):
                 message = "Cannot read file '{}'.".format(filename)
                 WarningDialog(message, window=self)
-            elif return_value == "empty":
+
+            # file is empty
+            elif status == "empty":
                 message = "File '{}' does not contain string definitions.".format(filename)
                 WarningDialog(message, window=self)
-            elif return_value == "success":
+
+            elif status == "success":
                 if filename in self.import_list:
                     row = self.import_list.rows[filename]
                 else:

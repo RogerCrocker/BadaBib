@@ -447,7 +447,7 @@ class MainWidget(Gtk.Paned):
         self.notebook.set_current_page(page)
 
         self.close_file(filename, True)
-        GLib.idle_add(self._open_files, [filename], state, None)
+        GLib.idle_add(self.open_files_thread, [filename], state, None)
 
         thread = Thread(target=self.move_new_tab, args=(filename, page, n_pages))
         thread.start()
@@ -464,7 +464,6 @@ class MainWidget(Gtk.Paned):
     def declare_file_created(self, filename):
         self.store.bibfiles[filename].created = True
         self.itemlists[filename].set_unsaved(True)
-        self.remove_watcher(filename)
 
     def confirm_close_file(self, filename):
         itemlist = self.itemlists[filename]

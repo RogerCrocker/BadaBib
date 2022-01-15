@@ -97,4 +97,3 @@ class SessionManager:
 
     def save_string_imports(self):
         set_string_imports(self.window.store.string_files)
-

@@ -47,25 +47,16 @@ class Watcher:
         self.active = False
 
     def watch_file(self):
-        head, _ = split(self.filename)
-        watcher = DefaultWatcher(head)
-
+        watcher = DefaultWatcher(self.filename)
         while self.active:
-            if not isdir(head):
-                self.file_deleted_or_moved()
-                break
-
             changes = watcher.check()
             for change in changes:
                 if change == (Change.deleted, self.filename):
                     self.file_deleted_or_moved()
                     self.active = False
-                    break
                 if change == (Change.modified, self.filename):
                     self.file_changed()
                     self.active = False
-                    break
-
             sleep(self.sleep_time)
 
     def file_changed(self):

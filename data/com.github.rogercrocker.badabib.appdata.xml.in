@@ -39,9 +39,18 @@
     </provides>
 
     <releases>
+      <release version="0.4.1" date="2022-01-15">
+            <description>
+                <p>Maintenance release:</p>
+                <ul>
+                  <li>Allow importing several string files at once</li>
+                  <li>Code refactoring and cleanup</li>
+                </ul>
+            </description>
+        </release>
       <release version="0.4.0" date="2021-12-22">
             <description>
-                Reworked file and session management. This fixes many minor bugs and quirks, for example:
+                <p>Reworked file and session management. This fixes many minor bugs and quirks, for example:</p>
                 <ul>
                   <li>Fix a bug where the wrong tab is closed</li>
                   <li>Allow user to open multiple files at once</li>
@@ -62,7 +71,7 @@
         </release>
         <release version="0.2.1" date="2021-11-6">
             <description>
-                Bugfix release:
+                <p>Bugfix release:</p>
                 <ul>
                   <li>Use GTK file chooser in all environments. The native file choosers can cause problems with file names and backups.</li>
                 </ul>
@@ -79,7 +88,7 @@
         </release>
         <release version="0.1.2" date="2021-10-10">
             <description>
-                Bugfix release:
+                <p>Bugfix release:</p>
                 <ul>
                   <li>Warn about fields containing defined and undefined strings</li>
                   <li>Work around possible race condition in file watcher</li>
@@ -88,12 +97,12 @@
         </release>
         <release version="0.1.1" date="2021-9-27">
             <description>
-                Use native file chooser
+                <p>Use native file chooser</p>
             </description>
         </release>
         <release version="0.1.0" date="2021-9-24">
             <description>
-                Initial release
+                <p>Initial release</p>
             </description>
         </release>
     </releases>

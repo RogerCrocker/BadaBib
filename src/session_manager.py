@@ -86,12 +86,12 @@ class SessionManager:
 
     def restore_string_imports(self):
         string_imports = get_string_imports()
-        return_values = [self.window.store.import_strings(filename) for filename in string_imports]
-        for filename, return_value in zip(string_imports,  return_values):
-            if return_value == "failure":
+        statuses = [self.window.store.import_strings(filename) for filename in string_imports]
+        for filename, status in zip(string_imports, statuses):
+            if status in ("file_error", "parse_error"):
                 message = "Importing strings failed: Cannot read file '{}'.".format(filename)
                 WarningDialog(message, window=self.window)
-            elif return_value == "empty":
+            elif status == "empty":
                 message = "Importing strings failed: File '{}' does not contain string definitions.".format(filename)
                 WarningDialog(message, window=self.window)
 

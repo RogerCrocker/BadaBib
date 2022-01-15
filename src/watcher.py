@@ -21,9 +21,6 @@ from gi.repository import Gtk, GLib
 
 from time import sleep
 
-from os.path import split
-from os.path import isdir
-
 from watchgod import DefaultWatcher
 from watchgod import Change
 

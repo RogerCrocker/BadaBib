@@ -121,7 +121,7 @@ class BadaBibStore:
                 try:
                     database = parser.parse_file(bibtex_file)
                 except Exception:
-                    return ["parsing_error"]
+                    return ["parse_error"]
 
             # create backup, if desired
             backup = True

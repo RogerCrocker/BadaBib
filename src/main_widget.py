@@ -464,6 +464,7 @@ class MainWidget(Gtk.Paned):
     def declare_file_created(self, filename):
         self.store.bibfiles[filename].created = True
         self.itemlists[filename].set_unsaved(True)
+        self.watchers.pop(filename)
 
     def confirm_close_file(self, filename):
         itemlist = self.itemlists[filename]

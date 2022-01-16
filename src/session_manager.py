@@ -17,7 +17,6 @@
 from .config_manager import get_remember_strings
 from .config_manager import get_window_geom
 from .config_manager import set_window_geom
-from .config_manager import get_new_file_name
 from .config_manager import get_open_files
 from .config_manager import set_open_files
 from .config_manager import get_open_tab
@@ -26,8 +25,6 @@ from .config_manager import get_string_imports
 from .config_manager import set_string_imports
 
 from .dialogs import WarningDialog
-
-NEW_FILE_NAME = get_new_file_name()
 
 
 class SessionManager:
@@ -74,7 +71,7 @@ class SessionManager:
         for n in range(n_pages):
             try:
                 itemlist = self.main_widget.notebook.get_nth_page(n).get_child().get_child()
-                if itemlist.bibfile.name != NEW_FILE_NAME:
+                if not itemlist.bibfile.created:
                     open_files[itemlist.bibfile.name] = itemlist.state_to_string()
             except AttributeError:
                 pass

@@ -128,7 +128,6 @@ class BadaBibItem:
         self.row = None
         self.sort_values = {}
         self.bibtex = ""
-        self.unsaved = False
         self.deleted = False
 
         self.update_all_sort_values()

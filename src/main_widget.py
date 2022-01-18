@@ -468,7 +468,7 @@ class MainWidget(Gtk.Paned):
 
     def confirm_close_file(self, filename):
         itemlist = self.itemlists[filename]
-        if itemlist.unsaved:
+        if itemlist.bibfile.unsaved:
             self.notebook.set_current_page(itemlist.on_page)
 
             dialog = SaveChanges(self.window, filename)
@@ -520,7 +520,7 @@ class MainWidget(Gtk.Paned):
             itemlist = self.itemlists[filename]
         bibfile = itemlist.bibfile
 
-        if itemlist.unsaved:
+        if bibfile.unsaved:
             if bibfile.created:
                 filename = self.save_file_as()
             else:

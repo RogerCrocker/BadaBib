@@ -43,6 +43,7 @@ class BadaBibFile:
         self.writer = store.get_default_writer()
         self.items = []
         self.itemlist = None
+        self.unsaved = False
         self.created = created
 
         self.read_database()

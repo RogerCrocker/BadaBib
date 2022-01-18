@@ -292,7 +292,6 @@ class Itemlist(Gtk.ListBox):
     def __init__(self, bibfile, state_string=None, change_buffer=None):
         Gtk.ListBox.__init__(self)
         self.bibfile = bibfile
-        self.unsaved = False
         self.on_page = -1
 
         self.sort_key = "ID"
@@ -331,14 +330,14 @@ class Itemlist(Gtk.ListBox):
         label.set_label(self.bibfile.tail)
 
     def set_unsaved(self, unsaved):
-        if unsaved and not self.unsaved:
-            self.unsaved = unsaved
+        if unsaved and not self.bibfile.unsaved:
+            self.bibfile.unsaved = unsaved
             children = self.header.get_children()
             label = children[0]
             text = label.get_label()
             label.set_label("*" + text)
-        elif not unsaved and self.unsaved:
-            self.unsaved = unsaved
+        elif not unsaved and self.bibfile.unsaved:
+            self.bibfile.unsaved = unsaved
             self.update_filename(self.bibfile.name)
 
     def add_row(self, item):

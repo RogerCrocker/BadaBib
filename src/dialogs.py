@@ -15,7 +15,9 @@
 
 
 import gi
-gi.require_version("Gtk", "3.0")
+gi.require_version("Gtk", "4.0")
+
+from platform import python_version
 
 from gi.repository import Gtk, Gio, GLib
 
@@ -39,24 +41,44 @@ def add_filters(dialog):
 
 
 class WarningDialog(Gtk.MessageDialog):
-    def __init__(self, text, title="Bada Bib! - Warning", window=None):
-        Gtk.MessageDialog.__init__(
-            self,
+    def __init__(self, texts, window):
+        if not isinstance(texts, list):
+            texts = [texts]
+        if len(texts) > 0:
+            WarningDialogChain(None, None, texts, window)
+
+
+class WarningDialogChain(Gtk.MessageDialog):
+    def __init__(self, dialog, response, texts, window, title="Bada Bib! - Warning", n=0):
+        super().__init__(
             transient_for=window,
             message_type=Gtk.MessageType.WARNING,
             buttons=Gtk.ButtonsType.OK,
-            text=text,
+            text=texts[n],
             title=title,
         )
+
+        if dialog:
+            dialog.destroy()
+
+        self.set_modal(True)
         self.props.use_markup = True
-        self.run()
-        self.destroy()
+
+        if n < len(texts) - 1:
+            self.connect("response", WarningDialogChain, texts, window, title, n+1)
+        else:
+            self.connect("response", self.end)
+
+        self.show()
+
+    @staticmethod
+    def end(dialog, response):
+        dialog.destroy()
 
 
 class SaveChanges(Gtk.MessageDialog):
     def __init__(self, window, filename):
-        Gtk.MessageDialog.__init__(
-            self,
+        super().__init__(
             transient_for=window,
             message_type=Gtk.MessageType.QUESTION,
             buttons=Gtk.ButtonsType.NONE,
@@ -65,122 +87,96 @@ class SaveChanges(Gtk.MessageDialog):
         )
         self.add_buttons(
             "Close without saving", Gtk.ResponseType.CLOSE,
-            Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
-            Gtk.STOCK_SAVE, Gtk.ResponseType.OK,
+            "Cancel", Gtk.ResponseType.CANCEL,
+            "Save", Gtk.ResponseType.OK,
         )
         self.set_default_response(Gtk.ResponseType.CANCEL)
+        self.set_modal(True)
 
 
-class FileChanged(Gtk.MessageDialog):
-    def __init__(self, window, filename):
-        Gtk.MessageDialog.__init__(
-            self,
-            transient_for=window,
-            flags=0,
-            message_type=Gtk.MessageType.QUESTION,
-            text="File '{}' changed on disk.".format(filename),
-            title="Bada Bib! - File Changed on Disk",
-        )
-        self.add_buttons(
-            "Continue Editing", Gtk.ResponseType.YES,
-            "Reload", Gtk.ResponseType.NO,
-        )
+class ConfirmSaveDialog(Gtk.MessageDialog):
+    def __init__(self, window, filename, has_empty_keys, duplicate_keys):
+        if has_empty_keys:
+            if duplicate_keys:
+                empty_warning = " <b>empty keys</b> and"
+            else:
+                empty_warning = " <b>empty keys</b>."
+        else:
+            empty_warning = ""
 
+        if duplicate_keys:
+            duplicate_warning = " the following <b>duplicate keys</b>:\n\n" + "\n".join(duplicate_keys)
+        else:
+            duplicate_warning = ""
 
-class EmptyKeys(Gtk.MessageDialog):
-    def __init__(self, window, filename):
         text = (
-            "Entries with empty keys in file '{}'".format(filename)
+            "File '{}'".format(filename)
+            + "contains{}{}".format(empty_warning, duplicate_warning)
             + "\n\n"
             + "Save anyhow?"
         )
 
-        Gtk.MessageDialog.__init__(
-            self,
+        super().__init__(
             transient_for=window,
             message_type=Gtk.MessageType.QUESTION,
             text=text,
             title="Bada Bib! - Empty keys",
         )
-        self.props.use_markup = True
+
         self.add_buttons(
-            Gtk.STOCK_NO, Gtk.ResponseType.NO,
-            Gtk.STOCK_YES, Gtk.ResponseType.YES,
+            "No", Gtk.ResponseType.NO,
+            "Yes", Gtk.ResponseType.YES,
         )
 
-
-class DuplicateKeys(Gtk.MessageDialog):
-    def __init__(self, window, filename, duplicate_keys):
-        text = (
-            "Duplicate keys\n\n"
-            + "\n".join(duplicate_keys)
-            + "\n\n"
-            + "in file '{}'".format(filename)
-            + "\n\n"
-            + "Save anyhow?"
-        )
-
-        Gtk.MessageDialog.__init__(
-            self,
-            transient_for=window,
-            message_type=Gtk.MessageType.QUESTION,
-            text=text,
-            title="Bada Bib! - Duplicate keys",
-        )
         self.props.use_markup = True
-        self.add_buttons(
-            Gtk.STOCK_NO, Gtk.ResponseType.NO,
-            Gtk.STOCK_YES, Gtk.ResponseType.YES,
-        )
+        self.set_modal(True)
 
 
 class FileChooser(Gtk.FileChooserDialog):
     def __init__(self, window):
-        Gtk.FileChooserDialog.__init__(
-            self,
+        super().__init__(
             title="Bada Bib! - Please choose a file",
             transient_for=window,
-            action=Gtk.FileChooserAction.OPEN,
+            action=Gtk.FileChooserAction.OPEN
         )
         # cancel button
-        self.add_button(Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL)
+        self.add_button("Cancel", Gtk.ResponseType.CANCEL)
 
         # accept button (suggested action -> blue)
-        accept_button = self.add_button(Gtk.STOCK_OPEN, Gtk.ResponseType.ACCEPT)
-        accept_button.get_style_context().add_class(Gtk.STYLE_CLASS_SUGGESTED_ACTION)
+        accept_button = self.add_button("Open", Gtk.ResponseType.ACCEPT)
+        accept_button.get_style_context().add_class("suggested-action")
 
+        self.set_select_multiple(True)
         add_filters(self)
 
 
 class SaveDialog(Gtk.FileChooserDialog):
     def __init__(self, window):
-        Gtk.FileChooserDialog.__init__(
-            self,
+        super().__init__(
             title="Bada Bib! - Please choose a file name",
             transient_for=window,
             action=Gtk.FileChooserAction.SAVE,
         )
         # cancel button
-        self.add_button(Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL)
+        self.add_button("Cancel", Gtk.ResponseType.CANCEL)
 
         # accept button (suggested action -> blue)
-        accept_button = self.add_button(Gtk.STOCK_SAVE, Gtk.ResponseType.ACCEPT)
-        accept_button.get_style_context().add_class(Gtk.STYLE_CLASS_SUGGESTED_ACTION)
+        accept_button = self.add_button("Save", Gtk.ResponseType.ACCEPT)
+        accept_button.get_style_context().add_class("suggested-action")
 
-        self.set_do_overwrite_confirmation(True)
+        # self.set_do_overwrite_confirmation(True)
         add_filters(self)
 
 
 class FilterPopover(Gtk.Popover):
     def __init__(self, button, itemlist):
-        Gtk.Popover.__init__(self)
-        self.set_border_width(5)
+        super().__init__()
+        self.set_parent(button)
+        self.set_position(Gtk.PositionType.TOP)
         self.switches = []
         self.track_changes = True
         self.itemlist = itemlist
         self.assemble()
-        self.set_relative_to(button)
-        self.show_all()
         self.popup()
 
     def assemble(self):
@@ -244,7 +240,7 @@ class FilterPopover(Gtk.Popover):
             label.set_sensitive(False)
             switch_grid.attach(label, 0, 0, 1, 1)
 
-        self.add(switch_grid)
+        self.set_child(switch_grid)
 
     def on_switch_clicked(self, switch, state, entrytype):
         if self.track_changes:
@@ -265,39 +261,46 @@ class FilterPopover(Gtk.Popover):
 
 class SortPopover(Gtk.Popover):
     def __init__(self, sort_button, itemlist):
-        Gtk.Popover.__init__(self)
-        self.set_border_width(5)
+        super().__init__()
+        self.set_parent(sort_button)
+        self.set_position(Gtk.PositionType.TOP)
         self.itemlist = itemlist
         self.assemble()
-        self.set_relative_to(sort_button)
-        self.show_all()
         self.popup()
 
     def assemble(self):
         vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
 
         sort_key_buttons = {sort_fields[0]: None}
+        group = None
         for field in sort_fields:
-            radio_button = Gtk.RadioButton.new_from_widget(sort_key_buttons[sort_fields[0]])
-            radio_button.set_label(field_dict[field])
+            radio_button = Gtk.CheckButton.new_with_label(field_dict[field])
             radio_button.connect("toggled", self.on_entrytype_clicked, field)
+            if group:
+                radio_button.set_group(group)
+            else:
+                group = radio_button
             sort_key_buttons[field] = radio_button
-            vbox.pack_start(radio_button, False, False, 0)
+            vbox.append(radio_button)
 
-        vbox.pack_start(Gtk.Separator(), False, False, 0)
+        vbox.append(Gtk.Separator())
 
         reverse_buttons = {False: None}
+        group = None
         for value, label in {False: "Ascending", True: "Descending"}.items():
-            radio_button = Gtk.RadioButton.new_from_widget(reverse_buttons[False])
-            radio_button.set_label(label)
+            radio_button = Gtk.CheckButton.new_with_label(label)
             radio_button.connect("toggled", self.on_order_clicked, value)
+            if group:
+                radio_button.set_group(group)
+            else:
+                group = radio_button
             reverse_buttons[value] = radio_button
-            vbox.pack_start(radio_button, False, False, 0)
+            vbox.append(radio_button)
 
         sort_key_buttons[self.itemlist.sort_key].set_active(True)
         reverse_buttons[self.itemlist.sort_reverse].set_active(True)
 
-        self.add(vbox)
+        self.set_child(vbox)
 
     def on_entrytype_clicked(self, radio_button, field):
         is_active = radio_button.get_active()
@@ -314,7 +317,7 @@ class SortPopover(Gtk.Popover):
 
 class RecentModel(Gio.Menu):
     def __init__(self, recent_files):
-        Gio.Menu.__init__(self)
+        super().__init__()
 
         menu_section = Gio.Menu()
         if not recent_files:
@@ -327,9 +330,7 @@ class RecentModel(Gio.Menu):
             for file, label in short_names.items():
                 filename = GLib.Variant.new_string(file)
                 menu_item = Gio.MenuItem()
-                menu_item.set_label(
-                    label.replace("_", "__")
-                )  # gio.menu swallows underscores
+                menu_item.set_label(label.replace("_", "__"))  # gio.menu swallows underscores
                 menu_item.set_action_and_target_value("app.open_file", filename)
                 menu_section.prepend_item(menu_item)
 
@@ -343,23 +344,47 @@ class RecentModel(Gio.Menu):
         self.prepend_section(None, menu_section)
 
 
-class MenuPopover(Gtk.Popover):
+class MenuPopover(Gtk.PopoverMenu):
     def __init__(self):
-        Gtk.Popover.__init__(self)
+        super().__init__()
+
+        save_all_item = Gio.MenuItem()
+        save_all_item.set_label("Save all")
+        save_all_item.set_action_and_target_value("app.save_all", None)
+
+        manage_strings_item = Gio.MenuItem()
+        manage_strings_item.set_label("Manage strings")
+        manage_strings_item.set_action_and_target_value("app.manage_strings", None)
+
+        custom_editor_item = Gio.MenuItem()
+        custom_editor_item.set_label("Customize editor")
+        custom_editor_item.set_action_and_target_value("app.custom_editor", None)
+
+        preferences_item = Gio.MenuItem()
+        preferences_item.set_label("Preferences")
+        preferences_item.set_action_and_target_value("app.preferences", None)
+
+        shortcuts_item = Gio.MenuItem()
+        shortcuts_item.set_label("Keyboard shortcuts")
+        shortcuts_item.set_action_and_target_value("app.shortcuts", None)
+
+        about_item = Gio.MenuItem()
+        about_item.set_label("About Bada Bib!")
+        about_item.set_action_and_target_value("app.about", None)
 
         save_section = Gio.Menu()
-        save_section.append("Save all", "save_all")
+        save_section.append_item(save_all_item)
 
         settings_section = Gio.Menu()
-        settings_section.append("Manage strings", "manage_strings")
-        settings_section.append("Customize editor", "custom_editor")
+        settings_section.append_item(manage_strings_item)
+        settings_section.append_item(custom_editor_item)
 
         preferences_section = Gio.Menu()
-        preferences_section.append("Preferences", "preferences")
+        preferences_section.append_item(preferences_item)
 
         about_section = Gio.Menu()
-        about_section.append("Keyboard shortcuts", "shortcuts")
-        about_section.append("About Bada Bib!", "about")
+        about_section.append_item(shortcuts_item)
+        about_section.append_item(about_item)
 
         menu = Gio.Menu()
         menu.append_section(None, save_section)
@@ -367,26 +392,19 @@ class MenuPopover(Gtk.Popover):
         menu.append_section(None, preferences_section)
         menu.append_section(None, about_section)
 
-        self.bind_model(menu, "app")
+        self.set_menu_model(menu)
 
 
 class AboutDialog(Gtk.AboutDialog):
     def __init__(self, window):
-        Gtk.AboutDialog.__init__(self, modal=True, transient_for=window)
-        self.set_program_name(
-            self.get_program_name() + " " + window.application.version
-        )
+        super().__init__(modal=True, transient_for=window)
+        self.set_program_name(self.get_program_name() + " " + window.application.version)
 
-        about_comment = "GTK {}.{}.{}".format(
-            Gtk.get_major_version(),
-            Gtk.get_minor_version(),
-            Gtk.get_micro_version(),
-        )
-        self.set_comments(about_comment)
+        gtk_version = "{}.{}.{}".format(Gtk.get_major_version(), Gtk.get_minor_version(), Gtk.get_micro_version())
+        self.set_version("Python {}, GTK {}".format(python_version(), gtk_version))
 
+        self.set_comments("View, search and edit your BibTeX files")
         self.set_logo_icon_name("com.github.rogercrocker.badabib")
         self.set_website("https://github.com/RogerCrocker/BadaBib")
         self.set_website_label("GitHub Repository")
         self.set_license_type(Gtk.License.GPL_3_0)
-
-        self.show()

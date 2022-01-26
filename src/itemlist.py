@@ -15,7 +15,7 @@
 
 
 import gi
-gi.require_version("Gtk", "3.0")
+gi.require_version("Gtk", "4.0")
 
 from gi.repository import Gtk
 
@@ -27,7 +27,6 @@ from .config_manager import entrytype_dict
 from .config_manager import link_fields
 from .config_manager import get_row_indent
 from .config_manager import get_new_file_name
-from .config_manager import SourceViewStatus
 
 
 row_indent = get_row_indent() * " "
@@ -39,40 +38,44 @@ MIN_MAX_CHAR = ('', chr(0x10FFFF))
 
 class ItemlistNotebook(Gtk.Notebook):
     def __init__(self):
-        Gtk.Notebook.__init__(self)
+        super().__init__()
         self.set_scrollable(True)
+        self.set_vexpand(True)
+        self.set_hexpand(True)
         self.popup_enable()
+
+        # work around notebook selecting the closed page bug
+        self.previous_page = None
+        self.current_page = None
 
         self.connect("page-reordered", self.update_pagenumbers)
         self.connect("page-added", self.update_pagenumbers)
         self.connect("page-removed", self.update_pagenumbers)
 
     def append_itemlist(self, itemlist):
-        scrolled = Gtk.ScrolledWindow()
-        scrolled.add(itemlist)
-        page = self.append_page(scrolled, itemlist.header)
-        itemlist.on_page = page
-        self.set_menu_label_text(scrolled, itemlist.header.title_label.get_label())
-        self.set_tab_reorderable(scrolled, True)
-        self.set_current_page(page)
+        itemlist_page = ItemlistPage(itemlist)
+        itemlist_page.number = self.append_page(itemlist_page, itemlist.header)
+        self.set_menu_label_text(itemlist_page, itemlist.header.title_label.get_label())
+        self.set_tab_reorderable(itemlist_page, True)
+        self.set_current_page(itemlist_page.number)
 
-        return page
+        return itemlist_page.number
 
     def contains_empty_new_file(self):
         if self.get_n_pages() == 1:
             try:
-                scrolled = self.get_nth_page(0)
-                itemlist = scrolled.get_child().get_child()
+                page = self.get_nth_page(0)
+                bibfile = page.itemlist.bibfile
             except AttributeError:
                 return False
-            if itemlist.bibfile.name == get_new_file_name() and len(itemlist) == 0:
+            if bibfile.name == get_new_file_name() and bibfile.is_empty():
                 return True
         return False
 
     def add_loading_pages(self, N):
         for _ in range(N):
-            image = Gtk.Image.new_from_icon_name("preferences-system-time-symbolic", Gtk.IconSize.DIALOG)
-            image.show()
+            image = Gtk.Image.new_from_icon_name("preferences-system-time-symbolic")
+            image.set_pixel_size(100)
             self.append_page(image, None)
             self.set_tab_label_text(image, "Loading...")
 
@@ -85,68 +88,150 @@ class ItemlistNotebook(Gtk.Notebook):
                     contains_loading_page = True
                     self.remove_page(n)
 
+    def next_page(self, delta):
+        n_pages = self.get_n_pages()
+        n_page = self.get_current_page()
+        self.set_current_page((n_page + delta) % n_pages)
+
     @staticmethod
     def update_pagenumbers(notebook, _itemlist, _page):
         n_pages = notebook.get_n_pages()
-        for page in range(n_pages):
+        for n in range(n_pages):
             try:
-                scrolled = notebook.get_nth_page(page)
-                itemlist = scrolled.get_child().get_child()
-                itemlist.on_page = page
+                page = notebook.get_nth_page(n)
+                page.number = n
             except AttributeError:
                 pass
 
 
+class ItemlistPage(Gtk.Box):
+    def __init__(self, itemlist):
+        super().__init__(orientation=Gtk.Orientation.VERTICAL)
+        self.number = -1
+        self.itemlist = itemlist
+        self.itemlist.page = self
+
+        self.deleted_bar = ItemlistDeletedBar()
+        self.changed_bar = ItemlistChangedBar()
+
+        scrolled = Gtk.ScrolledWindow()
+        scrolled.set_vexpand(True)
+        scrolled.set_child(itemlist)
+
+        self.searchbar = ItemlistSearchBar()
+        self.searchbar.search_entry.connect("search_changed", self.itemlist.set_search_string)
+
+        self.append(self.deleted_bar)
+        self.append(self.changed_bar)
+        self.append(scrolled)
+        self.append(self.searchbar)
+
+
+class ItemlistDeletedBar(Gtk.InfoBar):
+    def __init__(self):
+        super().__init__()
+        self.label = Gtk.Label()
+        self.add_child(self.label)
+        self.set_revealed(False)
+        self.set_show_close_button(True)
+        self.connect("response", self.on_response)
+
+    def show_text(self, state):
+        if state:
+            self.label.set_text("This file was deleted, renamed or moved.\nYou are now editing an unsaved copy.")
+        else:
+            self.label.set_text("")
+
+    def on_response(self, infobar, response):
+        if response == Gtk.ResponseType.CLOSE:
+            self.set_revealed(False)
+            self.show_text(False)
+
+
+class ItemlistChangedBar(Gtk.InfoBar):
+    def __init__(self):
+        super().__init__()
+        self.filename = None
+        self.label = Gtk.Label(label="")
+        self.add_child(self.label)
+        self.set_revealed(False)
+        self.set_show_close_button(True)
+
+        self.add_button("Reload", Gtk.ResponseType.YES)
+        self.connect("response", self.on_response)
+
+    def show_text(self, state):
+        if state:
+            self.label.set_text("This file changed on disk or was edited in another application.\nYou are now editing an unsaved copy.")
+        else:
+            self.label.set_text("")
+
+    def on_response(self, infobar, response):
+        if response == Gtk.ResponseType.CLOSE:
+            self.set_revealed(False)
+            self.show_text(False)
+        elif response == Gtk.ResponseType.YES:
+            self.set_revealed(False)
+            self.show_text(False)
+            window = self.get_root()
+            file = window.main_widget.get_current_file()
+            window.main_widget.reload_file(file.name)
+
+
 class ItemlistSearchBar(Gtk.SearchBar):
     def __init__(self):
-        Gtk.SearchBar.__init__(self)
+        super().__init__()
         self.search_entry = Gtk.SearchEntry()
-        self.add(self.search_entry)
+        self.set_child(self.search_entry)
         self.connect_entry(self.search_entry)
 
 
-class ItemlistToolbar(Gtk.Box):
+class ItemlistToolbar(Gtk.CenterBox):
     def __init__(self):
-        Gtk.Box.__init__(self)
+        super().__init__()
+        self.set_margin_top(5)
+        self.set_margin_bottom(5)
         self.assemble()
 
     def assemble(self):
-        self.set_orientation(Gtk.Orientation.HORIZONTAL)
+        self.delete_button = Gtk.Button.new_with_label("Delete")
+        self.delete_button.set_margin_start(5)
+        self.delete_button.get_style_context().add_class("destructive-action")
+        self.delete_button.set_tooltip_text("Delete entry")
+        self.set_start_widget(self.delete_button)
 
         self.new_button = Gtk.Button.new_with_label("New")
-        self.new_button.get_style_context().add_class(Gtk.STYLE_CLASS_SUGGESTED_ACTION)
+        self.new_button.set_margin_end(5)
+        self.new_button.get_style_context().add_class("suggested-action")
         self.new_button.set_tooltip_text("Create new entry")
-        self.pack_end(self.new_button, False, False, 5)
-
-        self.delete_button = Gtk.Button.new_with_label("Delete")
-        self.delete_button.get_style_context().add_class(Gtk.STYLE_CLASS_DESTRUCTIVE_ACTION)
-        self.delete_button.set_tooltip_text("Delete entry")
-        self.pack_start(self.delete_button, False, False, 5)
+        self.set_end_widget(self.new_button)
 
         center_box = Gtk.Box()
-        center_box.set_orientation(Gtk.Orientation.HORIZONTAL)
         self.set_center_widget(center_box)
 
-        self.search_button = Gtk.Button.new_from_icon_name("system-search-symbolic", Gtk.IconSize.BUTTON)
+        self.search_button = Gtk.Button.new_from_icon_name("system-search-symbolic")
         self.search_button.set_tooltip_text("Search entry list")
-        center_box.pack_start(self.search_button, False, False, 5)
+        center_box.prepend(self.search_button)
 
         self.sort_button = Gtk.Button.new_with_label("Sort")
         self.sort_button.set_tooltip_text("Sort entry list")
-        center_box.pack_start(self.sort_button, False, False, 5)
+        self.sort_button.set_margin_end(2)
+        center_box.prepend(self.sort_button)
 
         self.filter_button = Gtk.Button.new_with_label("Filter")
         self.filter_button.set_tooltip_text("Filter entry list")
-        center_box.pack_start(self.filter_button, False, False, 5)
+        self.filter_button.set_margin_end(2)
+        center_box.prepend(self.filter_button)
 
-        self.goto_button = Gtk.Button.new_from_icon_name("find-location-symbolic", Gtk.IconSize.BUTTON)
+        self.goto_button = Gtk.Button.new_from_icon_name("find-location-symbolic")
         self.goto_button.set_tooltip_text("Go to selected entry")
-        center_box.pack_start(self.goto_button, False, False, 5)
+        self.goto_button.set_margin_end(2)
+        center_box.prepend(self.goto_button)
 
 
 class TabHeader(Gtk.Box):
     def __init__(self, itemlist):
-        Gtk.Box.__init__(self)
+        super().__init__()
         self.set_orientation(Gtk.Orientation.HORIZONTAL)
         self.itemlist = itemlist
 
@@ -154,18 +239,16 @@ class TabHeader(Gtk.Box):
         self.title_label = Gtk.Label(label=head_tail[1])
         self.set_tooltip_text(itemlist.bibfile.name)
 
-        self.close_button = Gtk.Button.new_from_icon_name("window-close-symbolic", Gtk.IconSize.MENU)
-        self.close_button.set_relief(Gtk.ReliefStyle.NONE)
+        self.close_button = Gtk.Button.new_from_icon_name("window-close-symbolic")
+        self.close_button.set_has_frame(False)
 
-        self.pack_start(self.title_label, True, True, 0)
-        self.pack_end(self.close_button, False, False, 0)
-
-        self.show_all()
+        self.append(self.title_label)
+        self.append(self.close_button)
 
 
 class Row(Gtk.ListBoxRow):
     def __init__(self, item):
-        Gtk.ListBoxRow.__init__(self)
+        super().__init__()
         self.item = item
 
         self.id_label = Gtk.Label(xalign=0)
@@ -176,7 +259,6 @@ class Row(Gtk.ListBoxRow):
 
         self.link_image = Gtk.Image()
         self.link_image.set_margin_start(10)
-        self.link_icon_size = Gtk.IconSize.SMALL_TOOLBAR
 
         self.assemble()
         self.update()
@@ -184,17 +266,17 @@ class Row(Gtk.ListBoxRow):
     def assemble(self):
         idbox = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
         idbox.set_margin_top(5)
-        idbox.pack_start(self.id_label, False, True, 0)
-        idbox.pack_start(self.link_image, False, False, 0)
+        idbox.append(self.id_label)
+        idbox.append(self.link_image)
 
         vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
-        vbox.pack_start(idbox, True, True, 0)
-        vbox.pack_start(self.author_label, True, True, 0)
-        vbox.pack_start(self.title_label, True, True, 0)
-        vbox.pack_start(self.journal_label, True, True, 0)
-        vbox.pack_start(self.publisher_label, True, True, 0)
+        vbox.append(idbox)
+        vbox.append(self.author_label)
+        vbox.append(self.title_label)
+        vbox.append(self.journal_label)
+        vbox.append(self.publisher_label)
 
-        self.add(vbox)
+        self.set_child(vbox)
 
     def update(self):
         for field in ["ID", "author", "title", "journal", "publisher"]:
@@ -266,7 +348,7 @@ class Row(Gtk.ListBoxRow):
 
     def update_link(self):
         if set(link_fields) & set(self.item.entry.keys()):
-            self.link_image.set_from_icon_name("mail-attachment-symbolic", self.link_icon_size)
+            self.link_image.set_from_icon_name("mail-attachment-symbolic")
         else:
             self.link_image.clear()
 
@@ -290,9 +372,9 @@ class Row(Gtk.ListBoxRow):
 
 class Itemlist(Gtk.ListBox):
     def __init__(self, bibfile, state_string=None, change_buffer=None):
-        Gtk.ListBox.__init__(self)
+        super().__init__()
         self.bibfile = bibfile
-        self.on_page = -1
+        self.page = None
 
         self.sort_key = "ID"
         self.sort_reverse = False
@@ -306,7 +388,10 @@ class Itemlist(Gtk.ListBox):
         self.set_filter_func(self.filter_by_search)
 
         self.header = TabHeader(self)
-        self.set_header_func(self.add_separator)
+        self.set_show_separators(True)
+
+        self.event_controller = Gtk.EventControllerKey()
+        self.add_controller(self.event_controller)
 
         if change_buffer:
             self.change_buffer = change_buffer
@@ -315,25 +400,16 @@ class Itemlist(Gtk.ListBox):
 
         self.add_rows(bibfile.items)
 
-    @staticmethod
-    def add_separator(row, before):
-        if before:
-            row.set_header(Gtk.Separator())
-        else:
-            row.set_header(None)
-
     def update_filename(self, name):
         self.bibfile.update_filename(name)
         self.header.set_tooltip_text(name)
-        header_children = self.header.get_children()
-        label = header_children[0]
+        label = self.header.get_first_child()
         label.set_label(self.bibfile.tail)
 
     def set_unsaved(self, unsaved):
         if unsaved and not self.bibfile.unsaved:
             self.bibfile.unsaved = unsaved
-            children = self.header.get_children()
-            label = children[0]
+            label = self.header.get_first_child()
             text = label.get_label()
             label.set_label("*" + text)
         elif not unsaved and self.bibfile.unsaved:
@@ -342,7 +418,7 @@ class Itemlist(Gtk.ListBox):
 
     def add_row(self, item):
         row = Row(item)
-        self.add(row)
+        self.append(row)
         item.row = row
         return row
 
@@ -350,20 +426,23 @@ class Itemlist(Gtk.ListBox):
         for item in items:
             self.add_row(item)
 
-    def row_deleted(self, row):
+    def select_next_row(self, row):
+        # filter out deleted rows
         self.invalidate_filter()
+
+        # get next row...
         next_row = row.get_next(1)
         if not next_row:
             next_row = row.get_next(-1)
 
+        # ...and select it
         if next_row:
             next_row.select()
-            return False
+            return next_row
 
+        # ...or unselect all and return None
         self.unselect_all()
-        window = self.get_toplevel()
-        window.main_widget.source_view.set_status(SourceViewStatus.empty)
-        return True
+        return None
 
     def reselect_current_row(self):
         row = self.get_selected_row()
@@ -382,6 +461,10 @@ class Itemlist(Gtk.ListBox):
 
     def clear(self):
         self.foreach(lambda row, data : self.remove(row), None)
+
+    def set_search_string(self, search_entry):
+        self.search_string = search_entry.get_text()
+        self.invalidate_filter()
 
     def sort_by_field(self, row1, row2):
         items = (row1.item, row2.item)

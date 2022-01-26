@@ -14,7 +14,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import gi
-gi.require_version("Gtk", "3.0")
+gi.require_version("Gtk", "4.0")
 
 from gi.repository import Gio, GLib
 
@@ -98,19 +98,6 @@ month_dict = {
 
 sort_fields = ["ID", "author", "title", "journal", "year"]
 link_fields = ["doi", "url", "eprint", "file"]
-
-
-class StringStatus(Enum):
-    none = 0
-    defined = 1
-    undefined = 2
-
-
-class SourceViewStatus(Enum):
-    empty = 0
-    valid = 1
-    invalid = 2
-    modified = 3
 
 
 def get_align_fields():

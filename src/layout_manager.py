@@ -15,7 +15,7 @@
 
 
 import gi
-gi.require_version("Gtk", "3.0")
+gi.require_version("Gtk", "4.0")
 
 from gi.repository import Gtk
 
@@ -100,47 +100,74 @@ def string_to_layout(string, window):
         message += "Duplicated fields: " + ", ".join(duplicated)
 
     if message:
-        WarningDialog(message, title, window)
+        WarningDialog(message, window)
         return []
 
     return layout
 
 
-class TopToolbar(Gtk.Box):
+class TopToolbar(Gtk.CenterBox):
     def __init__(self):
-        Gtk.Box.__init__(self, orientation=Gtk.Orientation.HORIZONTAL)
+        super().__init__(orientation=Gtk.Orientation.HORIZONTAL)
 
         self.preview_button = Gtk.ToggleButton.new_with_label("Preview")
+        self.preview_button.set_margin_start(2)
+        self.preview_button.set_margin_top(2)
+        self.preview_button.set_margin_bottom(2)
+
         self.help_button = Gtk.ToggleButton.new_with_label("Help")
+        self.help_button.set_margin_start(2)
+        self.help_button.set_margin_top(2)
+        self.help_button.set_margin_bottom(2)
+
+        start_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
+        start_box.append(self.preview_button)
+        start_box.append(self.help_button)
 
         self.entrytype_box = Gtk.ComboBoxText()
+        self.entrytype_box.set_margin_end(2)
+        self.entrytype_box.set_margin_top(2)
+        self.entrytype_box.set_margin_bottom(2)
         for label in entrytype_dict.values():
             self.entrytype_box.append_text(label)
         self.entrytype_box.set_active(-1)
 
-        self.pack_start(self.preview_button, False, False, 5)
-        self.pack_start(self.help_button, False, False, 5)
-        self.pack_end(self.entrytype_box, False, False, 5)
+        self.set_start_widget(start_box)
+        self.set_end_widget(self.entrytype_box)
 
 
-class BottomToolbar(Gtk.Box):
+class BottomToolbar(Gtk.CenterBox):
     def __init__(self):
-        Gtk.Box.__init__(self, orientation=Gtk.Orientation.HORIZONTAL)
+        super().__init__(orientation=Gtk.Orientation.HORIZONTAL)
 
         self.default_button = Gtk.Button.new_with_label("Default")
-        self.default_button.get_style_context().add_class(Gtk.STYLE_CLASS_DESTRUCTIVE_ACTION)
-        self.reset_button = Gtk.Button.new_with_label("Reset")
-        self.apply_button = Gtk.Button.new_with_label("Apply")
-        self.apply_button.get_style_context().add_class(Gtk.STYLE_CLASS_SUGGESTED_ACTION)
+        self.default_button.set_margin_start(2)
+        self.default_button.set_margin_top(2)
+        self.default_button.set_margin_bottom(2)
+        self.default_button.get_style_context().add_class("destructive-action")
 
-        self.pack_start(self.default_button, False, False, 5)
-        self.pack_start(self.reset_button, False, False, 5)
-        self.pack_end(self.apply_button, False, False, 5)
+        self.reset_button = Gtk.Button.new_with_label("Reset")
+        self.reset_button.set_margin_start(2)
+        self.reset_button.set_margin_top(2)
+        self.reset_button.set_margin_bottom(2)
+
+        start_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
+        start_box.append(self.default_button)
+        start_box.append(self.reset_button)
+
+        self.apply_button = Gtk.Button.new_with_label("Apply")
+        self.apply_button.set_margin_end(2)
+        self.apply_button.set_margin_top(2)
+        self.apply_button.set_margin_bottom(2)
+        self.apply_button.get_style_context().add_class("suggested-action")
+
+        self.set_start_widget(start_box)
+        self.set_end_widget(self.apply_button)
 
 
 class ScrolledTextview(Gtk.ScrolledWindow):
     def __init__(self):
-        Gtk.ScrolledWindow.__init__(self)
+        super().__init__()
 
         self.textview = Gtk.TextView()
         self.textview.set_hexpand(True)
@@ -150,12 +177,12 @@ class ScrolledTextview(Gtk.ScrolledWindow):
         self.textview.set_sensitive(True)
         self.textview.set_wrap_mode(Gtk.WrapMode.NONE)
 
-        self.add(self.textview)
+        self.set_child(self.textview)
 
 
 class SideBar(Gtk.Box):
     def __init__(self):
-        Gtk.Box.__init__(self, orientation=Gtk.Orientation.VERTICAL)
+        super().__init__(orientation=Gtk.Orientation.VERTICAL)
 
         field_list = [field for field in field_dict if field not in ["ID", "ENTRYTYPE"]]
         field_list.sort()
@@ -172,17 +199,17 @@ class SideBar(Gtk.Box):
         fields_list.set_selectable(True)
 
         self.set_margin_bottom(10)
-        self.set_margin_left(20)
-        self.set_margin_right(30)
+        self.set_margin_start(20)
+        self.set_margin_end(30)
         self.set_valign(Gtk.Align.BASELINE)
 
-        self.pack_start(fields_header, False, False, 0)
-        self.pack_start(fields_list, False, False, 0)
+        self.append(fields_header)
+        self.append(fields_list)
 
 
 class LayoutManagerWindow(Gtk.Window):
     def __init__(self, main_window):
-        Gtk.Window.__init__(self, transient_for=main_window)
+        super().__init__(transient_for=main_window)
 
         self.main_window = main_window
         self.set_title("Layout Manager")
@@ -202,7 +229,7 @@ class LayoutManagerWindow(Gtk.Window):
         self.entrytype_box.set_active(idx)
         self.textview.grab_focus()
 
-        self.show_all()
+        self.show()
 
     def assemble(self):
         self.side_bar = SideBar()
@@ -232,19 +259,19 @@ class LayoutManagerWindow(Gtk.Window):
         self.apply_button.connect("clicked", self.on_apply_clicked)
 
         self.layout_editor = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
-        self.layout_editor.pack_start(self.top_toolbar, False, False, 5)
-        self.layout_editor.pack_start(Gtk.Separator(), False, True, 0)
-        self.layout_editor.pack_start(self.scrolled_textview, True, True, 0)
-        self.layout_editor.pack_end(self.bottom_toolbar, False, False, 5)
-        self.layout_editor.pack_end(Gtk.Separator(), False, True, 0)
+        self.layout_editor.append(self.top_toolbar)
+        self.layout_editor.append(Gtk.Separator())
+        self.layout_editor.append(self.scrolled_textview)
+        self.layout_editor.append(Gtk.Separator())
+        self.layout_editor.append(self.bottom_toolbar)
 
         background_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
-        background_box.pack_start(self.side_bar, False, False, 0)
-        background_box.pack_start(Gtk.Separator(), False, False, 0)
-        background_box.pack_start(self.layout_editor, True, True, 0)
+        background_box.append(self.side_bar)
+        background_box.append(Gtk.Separator())
+        background_box.append(self.layout_editor)
         background_box.set_baseline_position(Gtk.BaselinePosition.TOP)
 
-        self.add(background_box)
+        self.set_child(background_box)
 
     def get_entrytype(self):
         idx = self.entrytype_box.get_active()
@@ -278,7 +305,7 @@ class LayoutManagerWindow(Gtk.Window):
             self.entrytype_box.set_sensitive(False)
             self.bottom_toolbar.hide()
             self.scrolled_textview.hide()
-            self.layout_editor.pack_end(self.editor, True, True, 0)
+            self.layout_editor.append(self.editor)
             self.help_button.set_sensitive(False)
         else:
             self.preview_button.set_active(False)
@@ -286,7 +313,6 @@ class LayoutManagerWindow(Gtk.Window):
     def deactivate_preview(self):
         if self.editor:
             self.layout_editor.remove(self.editor)
-            self.editor.destroy()
             self.editor = None
             self.entrytype_box.set_sensitive(True)
             self.bottom_toolbar.show()

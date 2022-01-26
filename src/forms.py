@@ -15,12 +15,10 @@
 
 
 import gi
-gi.require_version("Gtk", "3.0")
+gi.require_version("Gtk", "4.0")
 
 from gi.repository import Gtk, Gio
 
-from .config_manager import StringStatus
-from .config_manager import SourceViewStatus
 from .config_manager import entrytype_dict
 from .config_manager import field_dict
 from .config_manager import month_dict
@@ -54,7 +52,7 @@ def fields_to_forms(fields, editor):
 
 class MultiLine(Gtk.TextView):
     def __init__(self, field, editor):
-        Gtk.TextView.__init__(self)
+        super().__init__()
         self.field = field
         self.editor = editor
         self.set_hexpand(True)
@@ -63,6 +61,14 @@ class MultiLine(Gtk.TextView):
         self.set_wrap_mode(Gtk.WrapMode.WORD)
         self.set_editable(True)
         self.set_monospace(True)
+
+        self.get_buffer().set_enable_undo(False)
+
+        self.event_controller_key = Gtk.EventControllerKey()
+        self.add_controller(self.event_controller_key)
+
+        self.event_controller_focus = Gtk.EventControllerFocus()
+        self.add_controller(self.event_controller_focus)
 
     def get_text(self):
         textbuffer = self.get_buffer()
@@ -74,7 +80,7 @@ class MultiLine(Gtk.TextView):
         textbuffer.set_text(text)
 
     def apply(self, func, n=0):
-        window = self.get_toplevel()
+        window = self.get_root()
         itemlist = window.main_widget.get_current_itemlist()
         bibstrings = itemlist.bibfile.database.strings
 
@@ -89,8 +95,8 @@ class MultiLine(Gtk.TextView):
 
     def deselect(self):
         buffer = self.get_buffer()
-        _, end = buffer.get_bounds()
-        buffer.select_range(end, end)
+        bounds = buffer.get_bounds()
+        buffer.select_range(bounds[0], bounds[0])
 
     def select(self):
         buffer = self.get_buffer()
@@ -124,14 +130,18 @@ class MultiLine(Gtk.TextView):
 
 class SingleLine(Gtk.Entry):
     def __init__(self, field, editor):
-        Gtk.Entry.__init__(self)
+        super().__init__()
         self.field = field
         self.editor = editor
         self.set_icon(False)
         self.set_hexpand(True)
+        self.set_enable_undo(False)
+
+        self.event_controller_focus = Gtk.EventControllerFocus()
+        self.add_controller(self.event_controller_focus)
 
     def apply(self, func, n=0):
-        window = self.get_toplevel()
+        window = self.get_root()
         itemlist = window.main_widget.get_current_itemlist()
         bibstrings = itemlist.bibfile.database.strings
 
@@ -152,7 +162,7 @@ class SingleLine(Gtk.Entry):
         self.set_position(pos)
 
     def deselect(self):
-        self.select_region(-1, -1)
+        self.select_region(0, 0)
 
     def select(self):
         self.select_region(0, -1)
@@ -177,7 +187,7 @@ class SingleLine(Gtk.Entry):
         pos = Gtk.EntryIconPosition.SECONDARY
         string_status = item.bibstring_status(self.field)
         if string_status:
-            if string_status == StringStatus.defined:
+            if string_status == "defined":
                 tooltip = item.pretty_field(self.field)
             else:
                 tooltip = "Undefined string"
@@ -188,9 +198,9 @@ class SingleLine(Gtk.Entry):
             self.set_icon_tooltip_text(pos, None)
 
     def set_icon(self, string_status):
-        if string_status == StringStatus.defined:
+        if string_status == "defined":
             icon_name = "font-x-generic-symbolic"
-        elif string_status == StringStatus.undefined:
+        elif string_status == "undefined":
             icon_name = "dialog-warning-symbolic"
         else:
             icon_name = None
@@ -204,10 +214,15 @@ class SingleLine(Gtk.Entry):
 
 class Box(Gtk.ComboBoxText):
     def __init__(self, field, editor):
-        Gtk.ComboBoxText.__init__(self, has_entry=True)
+        super().__init__(has_entry=True)
         self.field = field
         self.editor = editor
         self.set_hexpand(True)
+
+        self.get_child().set_enable_undo(False)
+
+        self.event_controller_focus = Gtk.EventControllerFocus()
+        self.add_controller(self.event_controller_focus)
 
     def get_text(self):
         return self.get_active_text()
@@ -218,7 +233,7 @@ class Box(Gtk.ComboBoxText):
 
     def deselect(self):
         entry = self.get_child()
-        entry.select_region(-1, -1)
+        entry.select_region(0, 0)
 
     def select(self):
         entry = self.get_child()
@@ -234,7 +249,7 @@ class Box(Gtk.ComboBoxText):
 
 class EntrytypeBox(Box):
     def __init__(self, field, editor):
-        Box.__init__(self, field, editor)
+        super().__init__(field, editor)
         entry = self.get_child()
         entry.set_editable(False)
         self.add_options(entrytype_dict)
@@ -269,7 +284,7 @@ class EntrytypeBox(Box):
         entry.set_icon_tooltip_text(pos, tooltip)
 
     def update(self, item):
-        window = self.get_toplevel()
+        window = self.get_root()
         editor = window.main_widget.get_current_editor()
         entrytype = item.raw_field("ENTRYTYPE")
 
@@ -287,7 +302,7 @@ class EntrytypeBox(Box):
 
 class MonthBox(Box):
     def __init__(self, field, editor):
-        Box.__init__(self, field, editor)
+        super().__init__(field, editor)
         self.add_options(month_dict)
 
     def get_text(self):
@@ -321,7 +336,7 @@ class MonthBox(Box):
 
 class Separator(Gtk.Separator):
     def __init__(self):
-        Gtk.Separator.__init__(self)
+        super().__init__()
         self.set_orientation(Gtk.Orientation.HORIZONTAL)
         self.set_hexpand(True)
         self.set_margin_top(5)
@@ -330,126 +345,134 @@ class Separator(Gtk.Separator):
 
 class SourceView(Gtk.Box):
     def __init__(self):
-        Gtk.Box.__init__(self, orientation=Gtk.Orientation.VERTICAL)
-        self.set_vexpand(False)
-        self.status = SourceViewStatus.empty
+        super().__init__(orientation=Gtk.Orientation.VERTICAL)
+        self.set_vexpand(True)
+        self.status = "empty"
         self.form = MultiLine("source", None)
+        self.form.set_vexpand(True)
         self.buffer = self.form.get_buffer()
 
         source_view_scrolled = Gtk.ScrolledWindow()
         source_view_scrolled.set_propagate_natural_width(True)
-        source_view_scrolled.add(self.form)
+        source_view_scrolled.set_child(self.form)
 
         self.assemble_offline_bar()
         self.assemble_online_bar()
 
-        self.mode = "online"
-        self.pack_start(source_view_scrolled, True, True, 0)
-        self.pack_start(Gtk.Separator(), False, False, 0)
-        self.pack_end(self.online_bar, False, False, 5)
+        self.mode = None
+        self.append(source_view_scrolled)
+        self.append(Gtk.Separator())
+        self.append(self.online_bar)
+        self.append(self.offline_bar)
 
         if get_parse_on_fly():
             self.set_mode("online")
         else:
             self.set_mode("offline")
 
+    def on_modifiers(self, event_controller_key, keyval):
+        self.modifier = keyval
+
     def set_mode(self, mode):
         if mode == "online" and self.mode != "online":
-            self.remove(self.offline_bar)
-            self.pack_end(self.online_bar, False, False, 5)
+            self.offline_bar.hide()
+            self.online_bar.show()
             self.mode = "online"
             self.set_status(self.status, True)
 
         if mode == "offline" and self.mode != "offline":
-            self.remove(self.online_bar)
-            self.pack_end(self.offline_bar, False, False, 5)
+            self.online_bar.hide()
+            self.offline_bar.show()
             self.mode = "offline"
             self.set_status(self.status, True)
 
-        self.show_all()
-
     def assemble_online_bar(self):
-        self.icon_size = Gtk.IconSize.LARGE_TOOLBAR
         self.status_icon = Gtk.Image()
-
-        self.online_bar = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
+        self.status_icon.set_icon_size(Gtk.IconSize.LARGE)
+        self.online_bar = Gtk.CenterBox()
         self.online_bar.set_center_widget(self.status_icon)
+        self.online_bar.set_margin_top(6)
+        self.online_bar.set_margin_bottom(6)
 
     def assemble_offline_bar(self):
         self.apply_button = Gtk.Button.new_with_label("Apply")
-        self.apply_button.get_style_context().add_class(Gtk.STYLE_CLASS_SUGGESTED_ACTION)
+        self.apply_button.get_style_context().add_class("suggested-action")
         self.apply_button.set_sensitive(False)
+        self.apply_button.set_margin_top(5)
+        self.apply_button.set_margin_bottom(5)
+        self.apply_button.set_margin_end(5)
 
         self.offline_message = Gtk.Label()
         self.offline_message.set_justify(Gtk.Justification.CENTER)
 
-        self.offline_bar = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
+        self.offline_bar = Gtk.CenterBox()
         self.offline_bar.set_center_widget(self.offline_message)
-        self.offline_bar.pack_end(self.apply_button, False, False, 5)
+        self.offline_bar.set_end_widget(self.apply_button)
 
     def set_status(self, status, force=False):
-        if status == SourceViewStatus.empty:
+        if status == "empty":
             self.clear(force)
-        elif status == SourceViewStatus.valid:
+        elif status == "valid":
             self.set_valid(force)
-        elif status == SourceViewStatus.invalid:
+        elif status == "invalid":
             self.set_invalid(force)
-        elif status == SourceViewStatus.modified:
+        elif status == "modified":
             self.set_modified(force)
+        else:
+            print("Unknown source view status")
 
     def set_valid(self, force=False):
-        if self.status != SourceViewStatus.valid or force:
+        if self.status != "valid" or force:
             if self.mode == "online":
-                self.status_icon.set_from_icon_name("emblem-ok-symbolic", self.icon_size)
-                if self.status == SourceViewStatus.empty:
-                    self.pack_end(self.online_bar, False, False, 5)
+                self.status_icon.set_from_icon_name("emblem-ok-symbolic")
+                if self.status == "empty":
+                    self.online_bar.show()
 
             if self.mode == "offline":
                 self.offline_message.set_text("")
                 self.apply_button.set_sensitive(False)
 
-            self.status = SourceViewStatus.valid
+            self.status = "valid"
 
     def set_invalid(self, force=False):
-        if self.status != SourceViewStatus.invalid or force:
+        if self.status != "invalid" or force:
             if self.mode == "online":
-                self.status_icon.set_from_icon_name("action-unavailable-symbolic", self.icon_size)
-                if self.status == SourceViewStatus.empty:
-                    self.pack_end(self.online_bar, False, False, 5)
+                self.status_icon.set_from_icon_name("action-unavailable-symbolic")
+                if self.status == "empty":
+                    self.online_bar.show()
 
             if self.mode == "offline":
                 self.offline_message.set_markup("Invalid Entry!")
 
-            self.status = SourceViewStatus.invalid
+            self.status = "invalid"
 
     def set_modified(self, force=False):
-        if self.status != SourceViewStatus.modified or force:
+        if self.status != "modified" or force:
             if self.mode == "online":
-                self.status_icon.set_from_icon_name("dialog-question-symbolic", self.icon_size)
-                if self.status == SourceViewStatus.empty:
-                    self.pack_end(self.online_bar, False, False, 5)
+                self.status_icon.set_from_icon_name("dialog-question-symbolic")
+                if self.status == "empty":
+                    self.online_bar.show()
 
             if self.mode == "offline":
-                self.offline_message.set_markup("<small>Entry has been modified.\nClick on 'Apply' or press 'Ctrl+Enter' to save.</small>")
+                self.offline_message.set_markup("<small>Entry has been modified.</small>\n<span size='x-small'>Click on 'Apply' or press 'Ctrl+Enter' to apply changes.</span>")
                 self.apply_button.set_sensitive(True)
 
-            self.status = SourceViewStatus.modified
+            self.status = "modified"
 
     def clear(self, force=False):
-        if self.status != SourceViewStatus.empty or force:
-            self.status = SourceViewStatus.empty
+        if self.status != "empty" or force:
+            self.status = "empty"
 
             self.form.set_text("")
             self.form.set_sensitive(False)
 
             if self.mode == "online":
-                self.remove(self.online_bar)
+                self.online_bar.hide()
 
             if self.mode == "offline":
                 self.offline_message.set_text("")
                 self.apply_button.set_sensitive(False)
 
-            self.show_all()
-
     def update(self, item):
         self.form.set_text(item.bibtex)
+        self.set_status("valid")

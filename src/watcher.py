@@ -15,7 +15,7 @@
 
 
 import gi
-gi.require_version("Gtk", "3.0")
+gi.require_version("Gtk", "4.0")
 
 from gi.repository import Gtk, GLib
 
@@ -26,17 +26,14 @@ from watchgod import Change
 
 from .config_manager import get_watcher_sleep_time
 
-from .dialogs import FileChanged
-from .dialogs import WarningDialog
-
 
 WATCHER_SLEEP_TIME = get_watcher_sleep_time()
 
 
 class Watcher:
-    def __init__(self, window, filename):
+    def __init__(self, main_widget, filename):
         self.active = True
-        self.window = window
+        self.main_widget = main_widget
         self.filename = filename
         self.sleep_time = WATCHER_SLEEP_TIME/1000
 
@@ -48,31 +45,15 @@ class Watcher:
         while self.active:
             changes = watcher.check()
             for change in changes:
-                if change == (Change.deleted, self.filename):
-                    self.file_deleted_or_moved()
+                if change[1] == self.filename:
                     self.active = False
-                if change == (Change.modified, self.filename):
-                    self.file_changed()
-                    self.active = False
+                    GLib.idle_add(self.main_widget.declare_file_created, self.filename)
+                    page = self.main_widget.itemlists[self.filename].page
+                    if change[0] == Change.modified:
+                        page.changed_bar.show_text(True)
+                        page.changed_bar.set_revealed(True)
+                    elif change[0] == Change.deleted:
+                        page.deleted_bar.show_text(True)
+                        page.deleted_bar.set_revealed(True)
+
             sleep(self.sleep_time)
-
-    def file_changed(self):
-        dialog = FileChanged(self.window, self.filename)
-        response = dialog.run()
-        dialog.destroy()
-        sleep(0.3)  # give dialog time to close
-        if response == Gtk.ResponseType.YES:
-            GLib.idle_add(self.window.main_widget.declare_file_created, self.filename)
-        else:
-            GLib.idle_add(self.window.main_widget.reload_file, self.filename)
-
-    def file_deleted_or_moved(self):
-        title = "Bada Bib! - File Deleted or Moved on Disk"
-        message = (
-            "It seems like the file '{}' was deleted, renamed, or moved.".format(self.filename)
-            + "\n\n"
-            + "You are now editing an unsaved copy of this file."
-        )
-        WarningDialog(message, title, self.window)
-        sleep(0.3)  # give dialog time to close
-        GLib.idle_add(self.window.main_widget.declare_file_created, self.filename)

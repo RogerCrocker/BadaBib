@@ -28,7 +28,6 @@ from bibtexparser.customization import InvalidName
 from .customization import prettify_unicode_field
 
 from .config_manager import month_dict
-from .config_manager import StringStatus
 from .config_manager import sort_fields
 
 
@@ -127,9 +126,10 @@ class BadaBibItem:
         self.idx = idx
         self.row = None
         self.sort_values = {}
-        self.bibtex = ""
+        self.bibtex = None
         self.deleted = False
 
+        self.update_bibtex()
         self.update_all_sort_values()
 
     @property
@@ -157,15 +157,15 @@ class BadaBibItem:
 
     def bibstring_status(self, field):
         if field not in self.entry:
-            return StringStatus.none
+            return None
 
         n_strings = get_n_strings(self.entry[field])
         n_strings_raw = get_n_strings_raw(self.raw_field(field), self.bibfile.database.strings)
         if n_strings > 0:
             if n_strings == n_strings_raw:
-                return StringStatus.defined
-            return StringStatus.undefined
-        return StringStatus.none
+                return "defined"
+            return "undefined"
+        return None
 
     def last_name_list(self):
         if "author" not in self.entry:

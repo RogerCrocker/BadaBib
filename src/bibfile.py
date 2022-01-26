@@ -57,10 +57,10 @@ class BadaBibFile:
         for idx in range(len(self.database.entries)):
             self.items.append(BadaBibItem(self, idx))
 
-    def append_item(self, bibtex=None):
+    def append_item(self, entry=None):
         idx = len(self.database.entries)
-        if bibtex:
-            self.database.entries.append(bibtex)
+        if entry:
+            self.database.entries.append(entry)
         else:
             self.database.entries.append({"ID": "", "ENTRYTYPE": DEFAULT_EDITOR})
         item = BadaBibItem(self, idx)
@@ -72,6 +72,11 @@ class BadaBibFile:
 
     def count_all(self):
         return sum(not item.deleted for item in self.items)
+
+    def is_empty(self):
+        n_items = self.count_all()
+        n_strings = len(self.local_strings)
+        return n_items == n_strings == 0
 
     def update_filename(self, name):
         self.name = name

@@ -28,7 +28,7 @@ class Change:
     class Generic:
         @property
         def main_widget(self):
-            window = self.item.row.get_toplevel()
+            window = self.item.row.get_root()
             return window.main_widget
 
         @property
@@ -71,10 +71,10 @@ class Change:
 
         def apply(self, redo=False):
             self.item.deleted = True
-            itemlist_empty = self.item.bibfile.itemlist.row_deleted(self.item.row)
-            if itemlist_empty:
+            next_row = self.item.bibfile.itemlist.select_next_row(self.item.row)
+            if not next_row:
                 self.editor.clear()
-                self.main_widget.show_editor(DEFAULT_EDITOR)
+                self.source_view.set_status("empty")
 
         def revert(self):
             self.item.deleted = False
@@ -95,10 +95,10 @@ class Change:
 
         def revert(self):
             self.item.deleted = True
-            itemlist_empty = self.item.bibfile.itemlist.row_deleted(self.item.row)
-            if itemlist_empty:
+            next_row = self.item.bibfile.itemlist.select_next_row(self.item.row)
+            if not next_row:
                 self.editor.clear()
-                self.main_widget.show_editor(DEFAULT_EDITOR)
+                main_widget.source_view.set_status("empty")
 
     class Replace(Generic):
         def __init__(self, item, old_entry, new_entry):
@@ -109,7 +109,7 @@ class Change:
             self.form = None
 
         def apply(self, redo=False):
-            self.item.update_entry(self.new_entry, redo)
+            self.item.update_entry(self.new_entry, True)
             self.item.row.update()
             self.editor.show_item(self.item)
             if redo:

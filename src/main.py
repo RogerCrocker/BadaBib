@@ -15,7 +15,7 @@
 
 
 import gi
-gi.require_version("Gtk", "3.0")
+gi.require_version("Gtk", "4.0")
 
 from gi.repository import GLib, Gtk, Gio
 
@@ -42,7 +42,7 @@ class Application(Gtk.Application):
     def __init__(self, version):
         GLib.set_application_name("Bada Bib!")
         GLib.set_prgname('badabib')
-        Gtk.Application.__init__(self, application_id="com.github.rogercrocker.badabib")
+        super().__init__(application_id="com.github.rogercrocker.badabib")
         self.window = None
         self.version = version
 
@@ -156,13 +156,23 @@ class Application(Gtk.Application):
 
         shortcuts_action = Gio.SimpleAction.new("shortcuts", None)
         shortcuts_action.connect("activate", self.do_show_shortcuts)
-        self.set_accels_for_action("app.shortcuts", ["<Alt>a"])
+        self.set_accels_for_action("app.shortcuts", ["<Control>question"])
         self.add_action(shortcuts_action)
 
         custom_editor_action = Gio.SimpleAction.new("custom_editor", None)
         custom_editor_action.connect("activate", self.do_show_editor_configurator)
-        self.set_accels_for_action("app.custom_editor", ["<Alt><Shift>e"])
+        self.set_accels_for_action("app.custom_editor", ["<Control><Alt>c"])
         self.add_action(custom_editor_action)
+
+        next_tab_action = Gio.SimpleAction.new("next_tab", None)
+        next_tab_action.connect("activate", self.do_next_tab)
+        self.set_accels_for_action("app.next_tab", ["<Control>Tab"])
+        self.add_action(next_tab_action)
+
+        prev_tab_action = Gio.SimpleAction.new("prev_tab", None)
+        prev_tab_action.connect("activate", self.do_prev_tab)
+        self.set_accels_for_action("app.prev_tab", ["<Control><shift>Tab"])
+        self.add_action(prev_tab_action)
 
         copy_action = Gio.SimpleAction.new("copy", None)
         copy_action.connect("activate", self.on_copy_entry)
@@ -181,11 +191,12 @@ class Application(Gtk.Application):
 
         string_manager_action = Gio.SimpleAction.new("manage_strings", None)
         string_manager_action.connect("activate", self.do_show_string_manager)
-        self.set_accels_for_action("app.manage_strings", ["<Alt><Shift>s"])
+        self.set_accels_for_action("app.manage_strings", ["<Control><Alt>m"])
         self.add_action(string_manager_action)
 
         preferences_action = Gio.SimpleAction.new("preferences", None)
         preferences_action.connect("activate", self.do_show_preferences)
+        self.set_accels_for_action("app.preferences", ["<Control>comma"])
         self.add_action(preferences_action)
 
         about_action = Gio.SimpleAction.new("about", None)
@@ -218,7 +229,7 @@ class Application(Gtk.Application):
         self.window.main_widget.save_all_files()
 
     def on_close(self, action=None, data=None):
-        self.window.main_widget.on_close_tab()
+        self.window.main_widget.on_tab_closed()
 
     def on_new_entry(self, action=None, data=None):
         self.window.main_widget.add_item()
@@ -250,38 +261,47 @@ class Application(Gtk.Application):
         StringManagerWindow(self.window)
 
     def do_show_about(self, action=None, data=None):
-        AboutDialog(self.window)
+        dialog = AboutDialog(self.window)
+        dialog.show()
+
+    def do_next_tab(self, action=None, data=None):
+        self.window.main_widget.get_current_itemlist().grab_focus()
+        self.window.main_widget.notebook.next_page(1)
+
+    def do_prev_tab(self, action=None, data=None):
+        self.window.main_widget.get_current_itemlist().grab_focus()
+        self.window.main_widget.notebook.next_page(-1)
 
     def do_capitalize(self, action=None, data=None):
-        form = self.window.get_focus()
+        form = self.window.get_focus().get_parent()
         try:
             form.apply(capitalize, 4)
         except AttributeError:
             pass
 
     def do_protect(self, action=None, data=None):
-        form = self.window.get_focus()
+        form = self.window.get_focus().get_parent()
         try:
             form.apply(protect)
         except AttributeError:
             pass
 
     def do_correct_hyphen(self, action=None, data=None):
-        form = self.window.get_focus()
+        form = self.window.get_focus().get_parent()
         try:
             form.apply(correct_hyphen)
         except AttributeError:
             pass
 
     def do_to_unicode(self, action=None, data=None):
-        form = self.window.get_focus()
+        form = self.window.get_focus().get_parent()
         try:
             form.apply(convert_to_unicode)
         except AttributeError:
             pass
 
     def do_to_latex(self, action=None, data=None):
-        form = self.window.get_focus()
+        form = self.window.get_focus().get_parent()
         try:
             form.apply(convert_to_latex)
         except AttributeError:
@@ -300,7 +320,7 @@ class Application(Gtk.Application):
         self.window.on_redo_clicked()
 
     def on_quit(self, action=None, data=None):
-        self.window.do_delete_event()
+        self.window.do_close_request()
 
     def do_show_shortcuts(self, action=None, data=None):
         builder = Gtk.Builder.new_from_resource("/com/github/rogercrocker/badabib/shortcuts.ui")

@@ -15,7 +15,7 @@
 
 
 import gi
-gi.require_version("Gtk", "3.0")
+gi.require_version("Gtk", "4.0")
 
 from gi.repository import Gtk
 
@@ -31,10 +31,11 @@ from .change import Change
 
 class Editor(Gtk.ScrolledWindow):
     def __init__(self, layout, entrytype=None):
-        Gtk.ScrolledWindow.__init__(self)
+        super().__init__()
+        self.set_vexpand(True)
 
         self.grid = Gtk.Grid()
-        self.add(self.grid)
+        self.set_child(self.grid)
 
         self.entrytype = entrytype
         self.active = True
@@ -47,8 +48,6 @@ class Editor(Gtk.ScrolledWindow):
         if entrytype:
             self.connect_forms()
             self.set_active(False)
-
-        self.show_all()
 
     def set_spacings(self):
         self.grid.set_column_spacing(10)
@@ -89,16 +88,12 @@ class Editor(Gtk.ScrolledWindow):
             if field in has_entry:
                 entry = form.get_child()
                 entry.connect("changed", self.update_item, form)
-                entry.connect("focus_in_event", self.deselect_unfocused, form)
-                entry.connect("activate", self.focus_on_item, form)
             if field in has_buffer:
                 buffer = form.get_buffer()
                 buffer.connect("changed", self.update_item, form)
-                form.connect("focus_in_event", self.deselect_unfocused, form)
             if field in is_entry:
                 form.connect("changed", self.update_item, form)
-                form.connect("focus_in_event", self.deselect_unfocused, form)
-                form.connect("activate", self.focus_on_item)
+            form.event_controller_focus.connect("enter", self.deselect_unfocused, form)
 
     def show_item(self, item):
         for form in self.forms.values():
@@ -125,15 +120,13 @@ class Editor(Gtk.ScrolledWindow):
             else:
                 old_value = ""
             new_value = form.get_text()
-            if old_value != new_value:
+            # work around strange combobox behavior
+            empty_entry = form.field in has_entry and not new_value
+            if not empty_entry and old_value != new_value:
                 change = Change.Edit(item, form, old_value, new_value)
                 item.bibfile.itemlist.change_buffer.push_change(change)
 
-    def focus_on_item(self, form=None):
-        item = self.current_item
-        item.row.grab_focus()
-
-    def deselect_unfocused(self, _widget, _event, current_form):
+    def deselect_unfocused(self, _event_controller_focus, current_form):
         for form in self.forms.values():
             if form != current_form:
                 form.deselect()

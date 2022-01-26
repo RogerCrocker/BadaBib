@@ -28,13 +28,12 @@ from .dialogs import WarningDialog
 
 
 class SessionManager:
-    def __init__(self, window, main_widget):
-        self.window = window
+    def __init__(self, main_widget):
         self.main_widget = main_widget
 
     def restore(self):
         self.restore_window_geom()
-        self.window.show_all()
+        self.main_widget.get_root().show()
         if get_remember_strings():
             self.restore_string_imports()
         self.restore_open_files()
@@ -47,11 +46,12 @@ class SessionManager:
 
     def restore_window_geom(self):
         window_geom = get_window_geom()
-        self.window.set_default_size(window_geom[0], window_geom[1])
+        self.main_widget.get_root().set_default_size(window_geom[0], window_geom[1])
         self.main_widget.set_position(window_geom[2])
 
     def save_window_geom(self):
-        width, height = self.window.get_size()
+        width = self.main_widget.get_root().get_width()
+        height = self.main_widget.get_root().get_height()
         position = self.main_widget.get_position()
         set_window_geom([width, height, position])
 
@@ -70,7 +70,7 @@ class SessionManager:
         n_pages = self.main_widget.notebook.get_n_pages()
         for n in range(n_pages):
             try:
-                itemlist = self.main_widget.notebook.get_nth_page(n).get_child().get_child()
+                itemlist = self.main_widget.notebook.get_nth_page(n).itemlist
                 if not itemlist.bibfile.created:
                     open_files[itemlist.bibfile.name] = itemlist.state_to_string()
             except AttributeError:
@@ -83,14 +83,14 @@ class SessionManager:
 
     def restore_string_imports(self):
         string_imports = get_string_imports()
-        statuses = [self.window.store.import_strings(filename) for filename in string_imports]
+        statuses = [self.main_widget.store.import_strings(filename) for filename in string_imports]
         for filename, status in zip(string_imports, statuses):
             if status in ("file_error", "parse_error"):
                 message = "Importing strings failed: Cannot read file '{}'.".format(filename)
-                WarningDialog(message, window=self.window)
+                WarningDialog(message, window=self.main_widget.get_root())
             elif status == "empty":
                 message = "Importing strings failed: File '{}' does not contain string definitions.".format(filename)
-                WarningDialog(message, window=self.window)
+                WarningDialog(message, window=self.main_widget.get_root())
 
     def save_string_imports(self):
-        set_string_imports(self.window.store.string_files)
+        set_string_imports(self.main_widget.store.string_files)

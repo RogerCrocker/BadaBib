@@ -15,7 +15,7 @@
 
 
 import gi
-gi.require_version("Gtk", "3.0")
+gi.require_version("Gtk", "4.0")
 
 from gi.repository import Gtk
 
@@ -33,19 +33,21 @@ from .config_manager import set_remember_strings
 
 class PreferencesWindow(Gtk.Window):
     def __init__(self, main_window):
-        Gtk.Window.__init__(self, transient_for=main_window, title="Preferences")
+        super().__init__(transient_for=main_window, title="Preferences")
         self.main_window = main_window
-        self.set_border_width(10)
 
         box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
-        box.pack_start(self.get_align(), False, False, 15)
-        box.pack_start(self.get_indent(), False, False, 15)
-        box.pack_start(self.get_strings(), False, False, 15)
-        box.pack_start(self.get_parse(), False, False, 15)
-        box.pack_start(self.get_backup(), False, False, 15)
+        box.append(self.get_align())
+        box.append(self.get_indent())
+        box.append(self.get_strings())
+        box.append(self.get_parse())
+        box.append(self.get_backup())
 
-        self.add(box)
-        self.show_all()
+        self.set_size_request(500, 350)
+
+        self.set_child(box)
+
+        self.show()
 
     def update_writer(self):
         for file in self.main_window.store.bibfiles.values():
@@ -57,24 +59,30 @@ class PreferencesWindow(Gtk.Window):
     def get_align(self):
         align_label = Gtk.Label(xalign=0)
         align_label.set_text("Align fields")
+        align_label.set_hexpand(True)
 
         align_hint = Gtk.Label(xalign=0)
         align_hint.set_markup("""<small>Align fields in the BibTeX source code along the "=" sign.</small>""")
+        align_hint.set_hexpand(True)
 
         align_switch = Gtk.Switch()
         align_switch.set_active(get_align_fields())
         align_switch.connect("state-set", self.on_align_changed)
 
         vbox1 = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
-        vbox1.pack_start(align_label, False, False, 0)
-        vbox1.pack_start(align_hint, False, False, 0)
+        vbox1.append(align_label)
+        vbox1.append(align_hint)
 
         vbox2 = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
-        vbox2.pack_start(align_switch, False, False, 0)
+        vbox2.append(align_switch)
 
         box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
-        box.pack_start(vbox1, False, False, 10)
-        box.pack_end(vbox2, False, False, 10)
+        box.set_margin_start(20)
+        box.set_margin_end(20)
+        box.set_margin_top(10)
+        box.set_margin_bottom(10)
+        box.append(vbox1)
+        box.append(vbox2)
 
         return box
 
@@ -85,9 +93,11 @@ class PreferencesWindow(Gtk.Window):
     def get_indent(self):
         indent_label = Gtk.Label(xalign=0)
         indent_label.set_text("Indentation width")
+        indent_label.set_hexpand(True)
 
         indent_hint = Gtk.Label(xalign=0)
         indent_hint.set_markup("<small>Set indentation width of fields in the BibTeX source code.</small>")
+        indent_hint.set_hexpand(True)
 
         indent_spin = Gtk.SpinButton.new_with_range(0, 20, 1)
         indent_spin.set_value(get_field_indent())
@@ -95,15 +105,19 @@ class PreferencesWindow(Gtk.Window):
         indent_spin.connect("value_changed", self.on_indent_changed)
 
         vbox1 = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
-        vbox1.pack_start(indent_label, False, False, 0)
-        vbox1.pack_start(indent_hint, False, False, 0)
+        vbox1.append(indent_label)
+        vbox1.append(indent_hint)
 
         vbox2 = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
-        vbox2.pack_start(indent_spin, False, False, 0)
+        vbox2.append(indent_spin)
 
         box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
-        box.pack_start(vbox1, False, False, 10)
-        box.pack_end(vbox2, False, False, 10)
+        box.set_margin_start(20)
+        box.set_margin_end(20)
+        box.set_margin_top(20)
+        box.set_margin_bottom(10)
+        box.append(vbox1)
+        box.append(vbox2)
 
         return box
 
@@ -114,25 +128,32 @@ class PreferencesWindow(Gtk.Window):
     def get_parse(self):
         parse_label = Gtk.Label(xalign=0)
         parse_label.set_text("Parse BibTeX code on the fly")
+        parse_label.set_hexpand(True)
 
         parse_hint = Gtk.Label(xalign=0)
         parse_hint.set_markup("<small>Disable if editing the source code of BibTeX entries is sluggish.\nThis can be the case if a file contains many strings.</small>")
         parse_hint.set_justify(Gtk.Justification.LEFT)
+        parse_hint.set_hexpand(True)
 
         parse_switch = Gtk.Switch()
         parse_switch.set_active(get_parse_on_fly())
         parse_switch.connect("state-set", self.on_parse_changed)
 
         vbox1 = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
-        vbox1.pack_start(parse_label, False, False, 0)
-        vbox1.pack_start(parse_hint, False, False, 0)
+        vbox1.append(parse_label)
+        vbox1.append(parse_hint)
 
         vbox2 = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
-        vbox2.pack_start(parse_switch, False, False, 0)
+        vbox2.append(parse_switch)
 
         box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
-        box.pack_start(vbox1, False, False, 10)
-        box.pack_end(vbox2, False, False, 10)
+        box.set_margin_start(20)
+        box.set_margin_end(20)
+        box.set_margin_top(10)
+        box.set_margin_bottom(10)
+        box.append(vbox1)
+        box.append(vbox2)
+
         return box
 
     def on_parse_changed(self, _switch, state):
@@ -146,25 +167,32 @@ class PreferencesWindow(Gtk.Window):
     def get_backup(self):
         backup_label = Gtk.Label(xalign=0)
         backup_label.set_text("Create backups when opening BibTeX files.")
+        backup_label.set_hexpand(True)
 
         backup_hint = Gtk.Label(xalign=0)
         backup_hint.set_markup("<small>Highly recommendend!\nBada Bib! is still under development, so it might mess with your files.</small>")
         backup_hint.set_justify(Gtk.Justification.LEFT)
+        backup_hint.set_hexpand(True)
 
         backup_switch = Gtk.Switch()
         backup_switch.set_active(get_create_backup())
         backup_switch.connect("state-set", self.on_backup_changed)
 
         vbox1 = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
-        vbox1.pack_start(backup_label, False, False, 0)
-        vbox1.pack_start(backup_hint, False, False, 0)
+        vbox1.append(backup_label)
+        vbox1.append(backup_hint)
 
         vbox2 = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
-        vbox2.pack_start(backup_switch, False, False, 0)
+        vbox2.append(backup_switch)
 
         box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
-        box.pack_start(vbox1, False, False, 10)
-        box.pack_end(vbox2, False, False, 10)
+        box.set_margin_start(20)
+        box.set_margin_end(20)
+        box.set_margin_top(10)
+        box.set_margin_bottom(10)
+        box.append(vbox1)
+        box.append(vbox2)
+
         return box
 
     @staticmethod
@@ -174,25 +202,32 @@ class PreferencesWindow(Gtk.Window):
     def get_strings(self):
         strings_label = Gtk.Label(xalign=0)
         strings_label.set_text("Remember imported strings between sessions.")
+        strings_label.set_hexpand(True)
 
         strings_hint = Gtk.Label(xalign=0)
         strings_hint.set_markup("<small>Enable to remember imported string definitions between session.</small>")
         strings_hint.set_justify(Gtk.Justification.LEFT)
+        strings_hint.set_hexpand(True)
 
         strings_switch = Gtk.Switch()
         strings_switch.set_active(get_remember_strings())
         strings_switch.connect("state-set", self.on_strings_changed)
 
         vbox1 = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
-        vbox1.pack_start(strings_label, False, False, 0)
-        vbox1.pack_start(strings_hint, False, False, 0)
+        vbox1.append(strings_label)
+        vbox1.append(strings_hint)
 
         vbox2 = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
-        vbox2.pack_start(strings_switch, False, False, 0)
+        vbox2.append(strings_switch)
 
         box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
-        box.pack_start(vbox1, False, False, 10)
-        box.pack_end(vbox2, False, False, 10)
+        box.set_margin_start(20)
+        box.set_margin_end(20)
+        box.set_margin_top(10)
+        box.set_margin_bottom(10)
+        box.append(vbox1)
+        box.append(vbox2)
+
         return box
 
     @staticmethod

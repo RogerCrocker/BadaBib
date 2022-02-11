@@ -247,14 +247,13 @@ class MainWidget(Gtk.Paned):
             self.source_view.form.set_text(row.item.bibtex)
 
     def on_tab_closed(self, button=None):
-        # work around notebook selecting the closed page bug
-        if self.notebook.previous_page is not None:
-            self.notebook.set_current_page(self.notebook.previous_page)
-
         if button is None:
             itemlist = self.get_current_itemlist()
         else:
             itemlist = button.get_parent().itemlist
+            # work around notebook selecting the closed page bug
+            if self.notebook.previous_page is not None:
+                self.notebook.set_current_page(self.notebook.previous_page)
         self.close_files(itemlist.bibfile.name)
 
     def on_switch_page(self, notebook, page, page_num):

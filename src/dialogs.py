@@ -41,11 +41,11 @@ def add_filters(dialog):
 
 
 class WarningDialog(Gtk.MessageDialog):
-    def __init__(self, texts, window):
+    def __init__(self, texts, window, title="Bada Bib! - Warning"):
         if not isinstance(texts, list):
             texts = [texts]
         if len(texts) > 0:
-            WarningDialogChain(None, None, texts, window)
+            WarningDialogChain(None, None, texts, window, title)
 
 
 class WarningDialogChain(Gtk.MessageDialog):

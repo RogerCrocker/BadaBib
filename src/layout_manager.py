@@ -60,7 +60,7 @@ def string_to_layout(string, window):
     lines = string.split("\n")
     if len(lines) > 3 * len(field_dict):
         message += "String contains too many lines."
-        WarningDialog(message, title, window)
+        WarningDialog(message, window, title)
         return []
 
     for line in lines:
@@ -82,7 +82,7 @@ def string_to_layout(string, window):
             layout.append(fields)
 
     if not layout:
-        WarningDialog("Empty layout, please add fields.", title, window)
+        WarningDialog("Empty layout, please add fields.", window, title)
         return []
 
     if unknown:
@@ -100,7 +100,7 @@ def string_to_layout(string, window):
         message += "Duplicated fields: " + ", ".join(duplicated)
 
     if message:
-        WarningDialog(message, window)
+        WarningDialog(message, window, title)
         return []
 
     return layout

@@ -98,7 +98,7 @@ class Change:
             next_row = self.item.bibfile.itemlist.select_next_row(self.item.row)
             if not next_row:
                 self.editor.clear()
-                main_widget.source_view.set_status("empty")
+                self.source_view.set_status("empty")
 
     class Replace(Generic):
         def __init__(self, item, old_entry, new_entry):

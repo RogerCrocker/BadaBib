@@ -178,7 +178,6 @@ class MainWidget(Gtk.Paned):
     def remove_itemlist(self, filename):
         itemlist = self.itemlists.pop(filename)
         self.store.bibfiles[filename].itemlist = None
-        row = itemlist.get_selected_row()
         self.notebook.remove_page(itemlist.page.number)
 
     def get_current_itemlist(self):
@@ -317,11 +316,11 @@ class MainWidget(Gtk.Paned):
         watcher = Watcher(self, filename)
         thread = Thread(target=watcher.watch_file)
         thread.start()
-        self.watchers[filename] = watcher, thread
+        self.watchers[filename] = watcher
 
     def remove_watcher(self, filename):
         if filename in self.watchers:
-            watcher, thread = self.watchers.pop(filename)
+            watcher = self.watchers.pop(filename)
             watcher.stop()
 
     def open_files(self, filenames, states=None, select_file=None):

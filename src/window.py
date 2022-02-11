@@ -98,7 +98,6 @@ class BadaBibWindow(Gtk.ApplicationWindow):
         headerbar.pack_start(undo_box)
 
         menu_button = Gtk.MenuButton()
-        menu_icon = Gtk.Image.new_from_icon_name("open-menu-symbolic")
         menu_button.set_icon_name("open-menu-symbolic")
         menu_button.set_popover(MenuPopover())
         headerbar.pack_end(menu_button)

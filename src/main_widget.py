@@ -601,4 +601,4 @@ class MainWidget(Gtk.Paned):
         self.add_watcher(new_name)
 
         if close_data is not None:
-           self.close_files_dialog(None, Gtk.ResponseType.CLOSE, *close_data)
+            self.close_files_dialog(None, Gtk.ResponseType.CLOSE, *close_data)

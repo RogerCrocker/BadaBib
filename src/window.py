@@ -128,7 +128,7 @@ class BadaBibWindow(Gtk.ApplicationWindow):
 
     def on_open_response(self, dialog, response):
         if response == Gtk.ResponseType.ACCEPT:
-            files = dialog.get_files();
+            files = dialog.get_files()
             self.main_widget.open_files([file.get_path() for file in files])
         dialog.destroy()
 

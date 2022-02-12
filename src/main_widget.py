@@ -260,7 +260,7 @@ class MainWidget(Gtk.Paned):
         try:
             itemlist = page.itemlist
         except AttributeError:
-            return
+            return None
 
         # work around notebook selecting the closed page bug
         if notebook.current_page is not None:
@@ -457,11 +457,11 @@ class MainWidget(Gtk.Paned):
             dialog.destroy()
 
         if response == Gtk.ResponseType.CANCEL:
-            return
+            return None
         if response == Gtk.ResponseType.OK:
             close_data = (files, n-1, force, close_app)
             self.save_file(files[n-1], close_data)
-            return
+            return None
 
         itemlist = self.itemlists[files[n]]
         if itemlist.bibfile.unsaved and not force:
@@ -483,11 +483,11 @@ class MainWidget(Gtk.Paned):
             dialog.destroy()
 
         if response == Gtk.ResponseType.CANCEL:
-            return
+            return None
         if response == Gtk.ResponseType.OK:
             close_data = (files, n-1, force, close_app)
             self.save_file(files[n-1], close_data)
-            return
+            return None
 
         if close_app:
             self.get_root().session_manager.save()
@@ -569,7 +569,7 @@ class MainWidget(Gtk.Paned):
                 if new_name[-4:] != ".bib":
                     new_name = new_name + ".bib"
             else:
-                return
+                return None
 
         if close_data:
             files = close_data[0]

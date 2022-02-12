@@ -82,10 +82,7 @@ class BadaBibFile:
         self.head, self.tail = split(name)
 
     def has_empty_keys(self):
-        for item in self.items:
-            if not item.entry["ID"] and not item.deleted:
-                return True
-        return False
+        return any(not item.entry["ID"] and not item.deleted for item in self.items)
 
     def get_duplicate_keys(self):
         keys = [item.entry["ID"] for item in self.items if not item.deleted]

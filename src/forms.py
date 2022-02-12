@@ -370,9 +370,6 @@ class SourceView(Gtk.Box):
         else:
             self.set_mode("offline")
 
-    def on_modifiers(self, event_controller_key, keyval):
-        self.modifier = keyval
-
     def set_mode(self, mode):
         if mode == "online" and self.mode != "online":
             self.offline_bar.hide()

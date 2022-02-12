@@ -164,7 +164,6 @@ class SaveDialog(Gtk.FileChooserDialog):
         accept_button = self.add_button("Save", Gtk.ResponseType.ACCEPT)
         accept_button.get_style_context().add_class("suggested-action")
 
-        # self.set_do_overwrite_confirmation(True)
         add_filters(self)
 
 

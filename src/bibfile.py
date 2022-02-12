@@ -20,7 +20,6 @@ from unicodedata import normalize
 
 from .customization import convert_to_unicode
 
-from .config_manager import entrytype_dict
 from .config_manager import get_default_entrytype
 
 from .bibitem import BadaBibItem

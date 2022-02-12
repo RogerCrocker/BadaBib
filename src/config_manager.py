@@ -18,8 +18,6 @@ gi.require_version("Gtk", "4.0")
 
 from gi.repository import Gio, GLib
 
-from enum import Enum
-
 from .default_layouts import default_layout_strings
 
 

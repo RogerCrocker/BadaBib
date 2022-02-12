@@ -18,13 +18,10 @@ gi.require_version("Gtk", "4.0")
 
 from gi.repository import Gtk, GLib
 
-from os.path import split
-
 from .config_manager import get_recent_files
 from .config_manager import set_recent_files
 
 from .dialogs import FileChooser
-from .dialogs import SaveDialog
 from .dialogs import MenuPopover
 from .dialogs import RecentModel
 

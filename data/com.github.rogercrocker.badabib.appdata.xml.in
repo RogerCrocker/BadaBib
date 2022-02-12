@@ -39,6 +39,11 @@
     </provides>
 
     <releases>
+      <release version="0.5.0" date="2022-02-12">
+            <description>
+                <p>Bada Bib! has been ported to GTK 4. Some minor bugs have been fixed in the process, but otherwise the user-facing changes should be minimal. Please report any new bugs you encounter!</p>
+            </description>
+      </release>
       <release version="0.4.1" date="2022-01-15">
             <description>
                 <p>Maintenance release:</p>
@@ -47,7 +52,7 @@
                   <li>Code refactoring and cleanup</li>
                 </ul>
             </description>
-        </release>
+      </release>
       <release version="0.4.0" date="2021-12-22">
             <description>
                 <p>Reworked file and session management. This fixes many minor bugs and quirks, for example:</p>

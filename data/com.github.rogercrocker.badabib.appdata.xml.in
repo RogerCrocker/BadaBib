@@ -39,6 +39,11 @@
     </provides>
 
     <releases>
+      <release version="0.5.1" date="2022-02-19">
+            <description>
+                <p>Use gtk4-update-icon-cache in postinstall script so that it doesn't fail on systems without GTK 3. Thanks @bobby285271 for the patch.</p>
+            </description>
+      </release>
       <release version="0.5.0" date="2022-02-12">
             <description>
                 <p>Bada Bib! has been ported to GTK 4. Some minor bugs have been fixed in the process, but otherwise the user-facing changes should be minimal. Please report any new bugs you encounter!</p>

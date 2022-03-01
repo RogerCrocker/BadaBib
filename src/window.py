@@ -16,7 +16,7 @@
 import gi
 gi.require_version("Gtk", "4.0")
 
-from gi.repository import Gtk, GLib, Gio
+from gi.repository import Gtk, GLib
 
 from .config_manager import get_recent_files
 from .config_manager import set_recent_files
@@ -131,13 +131,8 @@ class BadaBibWindow(Gtk.ApplicationWindow):
     def on_open_response(self, dialog, response):
         if response == Gtk.ResponseType.ACCEPT:
             files = dialog.get_files()
-            self.monitor = files[0].monitor_file(Gio.FileMonitorFlags.WATCH_MOVES, None)
-            self.monitor.connect("changed", self.test)
             self.main_widget.open_files([file.get_path() for file in files])
         dialog.destroy()
-
-    def test(self, file_monitor, file, other_file, event_type):
-        print("changed")
 
     def on_save_as_clicked(self, _button=None):
         self.main_widget.save_file_as()

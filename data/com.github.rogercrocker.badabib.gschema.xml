@@ -91,11 +91,6 @@
         <summary>Row indentation in itemlist</summary>
         <description>Number of spaces used to indent labels in itemlist.</description>
     </key>
-	  <key type="i" name="watcher-sleep-time">
-        <default>400</default>
-        <summary>Watcher Delay</summary>
-        <description>Time between file watcher updates in ms.</description>
-    </key>
 	  <key type="s" name="default-entrytype">
         <default>"article"</default>
         <summary>Default Entrytype</summary>

@@ -311,16 +311,13 @@ class MainWidget(Gtk.Paned):
             else:
                 self.source_view.set_status("invalid")
 
-    def add_watcher(self, filename):
-        watcher = Watcher(self, filename)
-        thread = Thread(target=watcher.watch_file)
-        thread.start()
-        self.watchers[filename] = watcher
+    def add_watcher(self, path):
+        self.watchers[path] = Watcher(self, path)
 
-    def remove_watcher(self, filename):
-        if filename in self.watchers:
-            watcher = self.watchers.pop(filename)
-            watcher.stop()
+    def remove_watcher(self, path):
+        if path in self.watchers:
+            watcher = self.watchers.pop(path)
+            watcher.monitor.cancel()
 
     def open_files(self, filenames, states=None, select_file=None):
         # make sure 'filenames' is a list
@@ -435,10 +432,13 @@ class MainWidget(Gtk.Paned):
     def move_new_tab(self, filename, page_number):
         # wait for file to finish opening
         while True:
-            last_page = self.notebook.get_nth_page(-1)
-            if last_page.itemlist.bibfile.name == filename:
-                break
-            sleep(0.05)
+            try:
+                last_page = self.notebook.get_nth_page(-1)
+                if last_page.itemlist.bibfile.name == filename:
+                    break
+            except AttributeError:
+                pass
+            sleep(0.02)
         self.notebook.reorder_child(last_page, page_number)
 
     def declare_file_created(self, filename):

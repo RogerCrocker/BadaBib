@@ -17,43 +17,29 @@
 import gi
 gi.require_version("Gtk", "4.0")
 
-from gi.repository import GLib
-
-from time import sleep
-
-from watchgod import DefaultWatcher
-from watchgod import Change
-
-from .config_manager import get_watcher_sleep_time
+from gi.repository import GLib, Gio
 
 
-WATCHER_SLEEP_TIME = get_watcher_sleep_time()
+DELETED_EVENTS = (Gio.FileMonitorEvent.MOVED_OUT, Gio.FileMonitorEvent.DELETED)
+CHANGED_EVENTS = (Gio.FileMonitorEvent.CHANGED, Gio.FileMonitorEvent.RENAMED)
 
 
 class Watcher:
-    def __init__(self, main_widget, filename):
-        self.active = True
+    def __init__(self, main_widget, path):
         self.main_widget = main_widget
-        self.filename = filename
-        self.sleep_time = WATCHER_SLEEP_TIME/1000
+        self.path = path
 
-    def stop(self):
-        self.active = False
+        file = Gio.File.new_for_path(path)
+        self.monitor = file.monitor_file(Gio.FileMonitorFlags.WATCH_MOVES, None)
+        self.monitor.connect("changed", self.on_changed)
 
-    def watch_file(self):
-        watcher = DefaultWatcher(self.filename)
-        while self.active:
-            changes = watcher.check()
-            for change in changes:
-                if change[1] == self.filename:
-                    self.active = False
-                    GLib.idle_add(self.main_widget.declare_file_created, self.filename)
-                    page = self.main_widget.itemlists[self.filename].page
-                    if change[0] == Change.modified:
-                        page.changed_bar.show_text(True)
-                        page.changed_bar.set_revealed(True)
-                    elif change[0] == Change.deleted:
-                        page.deleted_bar.show_text(True)
-                        page.deleted_bar.set_revealed(True)
-
-            sleep(self.sleep_time)
+    def on_changed(self, file_monitor, file, _other_file, event_type):
+        file_monitor.cancel()
+        GLib.idle_add(self.main_widget.declare_file_created, self.path)
+        page = self.main_widget.itemlists[self.path].page
+        if event_type in CHANGED_EVENTS:
+            page.changed_bar.show_text(True)
+            page.changed_bar.set_revealed(True)
+        if event_type in DELETED_EVENTS:
+            page.deleted_bar.show_text(True)
+            page.deleted_bar.set_revealed(True)

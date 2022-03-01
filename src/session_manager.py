@@ -31,12 +31,12 @@ class SessionManager:
     def __init__(self, main_widget):
         self.main_widget = main_widget
 
-    def restore(self):
+    def restore(self, arg_files=[]):
         self.restore_window_geom()
         self.main_widget.get_root().show()
         if get_remember_strings():
             self.restore_string_imports()
-        self.restore_open_files()
+        self.restore_open_files(arg_files)
 
     def save(self):
         self.save_window_geom()
@@ -55,9 +55,16 @@ class SessionManager:
         position = self.main_widget.get_position()
         set_window_geom([width, height, position])
 
-    def restore_open_files(self):
-        open_files = get_open_files()
-        open_tab = get_open_tab()
+    def restore_open_files(self, arg_files):
+        saved_files = get_open_files()
+        open_files = saved_files | arg_files
+        open_files.update(saved_files)
+
+        if arg_files:
+            open_tab = list(arg_files.keys())[0]
+        else:
+            open_tab = get_open_tab()
+
         if open_files:
             files = list(open_files.keys())
             states = list(open_files.values())

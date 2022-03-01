@@ -42,9 +42,16 @@ class Application(Gtk.Application):
     def __init__(self, version):
         GLib.set_application_name("Bada Bib!")
         GLib.set_prgname('badabib')
-        super().__init__(application_id="com.github.rogercrocker.badabib")
+        super().__init__(
+            application_id="com.github.rogercrocker.badabib",
+            flags=Gio.ApplicationFlags.HANDLES_OPEN,
+            )
         self.window = None
         self.version = version
+        self.arg_files = {}
+
+        self.connect("open", self.on_open_arg_files)
+
 
     def do_activate(self):
         self.window = self.props.active_window
@@ -55,6 +62,10 @@ class Application(Gtk.Application):
     def do_startup(self):
         Gtk.Application.do_startup(self)
         self.add_global_accelerators()
+
+    def on_open_arg_files(self, application, files, hint, _):
+        self.arg_files = {file.get_path() : None for file in files}
+        self.do_activate()
 
     def add_global_accelerators(self):
         # Files

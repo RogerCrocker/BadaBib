@@ -1,6 +1,6 @@
 [Desktop Entry]
 Name=Bada Bib!
-Exec=badabib
+Exec=badabib %U
 Icon=com.github.rogercrocker.badabib
 Terminal=false
 Type=Application

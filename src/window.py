@@ -16,7 +16,7 @@
 import gi
 gi.require_version("Gtk", "4.0")
 
-from gi.repository import Gtk, GLib
+from gi.repository import Gtk, GLib, Gio
 
 from .config_manager import get_recent_files
 from .config_manager import set_recent_files
@@ -40,6 +40,7 @@ class BadaBibWindow(Gtk.ApplicationWindow):
         self.application = kwargs["application"]
         self.set_title("Bada Bib! - BibTeX Editor")
 
+        self.monitor = None
         self.store = BadaBibStore()
         self.main_widget = MainWidget(self.store)
         self.set_child(self.main_widget)
@@ -51,7 +52,8 @@ class BadaBibWindow(Gtk.ApplicationWindow):
         self.update_recent_file_menu()
 
         self.session_manager = SessionManager(self.main_widget)
-        GLib.idle_add(self.session_manager.restore)
+        GLib.idle_add(self.session_manager.restore, self.application.arg_files)
+
 
     def update_recent_file_menu(self):
         recent_files = get_recent_files()
@@ -129,8 +131,13 @@ class BadaBibWindow(Gtk.ApplicationWindow):
     def on_open_response(self, dialog, response):
         if response == Gtk.ResponseType.ACCEPT:
             files = dialog.get_files()
+            self.monitor = files[0].monitor_file(Gio.FileMonitorFlags.WATCH_MOVES, None)
+            self.monitor.connect("changed", self.test)
             self.main_widget.open_files([file.get_path() for file in files])
         dialog.destroy()
+
+    def test(self, file_monitor, file, other_file, event_type):
+        print("changed")
 
     def on_save_as_clicked(self, _button=None):
         self.main_widget.save_file_as()

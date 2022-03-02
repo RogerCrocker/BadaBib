@@ -64,8 +64,11 @@ class Application(Gtk.Application):
         self.add_global_accelerators()
 
     def on_open_arg_files(self, application, files, hint, _):
-        self.arg_files = {file.get_path() : None for file in files}
-        self.do_activate()
+        if not self.props.active_window:
+            self.arg_files = {file.get_path() : None for file in files}
+            self.do_activate()
+        else:
+            self.window.main_widget.open_files([file.get_path() for file in files])
 
     def add_global_accelerators(self):
         # Files

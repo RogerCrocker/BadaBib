@@ -33,7 +33,7 @@ class Watcher:
         self.monitor = file.monitor_file(Gio.FileMonitorFlags.WATCH_MOVES, None)
         self.monitor.connect("changed", self.on_changed)
 
-    def on_changed(self, file_monitor, file, _other_file, event_type):
+    def on_changed(self, file_monitor, _file, _other_file, event_type):
         file_monitor.cancel()
         GLib.idle_add(self.main_widget.declare_file_created, self.path)
         page = self.main_widget.itemlists[self.path].page

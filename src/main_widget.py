@@ -311,12 +311,12 @@ class MainWidget(Gtk.Paned):
             else:
                 self.source_view.set_status("invalid")
 
-    def add_watcher(self, path):
-        self.watchers[path] = Watcher(self, path)
+    def add_watcher(self, filename):
+        self.watchers[filename] = Watcher(self, filename)
 
-    def remove_watcher(self, path):
-        if path in self.watchers:
-            watcher = self.watchers.pop(path)
+    def remove_watcher(self, filename):
+        if filename in self.watchers:
+            watcher = self.watchers.pop(filename)
             watcher.monitor.cancel()
 
     def open_files(self, filenames, states=None, select_file=None):
@@ -446,61 +446,61 @@ class MainWidget(Gtk.Paned):
         self.itemlists[filename].set_unsaved(True)
         self.watchers.pop(filename)
 
-    def close_files(self, files, force=False, close_app=False):
-        # make sure 'files' is a list
-        if not isinstance(files, list):
-            files = [files]
-        self.close_files_dialog(None, Gtk.ResponseType.CLOSE, files, 0, force, close_app)
+    def close_files(self, filenames, force=False, close_app=False):
+        # make sure 'filenames' is a list
+        if not isinstance(filenames, list):
+            filenames = [filenames]
+        self.close_files_dialog(None, Gtk.ResponseType.CLOSE, filenames, 0, force, close_app)
 
-    def close_files_dialog(self, dialog, response, files, n, force, close_app):
+    def close_files_dialog(self, dialog, response, filenames, n, force, close_app):
         if dialog:
             dialog.destroy()
 
         if response == Gtk.ResponseType.CANCEL:
             return None
         if response == Gtk.ResponseType.OK:
-            close_data = (files, n-1, force, close_app)
-            self.save_file(files[n-1], close_data)
+            close_data = (filenames, n-1, force, close_app)
+            self.save_file(filenames[n-1], close_data)
             return None
 
-        itemlist = self.itemlists[files[n]]
+        itemlist = self.itemlists[filenames[n]]
         if itemlist.bibfile.unsaved and not force:
             self.notebook.set_current_page(itemlist.page.number)
-            dialog = SaveChanges(self.get_root(), files[n])
-            if n < len(files) - 1:
-                dialog.connect("response", self.close_files_dialog, files, n+1, force, close_app)
+            dialog = SaveChanges(self.get_root(), filenames[n])
+            if n < len(filenames) - 1:
+                dialog.connect("response", self.close_files_dialog, filenames, n+1, force, close_app)
             else:
-                dialog.connect("response", self.close_files_finalize, files, n+1, force, close_app)
+                dialog.connect("response", self.close_files_finalize, filenames, n+1, force, close_app)
             dialog.show()
         else:
-            if n < len(files) - 1:
-                self.close_files_dialog(None, Gtk.ResponseType.CLOSE, files, n+1, force, close_app)
+            if n < len(filenames) - 1:
+                self.close_files_dialog(None, Gtk.ResponseType.CLOSE, filenames, n+1, force, close_app)
             else:
-                self.close_files_finalize(None, Gtk.ResponseType.CLOSE, files, n+1, force, close_app)
+                self.close_files_finalize(None, Gtk.ResponseType.CLOSE, filenames, n+1, force, close_app)
 
-    def close_files_finalize(self, dialog, response, files, n, force, close_app):
+    def close_files_finalize(self, dialog, response, filenames, n, force, close_app):
         if dialog:
             dialog.destroy()
 
         if response == Gtk.ResponseType.CANCEL:
             return None
         if response == Gtk.ResponseType.OK:
-            close_data = (files, n-1, force, close_app)
-            self.save_file(files[n-1], close_data)
+            close_data = (filenames, n-1, force, close_app)
+            self.save_file(filenames[n-1], close_data)
             return None
 
         if close_app:
             self.get_root().session_manager.save()
 
-        for file in files:
-            bibfile = self.store.bibfiles[file]
+        for filename in filenames:
+            bibfile = self.store.bibfiles[filename]
             if not bibfile.created and not close_app:
                 add_to_recent(bibfile)
                 self.get_root().update_recent_file_menu()
 
-            self.remove_itemlist(file)
-            self.remove_watcher(file)
-            self.store.remove_file(file)
+            self.remove_itemlist(filename)
+            self.remove_watcher(filename)
+            self.store.remove_file(filename)
 
         if self.notebook.get_n_pages() == 0 and not close_app:
             self.new_file()

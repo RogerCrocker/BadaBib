@@ -37,6 +37,10 @@ class Change:
             return self.main_widget.get_editor(entrytype)
 
         @property
+        def itemlist(self):
+            return self.item.bibfile.itemlist
+
+        @property
         def source_view(self):
             return self.main_widget.source_view
 
@@ -63,42 +67,40 @@ class Change:
             if redo:
                 self.item.row.grab_focus()
 
-    class Hide(Generic):
-        def __init__(self, item):
-            self.type = "hide"
-            self.item = item
-            self.form = None
-
-        def apply(self, redo=False):
-            self.item.deleted = True
-            next_row = self.item.bibfile.itemlist.select_next_row(self.item.row)
-            if not next_row:
-                self.editor.clear()
-                self.source_view.set_status("empty")
-
-        def revert(self):
-            self.item.deleted = False
-            self.item.row.update()
-            self.item.row.grab_focus()
-
     class Show(Generic):
-        def __init__(self, item):
+        def __init__(self, items):
             self.type = "show"
-            self.item = item
+            self.item = items[0]
             self.form = None
+            self.items = items
 
         def apply(self, redo=False):
-            self.item.deleted = False
-            self.item.row.update()
-            if redo:
-                self.item.row.grab_focus()
+            for item in self.items:
+                item.deleted = False
+            self.itemlist.invalidate_filter()
+            self.itemlist.unselect_all()
+            for item in self.items:
+                self.itemlist.select_row(item.row)
 
         def revert(self):
-            self.item.deleted = True
-            next_row = self.item.bibfile.itemlist.select_next_row(self.item.row)
+            for item in self.items:
+                item.deleted = True
+            self.itemlist.invalidate_filter()
+            self.itemlist.unselect_all()
+            next_row = self.itemlist.select_next_row(self.item.row)
             if not next_row:
                 self.editor.clear()
                 self.source_view.set_status("empty")
+
+    class Hide(Show):
+        def __init__(self, items):
+            super().__init__(items)
+
+        def apply(self, redo=False):
+            super().revert()
+
+        def revert(self):
+            super().apply()
 
     class Replace(Generic):
         def __init__(self, item, old_entry, new_entry):
@@ -169,14 +171,14 @@ class ChangeBuffer:
 
         change.apply()
         self.last_save = time()
-        change.item.bibfile.itemlist.set_unsaved(True)
+        change.itemlist.set_unsaved(True)
 
     def redo_change(self):
         if self.index < len(self.buffer) - 1:
             self.index += 1
             change = self.buffer[self.index]
             change.apply(redo=True)
-            change.item.bibfile.itemlist.set_unsaved(self.index != self.saved_index)
+            change.itemlist.set_unsaved(self.index != self.saved_index)
             if change.form:
                 change.form.select()
                 change.form.grab_focus()
@@ -186,7 +188,7 @@ class ChangeBuffer:
         if change:
             self.index -= 1
             change.revert()
-            change.item.bibfile.itemlist.set_unsaved(self.index != self.saved_index)
+            change.itemlist.set_unsaved(self.index != self.saved_index)
             if change.form:
                 change.form.select()
                 change.form.grab_focus()

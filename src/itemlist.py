@@ -375,6 +375,10 @@ class Itemlist(Gtk.ListBox):
         super().__init__()
         self.bibfile = bibfile
         self.page = None
+        self.focus_idx = 0
+
+        self.set_selection_mode(Gtk.SelectionMode.MULTIPLE)
+        self.set_activate_on_single_click(False)
 
         self.sort_key = "ID"
         self.sort_reverse = False
@@ -427,9 +431,6 @@ class Itemlist(Gtk.ListBox):
             self.add_row(item)
 
     def select_next_row(self, row):
-        # filter out deleted rows
-        self.invalidate_filter()
-
         # get next row...
         next_row = row.get_next(1)
         if not next_row:
@@ -444,20 +445,20 @@ class Itemlist(Gtk.ListBox):
         self.unselect_all()
         return None
 
-    def reselect_current_row(self):
-        row = self.get_selected_row()
-        if row:
-            row.unselect()
-            row.select()
+    def get_n_selected(self):
+        return len(self.get_selected_rows())
 
     def refresh(self):
-        current_row = self.get_selected_row()
+        current_rows = self.get_selected_rows()
         row = self.get_row_at_index(0)
         while row:
             row.item.refresh()
             row.update()
             row = row.get_next(1)
-        self.select_row(current_row)
+
+        self.unselect_all()
+        for row in current_rows:
+            self.select_row(row)
 
     def clear(self):
         self.foreach(lambda row, data : self.remove(row), None)

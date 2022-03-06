@@ -80,8 +80,8 @@ class MainWidget(Gtk.Paned):
 
         # Toolbar
         self.toolbar = ItemlistToolbar()
-        self.toolbar.new_button.connect("clicked", self.add_item)
-        self.toolbar.delete_button.connect("clicked", self.delete_item)
+        self.toolbar.new_button.connect("clicked", self.add_items)
+        self.toolbar.delete_button.connect("clicked", self.delete_selected_items)
         self.toolbar.sort_button.connect("clicked", self.sort_itemlist)
         self.toolbar.filter_button.connect("clicked", self.filter_itemlist)
         self.toolbar.goto_button.connect("clicked", self.focus_on_current_row)
@@ -161,7 +161,7 @@ class MainWidget(Gtk.Paned):
 
     def add_itemlist(self, bibfile, state=None, change_buffer=None):
         itemlist = Itemlist(bibfile, state, change_buffer)
-        itemlist.connect("row-selected", self.on_row_selected)
+        itemlist.connect("selected-rows-changed", self.on_row_selected)
         itemlist.event_controller.connect("key-pressed", self.on_itemlist_key_pressed)
         itemlist.header.close_button.connect("clicked", self.on_tab_closed)
 
@@ -186,8 +186,7 @@ class MainWidget(Gtk.Paned):
 
     def on_itemlist_key_pressed(self, _event_controller_key, keyval, _keycode, _state):
         if keyval == Gdk.KEY_Delete:
-            self.delete_item()
-            self.focus_on_current_row()
+            self.delete_selected_items()
         if keyval == Gdk.KEY_Return:
             self.focus_on_current_row()
 
@@ -195,37 +194,63 @@ class MainWidget(Gtk.Paned):
         return self.get_current_itemlist().bibfile
 
     def get_current_row(self):
+        if self.get_current_itemlist().get_n_selected() > 1:
+            return None
         return self.get_current_itemlist().get_selected_row()
 
     def get_current_item(self):
+        if self.get_current_itemlist().get_n_selected() > 1:
+            return None
+
         row = self.get_current_row()
         if row:
             return row.item
         return None
 
-    def add_item(self, _button=None, entry=None):
-        itemlist = self.get_current_itemlist()
-        item = itemlist.bibfile.append_item(entry)
-        itemlist.add_row(item)
-        item.row.grab_focus()
+    def get_selected_items(self, itemlist=None):
+        if not itemlist:
+            itemlist = self.get_current_itemlist()
+        return [row.item for row in itemlist.get_selected_rows()]
 
-        change = Change.Show(item)
+    def add_items(self, _button=None, entries=[]):
+        itemlist = self.get_current_itemlist()
+        items = []
+
+        if not entries:
+            entries = [None]
+
+        for entry in entries:
+            item = itemlist.bibfile.append_item(entry)
+            items.append(item)
+            itemlist.add_row(item)
+
+        change = Change.Show(items)
         itemlist.change_buffer.push_change(change)
 
-    def delete_item(self, _button=None):
-        item = self.get_current_item()
-        if item:
-            change = Change.Hide(item)
-            item.bibfile.itemlist.change_buffer.push_change(change)
+    def delete_items(self, items):
+        itemlist = self.get_current_itemlist()
+
+        # prevents new row from being selected on key press
+        itemlist.grab_focus()
+
+        if items:
+            change = Change.Hide(items)
+            itemlist.change_buffer.push_change(change)
+
+    def delete_selected_items(self, _button=None):
+        items = self.get_selected_items()
+        self.delete_items(items)
 
     def sort_itemlist(self, button):
         itemlist = self.get_current_itemlist()
         SortPopover(button, itemlist)
 
     def focus_on_current_row(self, _button=None):
-        row = self.get_current_row()
-        if row:
-            itemlist = self.get_current_itemlist()
+        itemlist = self.get_current_itemlist()
+        items = self.get_selected_items(itemlist)
+        if items:
+            itemlist.focus_idx = (itemlist.focus_idx + 1) % len(items)
+            row = items[itemlist.focus_idx].row
             itemlist.get_adjustment().set_value(row.get_index() * row.get_height())
 
     def filter_itemlist(self, button):
@@ -236,7 +261,16 @@ class MainWidget(Gtk.Paned):
         searchbar = self.get_current_itemlist().page.searchbar
         searchbar.set_search_mode(not searchbar.get_search_mode())
 
-    def on_row_selected(self, _itemlist, row):
+    def on_row_selected(self, itemlist, row=None):
+        itemlist.focus_idx = 0
+        if itemlist.get_n_selected() > 1:
+            self.get_current_editor().clear()
+            self.source_view.clear()
+            return None
+
+        if not row:
+            row = self.get_current_row()
+
         if row:
             entrytype = row.item.entry["ENTRYTYPE"]
             editor = self.show_editor(entrytype)
@@ -261,6 +295,9 @@ class MainWidget(Gtk.Paned):
             itemlist = page.itemlist
         except AttributeError:
             return None
+
+        # prevents new row from being selected on tab change
+        itemlist.grab_focus()
 
         # work around notebook selecting the closed page bug
         if notebook.current_page is not None:

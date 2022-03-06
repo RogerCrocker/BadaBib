@@ -246,7 +246,7 @@ class Application(Gtk.Application):
         self.window.main_widget.on_tab_closed()
 
     def on_new_entry(self, action=None, data=None):
-        self.window.main_widget.add_item()
+        self.window.main_widget.add_items()
 
     def on_find(self, action=None, data=None):
         self.window.main_widget.search_itemlist()
@@ -255,18 +255,17 @@ class Application(Gtk.Application):
         self.window.main_widget.on_goto_clicked()
 
     def on_copy_entry(self, action=None, data=None):
-        item = self.window.main_widget.get_current_item()
-        self.window.main_widget.copy_paste_buffer = item.entry.copy()
+        items = self.window.main_widget.get_selected_items()
+        self.window.main_widget.copy_paste_buffer = [item.entry.copy() for item in items]
 
     def on_cut_entry(self, action=None, data=None):
-        item = self.window.main_widget.get_current_item()
-        self.window.main_widget.copy_paste_buffer = item.entry.copy()
-        self.window.main_widget.delete_item()
+        items = self.window.main_widget.get_selected_items()
+        self.window.main_widget.copy_paste_buffer = [item.entry.copy() for item in items]
+        self.window.main_widget.delete_items(items)
 
     def on_paste_entry(self, action=None, data=None):
-        entry = self.window.main_widget.copy_paste_buffer
-        if entry:
-            self.window.main_widget.add_item(None, entry)
+        entries = self.window.main_widget.copy_paste_buffer
+        self.window.main_widget.add_items(None, entries)
 
     def do_show_editor_configurator(self, action=None, data=None):
         LayoutManagerWindow(self.window)

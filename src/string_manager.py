@@ -458,7 +458,6 @@ class StringManagerWindow(Gtk.Window):
     @staticmethod
     def refresh_display(file):
         file.itemlist.refresh()
-        file.itemlist.reselect_current_row()
 
     def import_strings(self, _button):
         dialog = FileChooser(self)

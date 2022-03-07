@@ -84,7 +84,7 @@ class MainWidget(Gtk.Paned):
         self.toolbar.delete_button.connect("clicked", self.delete_selected_items)
         self.toolbar.sort_button.connect("clicked", self.sort_itemlist)
         self.toolbar.filter_button.connect("clicked", self.filter_itemlist)
-        self.toolbar.goto_button.connect("clicked", self.focus_on_current_row)
+        self.toolbar.goto_button.connect("clicked", self.focus_on_current_item)
         self.toolbar.search_button.connect("clicked", self.search_itemlist)
 
         # box notebook and toolbar
@@ -125,6 +125,8 @@ class MainWidget(Gtk.Paned):
 
         self.set_end_child(right_pane)
 
+    # Editor
+
     def show_editor(self, entrytype):
         editor = self.get_editor(entrytype)
         self.editor_stack.set_visible_child_name(entrytype)
@@ -142,10 +144,11 @@ class MainWidget(Gtk.Paned):
         if entrytype in self.editors:
             editor = self.editors.pop(entrytype)
             self.editor_stack.remove(editor)
-        row = self.get_current_row()
-        if row:
-            row.unselect()
-            row.select()
+
+        item = self.get_current_item()
+        if item:
+            item.row.unselect()
+            item.row.select()
         else:
             self.show_editor(DEFAULT_EDITOR)
 
@@ -159,9 +162,11 @@ class MainWidget(Gtk.Paned):
     def get_current_editor(self):
         return self.editor_stack.get_visible_child()
 
+    #Itemlist
+
     def add_itemlist(self, bibfile, state=None, change_buffer=None):
         itemlist = Itemlist(bibfile, state, change_buffer)
-        itemlist.connect("selected-rows-changed", self.on_row_selected)
+        itemlist.connect("selected-rows-changed", self.on_item_selected)
         itemlist.event_controller.connect("key-pressed", self.on_itemlist_key_pressed)
         itemlist.header.close_button.connect("clicked", self.on_tab_closed)
 
@@ -184,25 +189,31 @@ class MainWidget(Gtk.Paned):
         page = self.notebook.get_current_page()
         return self.notebook.get_nth_page(page).itemlist
 
+    def sort_itemlist(self, button):
+        itemlist = self.get_current_itemlist()
+        SortPopover(button, itemlist)
+
+    def filter_itemlist(self, button):
+        itemlist = self.get_current_itemlist()
+        FilterPopover(button, itemlist)
+
+    def search_itemlist(self, _button=None):
+        searchbar = self.get_current_itemlist().page.searchbar
+        searchbar.set_search_mode(not searchbar.get_search_mode())
+
     def on_itemlist_key_pressed(self, _event_controller_key, keyval, _keycode, _state):
         if keyval == Gdk.KEY_Delete:
             self.delete_selected_items()
         if keyval == Gdk.KEY_Return:
-            self.focus_on_current_row()
+            self.focus_on_current_item()
 
-    def get_current_file(self):
-        return self.get_current_itemlist().bibfile
-
-    def get_current_row(self):
-        if self.get_current_itemlist().get_n_selected() > 1:
-            return None
-        return self.get_current_itemlist().get_selected_row()
+    # Item
 
     def get_current_item(self):
         if self.get_current_itemlist().get_n_selected() > 1:
             return None
 
-        row = self.get_current_row()
+        row = self.get_current_itemlist().get_selected_row()
         if row:
             return row.item
         return None
@@ -212,17 +223,13 @@ class MainWidget(Gtk.Paned):
             itemlist = self.get_current_itemlist()
         return [row.item for row in itemlist.get_selected_rows()]
 
-    def add_items(self, _button=None, entries=[]):
+    def add_items(self, _button=None, entries=None):
         itemlist = self.get_current_itemlist()
-        items = []
-
         if not entries:
             entries = [None]
 
-        for entry in entries:
-            item = itemlist.bibfile.append_item(entry)
-            items.append(item)
-            itemlist.add_row(item)
+        items = [itemlist.bibfile.append_item(entry) for entry in entries]
+        itemlist.add_rows(items)
 
         change = Change.Show(items)
         itemlist.change_buffer.push_change(change)
@@ -241,11 +248,7 @@ class MainWidget(Gtk.Paned):
         items = self.get_selected_items()
         self.delete_items(items)
 
-    def sort_itemlist(self, button):
-        itemlist = self.get_current_itemlist()
-        SortPopover(button, itemlist)
-
-    def focus_on_current_row(self, _button=None):
+    def focus_on_current_item(self, _button=None):
         itemlist = self.get_current_itemlist()
         items = self.get_selected_items(itemlist)
         if items:
@@ -253,15 +256,7 @@ class MainWidget(Gtk.Paned):
             row = items[itemlist.focus_idx].row
             itemlist.get_adjustment().set_value(row.get_index() * row.get_height())
 
-    def filter_itemlist(self, button):
-        itemlist = self.get_current_itemlist()
-        FilterPopover(button, itemlist)
-
-    def search_itemlist(self, _button=None):
-        searchbar = self.get_current_itemlist().page.searchbar
-        searchbar.set_search_mode(not searchbar.get_search_mode())
-
-    def on_row_selected(self, itemlist, row=None):
+    def on_item_selected(self, itemlist, row=None):
         itemlist.focus_idx = 0
         if itemlist.get_n_selected() > 1:
             self.get_current_editor().clear()
@@ -269,7 +264,7 @@ class MainWidget(Gtk.Paned):
             return None
 
         if not row:
-            row = self.get_current_row()
+            row = itemlist.get_selected_row()
 
         if row:
             entrytype = row.item.entry["ENTRYTYPE"]
@@ -279,6 +274,18 @@ class MainWidget(Gtk.Paned):
             self.source_view.set_status("valid")
             self.source_view.form.set_sensitive(True)
             self.source_view.form.set_text(row.item.bibtex)
+
+    def generate_key(self):
+        item = self.get_current_item()
+        new_key = item.bibfile.generate_key_for_item(item)
+        if new_key != item.entry["ID"]:
+            editor = self.get_current_editor()
+            form = editor.forms["ID"]
+            old_key = item.entry["ID"]
+            change = Change.Edit(item, form, old_key, new_key)
+            item.bibfile.itemlist.change_buffer.push_change(change)
+
+    # Notebook
 
     def on_tab_closed(self, button=None):
         if button is None:
@@ -305,21 +312,11 @@ class MainWidget(Gtk.Paned):
         notebook.current_page = itemlist.page.number
 
         row = itemlist.get_selected_row()
-        if row:
-            self.on_row_selected(itemlist, row)
-        else:
+        if not row:
             self.source_view.set_status("empty", True)
             self.get_current_editor().clear()
 
-    def generate_key(self):
-        item = self.get_current_item()
-        new_key = item.bibfile.generate_key_for_item(item)
-        if new_key != item.entry["ID"]:
-            editor = self.get_current_editor()
-            form = editor.forms["ID"]
-            old_key = item.entry["ID"]
-            change = Change.Edit(item, form, old_key, new_key)
-            item.bibfile.itemlist.change_buffer.push_change(change)
+    # Source view
 
     def on_source_view_modified(self, _buffer):
         if get_parse_on_fly():
@@ -337,8 +334,7 @@ class MainWidget(Gtk.Paned):
         bibtex = self.source_view.form.get_text()
         if bibtex:
             item = self.get_current_item()
-            bibfile = self.get_current_file()
-            new_entry = bibfile.parse_entry(bibtex)
+            new_entry = item.bibfile.parse_entry(bibtex)
             old_entry = item.entry
             if new_entry:
                 self.source_view.set_status("valid")
@@ -348,6 +344,8 @@ class MainWidget(Gtk.Paned):
             else:
                 self.source_view.set_status("invalid")
 
+    # File watcher
+
     def add_watcher(self, filename):
         self.watchers[filename] = Watcher(self, filename)
 
@@ -355,6 +353,13 @@ class MainWidget(Gtk.Paned):
         if filename in self.watchers:
             watcher = self.watchers.pop(filename)
             watcher.monitor.cancel()
+
+    # File
+
+    def new_file(self):
+        bibfile = self.store.new_file()
+        itemlist = self.add_itemlist(bibfile)
+        self.notebook.set_current_page(itemlist.page.number)
 
     def open_files(self, filenames, states=None, select_file=None):
         # make sure 'filenames' is a list
@@ -438,15 +443,11 @@ class MainWidget(Gtk.Paned):
                 itemlist = self.notebook.get_nth_page(n).itemlist
                 if itemlist.bibfile.name == select_file:
                     self.notebook.set_current_page(itemlist.page.number)
+                    break
 
         # display warnings, if any
         if messages:
             WarningDialog(messages, self.get_root())
-
-    def new_file(self):
-        bibfile = self.store.new_file()
-        itemlist = self.add_itemlist(bibfile)
-        self.notebook.set_current_page(itemlist.page.number)
 
     def reload_file(self, filename):
         itemlist = self.itemlists[filename]

@@ -85,7 +85,7 @@ class SessionManager:
         set_open_files(open_files)
 
     def save_open_tab(self):
-        current_file = self.main_widget.get_current_file()
+        current_file = self.main_widget.get_current_itemlist().bibfile
         set_open_tab(current_file.name)
 
     def restore_string_imports(self):

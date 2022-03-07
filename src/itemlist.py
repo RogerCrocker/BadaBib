@@ -174,7 +174,7 @@ class ItemlistChangedBar(Gtk.InfoBar):
             self.set_revealed(False)
             self.show_text(False)
             window = self.get_root()
-            file = window.main_widget.get_current_file()
+            file = window.main_widget.get_current_itemlist().bibfile
             window.main_widget.reload_file(file.name)
 
 

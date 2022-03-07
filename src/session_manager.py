@@ -31,11 +31,13 @@ class SessionManager:
     def __init__(self, main_widget):
         self.main_widget = main_widget
 
-    def restore(self, arg_files=[]):
+    def restore(self, arg_files=None):
         self.restore_window_geom()
         self.main_widget.get_root().show()
         if get_remember_strings():
             self.restore_string_imports()
+        if arg_files is None:
+            arg_files = []
         self.restore_open_files(arg_files)
 
     def save(self):

@@ -93,9 +93,6 @@ class Change:
                 self.source_view.set_status("empty")
 
     class Hide(Show):
-        def __init__(self, items):
-            super().__init__(items)
-
         def apply(self, redo=False):
             super().revert()
 

@@ -52,7 +52,6 @@ class Application(Gtk.Application):
 
         self.connect("open", self.on_open_arg_files)
 
-
     def do_activate(self):
         self.window = self.props.active_window
         if not self.window:

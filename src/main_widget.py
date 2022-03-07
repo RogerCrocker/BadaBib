@@ -162,7 +162,7 @@ class MainWidget(Gtk.Paned):
     def get_current_editor(self):
         return self.editor_stack.get_visible_child()
 
-    #Itemlist
+    # Itemlist
 
     def add_itemlist(self, bibfile, state=None, change_buffer=None):
         itemlist = Itemlist(bibfile, state, change_buffer)
@@ -261,7 +261,7 @@ class MainWidget(Gtk.Paned):
         if itemlist.get_n_selected() > 1:
             self.get_current_editor().clear()
             self.source_view.clear()
-            return None
+            return
 
         if not row:
             row = itemlist.get_selected_row()

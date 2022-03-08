@@ -149,8 +149,7 @@ class ChangeBuffer:
         previous_change = self.buffer[self.index]
         if (
             previous_change
-            and previous_change.type == "edit"
-            and change.type == "edit"
+            and previous_change.type == change.type == "edit"
             and previous_change.form == change.form
             and previous_change.item == change.item
             and time() - self.last_save < UNDO_DELAY
@@ -158,8 +157,7 @@ class ChangeBuffer:
             previous_change.new_value = change.new_value
         elif (
             previous_change
-            and previous_change.type == "replace"
-            and change.type == "replace"
+            and previous_change.type == change.type == "replace"
             and time() - self.last_save < UNDO_DELAY
         ):
             previous_change.new_entry = change.new_entry

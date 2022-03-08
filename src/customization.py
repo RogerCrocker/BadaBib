@@ -66,7 +66,7 @@ def prettify_unicode_names(value):
 
 
 def prettify_unicode_field(field, value):
-    if field == "author":
+    if field in ("author", "editor"):
         return prettify_unicode_names(value)
     return prettify_unicode_string(value)
 

@@ -171,14 +171,6 @@ def set_row_indent(indent):
     setting.set_int("row-indent", indent)
 
 
-def get_watcher_sleep_time():
-    return setting.get_int("watcher-sleep-time")
-
-
-def set_watcher_sleep_time(T):
-    setting.set_int("watcher-sleep-time", T)
-
-
 def get_default_entrytype():
     return setting.get_string("default-entrytype")
 

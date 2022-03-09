@@ -96,6 +96,7 @@ class Editor(Gtk.ScrolledWindow):
             form.event_controller_focus.connect("enter", self.deselect_unfocused, form)
 
     def show_item(self, item):
+        self.current_item = item
         for form in self.forms.values():
             form.update(item)
 

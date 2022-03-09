@@ -296,7 +296,6 @@ class Row(Gtk.ListBoxRow):
             self.update_publisher()
         elif field in link_fields:
             self.update_link()
-        self.select()
 
     def update_id(self):
         label = row_indent

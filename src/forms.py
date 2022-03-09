@@ -105,8 +105,6 @@ class MultiLine(Gtk.TextView):
 
     def update(self, item):
         self.editor.set_active(True)
-        self.editor.current_item = item
-
         self.editor.track_changes = False
         raw_value = item.raw_field(self.field)
         if raw_value is None:
@@ -173,8 +171,6 @@ class SingleLine(Gtk.Entry):
 
     def update_text(self, item):
         self.editor.set_active(True)
-        self.editor.current_item = item
-
         self.editor.track_changes = False
         raw_value = item.raw_field(self.field)
         if not raw_value:
@@ -324,7 +320,6 @@ class MonthBox(Box):
 
     def update(self, item):
         self.editor.set_active(True)
-        self.editor.current_item = item
         if item.raw_field(self.field) != self.get_text():
             self.editor.track_changes = False
             self.set_text(item.raw_field(self.field))

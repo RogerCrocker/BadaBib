@@ -65,7 +65,8 @@ class Change:
             self.source_view.update(self.item)
             self.form.update(self.item)
             if redo:
-                self.item.row.grab_focus()
+                self.itemlist.unselect_all()
+                self.itemlist.select_row(self.item.row)
 
     class Show(Generic):
         def __init__(self, items):
@@ -113,14 +114,16 @@ class Change:
             self.editor.show_item(self.item)
             if redo:
                 self.source_view.update(self.item)
-                self.item.row.grab_focus()
+                self.itemlist.unselect_all()
+                self.itemlist.select_row(self.item.row)
 
         def revert(self):
             self.item.update_entry(self.old_entry, True)
             self.item.row.update()
             self.editor.show_item(self.item)
             self.source_view.update(self.item)
-            self.item.row.grab_focus()
+            self.itemlist.unselect_all()
+            self.itemlist.select_row(self.item.row)
 
 
 class ChangeBuffer:

@@ -147,8 +147,8 @@ class MainWidget(Gtk.Paned):
 
         item = self.get_current_item()
         if item:
-            item.row.unselect()
-            item.row.select()
+            item.bibfile.itemlist.unselect_row(item.row)
+            item.bibfile.itemlist.select_row(item.row)
         else:
             self.show_editor(DEFAULT_EDITOR)
 
@@ -312,7 +312,10 @@ class MainWidget(Gtk.Paned):
         notebook.current_page = itemlist.page.number
 
         row = itemlist.get_selected_row()
-        if not row:
+        if row:
+            itemlist.unselect_row(row)
+            itemlist.select_row(row)
+        else:
             self.source_view.set_status("empty", True)
             self.get_current_editor().clear()
 

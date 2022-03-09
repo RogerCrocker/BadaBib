@@ -351,14 +351,6 @@ class Row(Gtk.ListBoxRow):
         else:
             self.link_image.clear()
 
-    def select(self):
-        if not self.is_selected() and self.item.bibfile.itemlist is not None:
-            self.item.bibfile.itemlist.select_row(self)
-
-    def unselect(self):
-        if self.is_selected() and self.item.bibfile.itemlist is not None:
-            self.item.bibfile.itemlist.unselect_row(self)
-
     def get_next(self, increment):
         row = self
         while row:
@@ -437,7 +429,7 @@ class Itemlist(Gtk.ListBox):
 
         # ...and select it
         if next_row:
-            next_row.select()
+            self.select_row(next_row)
             return next_row
 
         # ...or unselect all and return None

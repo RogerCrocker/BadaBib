@@ -462,7 +462,7 @@ class Itemlist(Gtk.ListBox):
         while row:
             row.item.refresh()
             row.update()
-            row = self.get_next_row(1)
+            row = self.get_next_row(row, 1)
 
         self.unselect_all()
         for row in current_rows:

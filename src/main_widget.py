@@ -216,7 +216,7 @@ class MainWidget(Gtk.Paned):
         items = self.get_selected_items()
         if len(items) != 1:
             return None
-        return item
+        return items[0]
 
     def add_items(self, _button=None, entries=None):
         itemlist = self.get_current_itemlist()

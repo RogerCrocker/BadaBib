@@ -209,19 +209,14 @@ class MainWidget(Gtk.Paned):
 
     # Item
 
+    def get_selected_items(self):
+        return self.get_current_itemlist().get_selected_items()
+
     def get_current_item(self):
-        if self.get_current_itemlist().get_n_selected() > 1:
+        items = self.get_selected_items()
+        if len(items) != 1:
             return None
-
-        row = self.get_current_itemlist().get_selected_row()
-        if row:
-            return row.item
-        return None
-
-    def get_selected_items(self, itemlist=None):
-        if not itemlist:
-            itemlist = self.get_current_itemlist()
-        return [row.item for row in itemlist.get_selected_rows()]
+        return item
 
     def add_items(self, _button=None, entries=None):
         itemlist = self.get_current_itemlist()
@@ -249,16 +244,11 @@ class MainWidget(Gtk.Paned):
         self.delete_items(items)
 
     def focus_on_current_item(self, _button=None):
-        itemlist = self.get_current_itemlist()
-        items = self.get_selected_items(itemlist)
-        if items:
-            itemlist.focus_idx = (itemlist.focus_idx + 1) % len(items)
-            row = items[itemlist.focus_idx].row
-            itemlist.get_adjustment().set_value(row.get_index() * row.get_height())
+        self.get_current_itemlist().focus_on_selected_items()
 
     def on_item_selected(self, itemlist, row=None):
         itemlist.focus_idx = 0
-        if itemlist.get_n_selected() > 1:
+        if len(itemlist.get_selected_items()) > 1:
             self.get_current_editor().clear()
             self.source_view.clear()
             return
@@ -303,18 +293,19 @@ class MainWidget(Gtk.Paned):
         except AttributeError:
             return None
 
-        # prevents new row from being selected on tab change
+        # work around new row being selected on tab change
         itemlist.grab_focus()
 
-        # work around notebook selecting the closed page bug
+        # work around notebook switching to page when closing it
         if notebook.current_page is not None:
             notebook.previous_page = notebook.current_page
         notebook.current_page = itemlist.page.number
 
-        row = itemlist.get_selected_row()
-        if row:
-            itemlist.unselect_row(row)
-            itemlist.select_row(row)
+        rows = itemlist.get_selected_rows()
+        if rows:
+            # work around ListBox not selecting multiple rows on page switch
+            adj = itemlist.get_adjustment().get_value()
+            GLib.idle_add(itemlist.reselect_rows, rows, adj)
         else:
             self.source_view.set_status("empty", True)
             self.get_current_editor().clear()

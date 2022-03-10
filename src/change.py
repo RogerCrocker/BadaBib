@@ -14,6 +14,11 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
+import gi
+gi.require_version("Gtk", "4.0")
+
+from gi.repository import GLib
+
 from time import time
 
 from .config_manager import get_undo_delay
@@ -67,6 +72,7 @@ class Change:
             if redo:
                 self.itemlist.unselect_all()
                 self.itemlist.select_row(self.item.row)
+                self.main_widget.focus_on_current_item()
 
     class Show(Generic):
         def __init__(self, items):
@@ -82,6 +88,7 @@ class Change:
             self.itemlist.unselect_all()
             for item in self.items:
                 self.itemlist.select_row(item.row)
+            self.main_widget.focus_on_current_item()
 
         def revert(self):
             for item in self.items:
@@ -89,7 +96,9 @@ class Change:
             self.itemlist.invalidate_filter()
             self.itemlist.unselect_all()
             next_row = self.itemlist.select_next_row(self.item.row)
-            if not next_row:
+            if next_row:
+                self.main_widget.focus_on_current_item()
+            else:
                 self.editor.clear()
                 self.source_view.set_status("empty")
 
@@ -116,6 +125,7 @@ class Change:
                 self.source_view.update(self.item)
                 self.itemlist.unselect_all()
                 self.itemlist.select_row(self.item.row)
+                self.main_widget.focus_on_current_item()
 
         def revert(self):
             self.item.update_entry(self.old_entry, True)
@@ -124,6 +134,7 @@ class Change:
             self.source_view.update(self.item)
             self.itemlist.unselect_all()
             self.itemlist.select_row(self.item.row)
+            self.main_widget.focus_on_current_item()
 
 
 class ChangeBuffer:

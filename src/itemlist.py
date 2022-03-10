@@ -34,6 +34,7 @@ row_indent = get_row_indent() * " "
 entrytypes = list(entrytype_dict.keys()) + ["other"]
 
 MIN_MAX_CHAR = ('', chr(0x10FFFF))
+ROW_HEIGHT = 95
 
 
 class ItemlistNotebook(Gtk.Notebook):
@@ -249,6 +250,7 @@ class TabHeader(Gtk.Box):
 class Row(Gtk.ListBoxRow):
     def __init__(self, item):
         super().__init__()
+        self.set_activatable(False)
         self.item = item
 
         self.id_label = Gtk.Label(xalign=0)
@@ -351,15 +353,6 @@ class Row(Gtk.ListBoxRow):
         else:
             self.link_image.clear()
 
-    def get_next(self, increment):
-        row = self
-        while row:
-            index = row.get_index()
-            row = row.item.bibfile.itemlist.get_row_at_index(index + increment)
-            if row and not row.item.deleted:
-                return row
-        return None
-
 
 class Itemlist(Gtk.ListBox):
     def __init__(self, bibfile, state_string=None, change_buffer=None):
@@ -421,11 +414,19 @@ class Itemlist(Gtk.ListBox):
         for item in items:
             self.add_row(item)
 
+    def get_next_row(self, row, increment):
+        while row:
+            index = row.get_index()
+            row = self.get_row_at_index(index + increment)
+            if row and self.filter_by_search(row):
+                return row
+        return None
+
     def select_next_row(self, row):
         # get next row...
-        next_row = row.get_next(1)
+        next_row = self.get_next_row(row, 1)
         if not next_row:
-            next_row = row.get_next(-1)
+            next_row = self.get_next_row(row, -1)
 
         # ...and select it
         if next_row:
@@ -436,8 +437,24 @@ class Itemlist(Gtk.ListBox):
         self.unselect_all()
         return None
 
-    def get_n_selected(self):
-        return len(self.get_selected_rows())
+    def focus_on_selected_items(self):
+        items = self.get_selected_items()
+        self.focus_idx = (self.focus_idx + 1) % len(items)
+        row = items[self.focus_idx].row
+        preceeding_rows = -1
+        while row := self.get_next_row(row, -1):
+            preceeding_rows += 1
+        self.get_adjustment().set_value(preceeding_rows * 95)
+
+    def reselect_rows(self, rows, adj=None):
+        self.unselect_all()
+        for row in rows:
+            self.select_row(row)
+        if adj is not None:
+            self.get_adjustment().set_value(adj)
+
+    def get_selected_items(self):
+        return [row.item for row in self.get_selected_rows()]
 
     def refresh(self):
         current_rows = self.get_selected_rows()
@@ -445,7 +462,7 @@ class Itemlist(Gtk.ListBox):
         while row:
             row.item.refresh()
             row.update()
-            row = row.get_next(1)
+            row = self.get_next_row(1)
 
         self.unselect_all()
         for row in current_rows:

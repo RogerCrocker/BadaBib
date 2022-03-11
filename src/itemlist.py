@@ -441,10 +441,10 @@ class Itemlist(Gtk.ListBox):
         items = self.get_selected_items()
         self.focus_idx = (self.focus_idx + 1) % len(items)
         row = items[self.focus_idx].row
-        preceeding_rows = -1
+        preceeding_rows = 0
         while row := self.get_next_row(row, -1):
             preceeding_rows += 1
-        self.get_adjustment().set_value(preceeding_rows * 95)
+        self.get_adjustment().set_value(preceeding_rows * ROW_HEIGHT)
 
     def reselect_rows(self, rows, adj=None):
         self.unselect_all()

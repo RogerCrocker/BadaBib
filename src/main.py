@@ -291,29 +291,35 @@ class Application(Gtk.Application):
         except AttributeError:
             pass
 
+    def get_form(self):
+        form = self.window.get_focus()
+        if isinstance(form, Gtk.Text):
+            return form.get_parent()
+        return form
+
     def do_protect(self, action=None, data=None):
-        form = self.window.get_focus().get_parent()
+        form = self.get_form()
         try:
             form.apply(protect)
         except AttributeError:
             pass
 
     def do_correct_hyphen(self, action=None, data=None):
-        form = self.window.get_focus().get_parent()
+        form = self.get_form()
         try:
             form.apply(correct_hyphen)
         except AttributeError:
             pass
 
     def do_to_unicode(self, action=None, data=None):
-        form = self.window.get_focus().get_parent()
+        form = self.get_form()
         try:
             form.apply(convert_to_unicode)
         except AttributeError:
             pass
 
     def do_to_latex(self, action=None, data=None):
-        form = self.window.get_focus().get_parent()
+        form = self.get_form()
         try:
             form.apply(convert_to_latex)
         except AttributeError:

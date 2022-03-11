@@ -86,12 +86,12 @@ class MultiLine(Gtk.TextView):
 
         textbuffer = self.get_buffer()
         bounds = textbuffer.get_selection_bounds()
-
-        if bounds:
-            selection = textbuffer.get_text(bounds[0], bounds[1], True)
-            new_selection = func(selection, bibstrings, n)
-            textbuffer.delete(bounds[0], bounds[1])
-            textbuffer.insert(bounds[0], new_selection, -1)
+        if not bounds:
+            bounds = (textbuffer.get_start_iter(), textbuffer.get_end_iter())
+        selection = textbuffer.get_text(bounds[0], bounds[1], True)
+        new_selection = func(selection, bibstrings, n)
+        textbuffer.delete(bounds[0], bounds[1])
+        textbuffer.insert(bounds[0], new_selection, -1)
 
     def deselect(self):
         buffer = self.get_buffer()

@@ -168,6 +168,7 @@ class MainWidget(Gtk.Paned):
         itemlist = Itemlist(bibfile, state, change_buffer)
         itemlist.connect("selected-rows-changed", self.on_item_selected)
         itemlist.event_controller.connect("key-pressed", self.on_itemlist_key_pressed)
+        itemlist.drop_target.connect("drop", self.on_drop)
         itemlist.header.close_button.connect("clicked", self.on_tab_closed)
 
         bibfile.itemlist = itemlist
@@ -206,6 +207,9 @@ class MainWidget(Gtk.Paned):
             self.delete_selected_items()
         if keyval == Gdk.KEY_Return:
             self.focus_on_current_item()
+
+    def on_drop(self, _drop_target, file, _x, _y):
+        self.open_files(file.get_path())
 
     # Item
 

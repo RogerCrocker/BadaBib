@@ -17,7 +17,7 @@
 import gi
 gi.require_version("Gtk", "4.0")
 
-from gi.repository import Gtk
+from gi.repository import Gtk, Gdk, Gio
 
 from os.path import split
 
@@ -380,6 +380,11 @@ class Itemlist(Gtk.ListBox):
 
         self.event_controller = Gtk.EventControllerKey()
         self.add_controller(self.event_controller)
+
+        # Dropping multiple files is not supported right now
+        # Compare: https://discourse.gnome.org/t/drag-dropping-files-with-gtk4/6084
+        self.drop_target = Gtk.DropTarget.new(Gio.File, Gdk.DragAction.COPY)
+        self.add_controller(self.drop_target)
 
         if change_buffer:
             self.change_buffer = change_buffer

@@ -132,7 +132,6 @@ def protect(string, bibstrings, n=0):
             protected += char
             pre_char = char
 
-
     if upper_case_sequence:
         if upper_case_sequence.lower() in bibstrings:
             protected += upper_case_sequence

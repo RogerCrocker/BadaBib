@@ -284,51 +284,46 @@ class Application(Gtk.Application):
         self.window.main_widget.get_current_itemlist().grab_focus()
         self.window.main_widget.notebook.next_page(-1)
 
+    def get_active_form(self):
+        editor = self.window.main_widget.get_current_editor()
+        return editor.current_form
+
     def do_capitalize(self, action=None, data=None):
-        form = self.window.get_focus().get_parent()
+        form = self.get_active_form()
         try:
             form.apply(capitalize, 4)
         except AttributeError:
             pass
 
-    def get_form(self):
-        form = self.window.get_focus()
-        if isinstance(form, Gtk.Text):
-            return form.get_parent()
-        return form
-
     def do_protect(self, action=None, data=None):
-        form = self.get_form()
+        form = self.get_active_form()
         try:
             form.apply(protect)
         except AttributeError:
             pass
 
     def do_correct_hyphen(self, action=None, data=None):
-        form = self.get_form()
+        form = self.get_active_form()
         try:
             form.apply(correct_hyphen)
         except AttributeError:
             pass
 
     def do_to_unicode(self, action=None, data=None):
-        form = self.get_form()
+        form = self.get_active_form()
         try:
             form.apply(convert_to_unicode)
         except AttributeError:
             pass
 
     def do_to_latex(self, action=None, data=None):
-        form = self.get_form()
+        form = self.get_active_form()
         try:
             form.apply(convert_to_latex)
         except AttributeError:
             pass
 
     def do_generate_key(self, action=None, data=None):
-        self.window.main_widget.generate_key()
-
-    def do_double_hyphen(self, action=None, data=None):
         self.window.main_widget.generate_key()
 
     def on_undo(self, action=None, data=None):

@@ -42,6 +42,7 @@ class Editor(Gtk.ScrolledWindow):
         self.track_changes = True
         self.forms = {}
         self.current_item = None
+        self.current_form = None
 
         self.set_spacings()
         self.apply_layout(layout)
@@ -93,7 +94,8 @@ class Editor(Gtk.ScrolledWindow):
                 buffer.connect("changed", self.update_item, form)
             if field in is_entry:
                 form.connect("changed", self.update_item, form)
-            form.event_controller_focus.connect("enter", self.deselect_unfocused, form)
+            form.event_controller_focus.connect("enter", self.on_enter, form)
+            form.event_controller_focus.connect("leave", self.on_leave, form)
 
     def show_item(self, item):
         self.current_item = item
@@ -127,7 +129,11 @@ class Editor(Gtk.ScrolledWindow):
                 change = Change.Edit(item, form, old_value, new_value)
                 item.bibfile.itemlist.change_buffer.push_change(change)
 
-    def deselect_unfocused(self, _event_controller_focus, current_form):
+    def on_enter(self, _event_controller_focus, current_form):
+        self.current_form = current_form
         for form in self.forms.values():
             if form != current_form:
                 form.deselect()
+
+    def on_leave(self, _event_controller_focus, current_form):
+        self.current_form = None

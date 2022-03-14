@@ -17,7 +17,7 @@
 import gi
 gi.require_version("Gtk", "4.0")
 
-from gi.repository import Gtk
+from gi.repository import Gtk, Gio, GLib
 
 from .config_manager import entrytype_dict
 from .config_manager import field_dict
@@ -48,6 +48,51 @@ def fields_to_forms(fields, editor):
             form = SingleLine(field, editor)
         forms.append(form)
     return forms
+
+
+class FormMenu(Gio.Menu):
+    def __init__(self, field):
+        super().__init__()
+
+        capitalize = Gio.MenuItem()
+        capitalize.set_label("Capitalize")
+        capitalize.set_action_and_target_value("app.cap", None)
+
+        protect = Gio.MenuItem()
+        protect.set_label("Protect upper case")
+        protect.set_action_and_target_value("app.protect_caps", None)
+
+        unicode = Gio.MenuItem()
+        unicode.set_label("Convert to Unicode")
+        unicode.set_action_and_target_value("app.unicode", None)
+
+        latex = Gio.MenuItem()
+        latex.set_label("Convert to LaTeX")
+        latex.set_action_and_target_value("app.latex", None)
+
+        hyphen = Gio.MenuItem()
+        hyphen.set_label("Sanitize ranges")
+        hyphen.set_action_and_target_value("app.correct_hyphen", None)
+
+        key = Gio.MenuItem()
+        key.set_label("Generate key")
+        key.set_action_and_target_value("app.key", None)
+
+        customize_menu = Gio.Menu()
+        customize_menu.append_item(capitalize)
+        customize_menu.append_item(protect)
+        customize_menu.append_item(unicode)
+        customize_menu.append_item(latex)
+
+        customize_section = Gio.Menu()
+        customize_section.append_submenu("Customize", customize_menu)
+
+        if field == "pages":
+            customize_section.append_item(hyphen)
+        if field == "ID":
+            customize_section.append_item(key)
+
+        self.prepend_section(None, customize_section)
 
 
 class MultiLine(Gtk.TextView):
@@ -90,8 +135,10 @@ class MultiLine(Gtk.TextView):
             bounds = (textbuffer.get_start_iter(), textbuffer.get_end_iter())
         selection = textbuffer.get_text(bounds[0], bounds[1], True)
         new_selection = func(selection, bibstrings, n)
-        textbuffer.delete(bounds[0], bounds[1])
-        textbuffer.insert(bounds[0], new_selection, -1)
+
+        if new_selection is not None:
+            textbuffer.delete(bounds[0], bounds[1])
+            textbuffer.insert(bounds[0], new_selection, -1)
 
     def deselect(self):
         buffer = self.get_buffer()
@@ -135,6 +182,8 @@ class SingleLine(Gtk.Entry):
         self.set_hexpand(True)
         self.set_enable_undo(False)
 
+        self.set_extra_menu(FormMenu(field))
+
         self.event_controller_focus = Gtk.EventControllerFocus()
         self.add_controller(self.event_controller_focus)
 
@@ -156,8 +205,10 @@ class SingleLine(Gtk.Entry):
         else:
             new_text = func(text, bibstrings, n)
             pos = -1
-        self.set_text(new_text)
-        self.set_position(pos)
+
+        if new_text is not None:
+            self.set_text(new_text)
+            self.set_position(pos)
 
     def deselect(self):
         self.select_region(0, 0)

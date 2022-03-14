@@ -120,7 +120,7 @@ class ConfirmSaveDialog(Gtk.MessageDialog):
             transient_for=window,
             message_type=Gtk.MessageType.QUESTION,
             text=text,
-            title="Bada Bib! - Empty keys",
+            title="Bada Bib! - Warning",
         )
 
         self.add_buttons(

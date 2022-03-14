@@ -39,6 +39,19 @@
     </provides>
 
     <releases>
+      <release version="0.6.0" date="2022-03-14">
+            <description>
+                <p>New features and bug fixes:</p>
+                <ul>
+                  <li>Select, copy/paste and delete multiple entries at once</li>
+                  <li>Open files directly from the file manager or via drag and drop</li>
+                  <li>Access customizations via right-click menu</li>
+                  <li>Use GTK's file monitor instead of watchgod</li>
+                  <li>Switching tabs no longer changes the selected entries</li>
+                  <li>Customizations can be used in all fields again, including the BibTeX source</li>
+                </ul>
+            </description>
+      </release>
       <release version="0.5.1" date="2022-02-19">
             <description>
                 <p>Use gtk4-update-icon-cache in postinstall script so that it doesn't fail on systems without GTK 3. Thanks @bobby285271 for the patch.</p>

@@ -108,54 +108,39 @@ def capitalize(value, bibstrings, n=0):
     return value_cap
 
 
-def protect_word(word, bibstrings):
-    if not word or word.lower() in bibstrings:
-        return word
-
-    protected = 0
-    bracket_open = 0
-
-    if word and word[0] == "{":
-        word_out = "{"
-        protected = 1
-        bracket_open = 1
-    elif word and word[0].isupper():
-        word_out = "{"
-        word_out += word[0]
-        bracket_open = 1
-    else:
-        word_out = word[0]
-
-    char = None
-    for char in word[1:]:
-        if protected:
-            word_out += char
-            if char == "}":
-                protected -= 1
-                bracket_open -= 1
-        else:
-            if char == "{":
-                protected += 1
-                bracket_open += 1
-            elif bracket_open and char.islower():
-                word_out += "}"
-                bracket_open -= 1
-            elif not bracket_open and char.isupper():
-                word_out += "{"
-                bracket_open += 1
-            word_out += char
-
-    if bracket_open and char != "}":
-        word_out += "}"
-
-    return word_out
-
-
 def protect(string, bibstrings, n=0):
     if not string:
         return None
-    protected = [protect_word(word, bibstrings) for word in string.split(" ")]
-    return " ".join(protected)
+
+    protected = ""
+    upper_case_sequence = ""
+    pre_char = ""
+
+    for char in string:
+        if char.isupper():
+            upper_case_sequence += char
+        else:
+            if upper_case_sequence:
+                if (
+                    upper_case_sequence.lower() in bibstrings
+                    or (pre_char == "{" and char == "}")
+                ):
+                    protected += upper_case_sequence
+                else:
+                    protected += "{" + upper_case_sequence + "}"
+                upper_case_sequence = ""
+            protected += char
+            pre_char = char
+
+
+    if upper_case_sequence:
+        if upper_case_sequence.lower() in bibstrings:
+            protected += upper_case_sequence
+        else:
+            protected += "{" + upper_case_sequence + "}"
+        upper_case_sequence = ""
+
+    return protected
 
 
 def correct_hyphen(string, bibstrings, n=0):

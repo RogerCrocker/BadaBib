@@ -166,7 +166,7 @@ class MainWidget(Gtk.Paned):
 
     def add_itemlist(self, bibfile, state=None, change_buffer=None):
         itemlist = Itemlist(bibfile, state, change_buffer)
-        itemlist.connect("selected-rows-changed", self.on_item_selected)
+        itemlist.connect("selected-rows-changed", self.on_selected_rows_changed)
         itemlist.event_controller.connect("key-pressed", self.on_itemlist_key_pressed)
         itemlist.drop_target.connect("drop", self.on_drop)
         itemlist.header.close_button.connect("clicked", self.on_tab_closed)
@@ -250,24 +250,18 @@ class MainWidget(Gtk.Paned):
     def focus_on_current_item(self, _button=None):
         self.get_current_itemlist().focus_on_selected_items()
 
-    def on_item_selected(self, itemlist, row=None):
+    def on_selected_rows_changed(self, itemlist):
         itemlist.focus_idx = 0
-        if len(itemlist.get_selected_items()) > 1:
-            self.get_current_editor().clear()
-            self.source_view.clear()
-            return
-
-        if not row:
-            row = itemlist.get_selected_row()
-
-        if row:
-            entrytype = row.item.entry["ENTRYTYPE"]
-            editor = self.show_editor(entrytype)
-            editor.show_item(row.item)
-
+        item = self.get_current_item()
+        if item:
+            entrytype = item.entry["ENTRYTYPE"]
+            self.show_editor(entrytype).show_item(item)
             self.source_view.set_status("valid")
             self.source_view.form.set_sensitive(True)
-            self.source_view.form.set_text(row.item.bibtex)
+            self.source_view.form.set_text(item.bibtex)
+        else:
+            self.get_current_editor().clear()
+            self.source_view.clear()
 
     def generate_key(self):
         item = self.get_current_item()

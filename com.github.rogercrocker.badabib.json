@@ -9,7 +9,8 @@
         "--share=ipc",
         "--socket=fallback-x11",
         "--socket=wayland",
-	"--filesystem=home"
+	"--filesystem=home",
+	"--device=dri"
     ],
     "cleanup" : [
         "/include",
@@ -47,20 +48,6 @@
 		}
 	    ]
 	},
-	{
-	    "name": "python3-watchgod",
-	    "buildsystem": "simple",
-	    "build-commands": [
-		"pip3 install --verbose --exists-action=i --no-index --find-links=\"file://${PWD}\" --prefix=${FLATPAK_DEST} \"watchgod\" --no-build-isolation"
-	    ],
-	    "sources": [
-		{
-		    "type": "file",
-		    "url": "https://files.pythonhosted.org/packages/57/35/9a8da3fb6681e6eba662b2d249eea58cebf575e392271efac3344c172c5f/watchgod-0.7-py3-none-any.whl",
-		    "sha256": "d6c1ea21df37847ac0537ca0d6c2f4cdf513562e95f77bb93abbcf05573407b7"
-		}
-	    ]
-	},
         {
             "name" : "badabib",
             "builddir" : true,
@@ -69,11 +56,10 @@
                 {
                     "type" : "git",
                     "url" : "https://github.com/RogerCrocker/BadaBib.git",
-                    "tag": "v0.5.0",
-                    "commit": "87dea63428ad072b532e62651af36e6a12014e0b"
+                    "tag": "v0.6.0",
+                    "commit": "35c4d3962539a2840bfaf316776a4d771e4ca617"
                 }
             ]
         }
     ]
 }
-

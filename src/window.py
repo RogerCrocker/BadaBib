@@ -52,7 +52,7 @@ class BadaBibWindow(Gtk.ApplicationWindow):
         self.update_recent_file_menu()
 
         self.session_manager = SessionManager(self.main_widget)
-        GLib.idle_add(self.session_manager.restore, self.app.arg_files)
+        self.session_manager.restore(self.app.arg_files)
 
     def update_recent_file_menu(self):
         recent_files = get_recent_files()

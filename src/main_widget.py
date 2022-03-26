@@ -275,11 +275,11 @@ class MainWidget(Gtk.Paned):
 
     # Notebook
 
-    def on_tab_closed(self, button=None):
-        if button is None:
+    def on_tab_closed(self, widget=None, action=None, data=None):
+        if widget is None:
             itemlist = self.get_current_itemlist()
         else:
-            itemlist = button.get_parent().itemlist
+            itemlist = widget.get_parent().itemlist
             # work around notebook selecting the closed page bug
             if self.notebook.previous_page is not None:
                 self.notebook.set_current_page(self.notebook.previous_page)

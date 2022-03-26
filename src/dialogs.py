@@ -361,15 +361,15 @@ class MenuPopover(Gtk.PopoverMenu):
 
         preferences_item = Gio.MenuItem()
         preferences_item.set_label("Preferences")
-        preferences_item.set_action_and_target_value("app.preferences", None)
+        preferences_item.set_action_and_target_value("app.show_prefs", None)
 
         shortcuts_item = Gio.MenuItem()
         shortcuts_item.set_label("Keyboard shortcuts")
-        shortcuts_item.set_action_and_target_value("app.shortcuts", None)
+        shortcuts_item.set_action_and_target_value("app.show_shortcuts", None)
 
         about_item = Gio.MenuItem()
         about_item.set_label("About Bada Bib!")
-        about_item.set_action_and_target_value("app.about", None)
+        about_item.set_action_and_target_value("app.show_about", None)
 
         save_section = Gio.Menu()
         save_section.append_item(save_all_item)
@@ -397,7 +397,7 @@ class MenuPopover(Gtk.PopoverMenu):
 class AboutDialog(Gtk.AboutDialog):
     def __init__(self, window):
         super().__init__(modal=True, transient_for=window)
-        self.set_program_name(self.get_program_name() + " " + window.application.version)
+        self.set_program_name(self.get_program_name() + " " + window.app.version)
 
         gtk_version = "{}.{}.{}".format(Gtk.get_major_version(), Gtk.get_minor_version(), Gtk.get_micro_version())
         self.set_version("Python {}, GTK {}".format(python_version(), gtk_version))

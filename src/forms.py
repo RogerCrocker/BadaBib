@@ -56,7 +56,7 @@ class FormMenu(Gio.Menu):
 
         capitalize = Gio.MenuItem()
         capitalize.set_label("Capitalize")
-        capitalize.set_action_and_target_value("app.cap", None)
+        capitalize.set_action_and_target_value("app.capitalize", None)
 
         protect = Gio.MenuItem()
         protect.set_label("Protect upper case")
@@ -64,19 +64,19 @@ class FormMenu(Gio.Menu):
 
         unicode = Gio.MenuItem()
         unicode.set_label("Convert to Unicode")
-        unicode.set_action_and_target_value("app.unicode", None)
+        unicode.set_action_and_target_value("app.to_unicode", None)
 
         latex = Gio.MenuItem()
         latex.set_label("Convert to LaTeX")
-        latex.set_action_and_target_value("app.latex", None)
+        latex.set_action_and_target_value("app.to_latex", None)
 
         hyphen = Gio.MenuItem()
         hyphen.set_label("Sanitize ranges")
-        hyphen.set_action_and_target_value("app.correct_hyphen", None)
+        hyphen.set_action_and_target_value("app.on_sanitize_range", None)
 
         key = Gio.MenuItem()
         key.set_label("Generate key")
-        key.set_action_and_target_value("app.key", None)
+        key.set_action_and_target_value("app.generate_key", None)
 
         customize_menu = Gio.Menu()
         customize_menu.append_item(capitalize)
@@ -107,10 +107,13 @@ class MultiLine(Gtk.TextView):
         self.set_editable(True)
         self.set_monospace(True)
 
+        self.set_extra_menu(FormMenu(field))
+
         self.get_buffer().set_enable_undo(False)
 
         self.event_controller_key = Gtk.EventControllerKey()
         self.add_controller(self.event_controller_key)
+        self.event_controller_key.connect("key-pressed", self.on_key_pressed)
 
         self.event_controller_focus = Gtk.EventControllerFocus()
         self.add_controller(self.event_controller_focus)
@@ -136,9 +139,10 @@ class MultiLine(Gtk.TextView):
         selection = textbuffer.get_text(bounds[0], bounds[1], True)
         new_selection = func(selection, bibstrings, n)
 
-        if new_selection is not None:
+        if new_selection is not None and new_selection != selection:
             textbuffer.delete(bounds[0], bounds[1])
             textbuffer.insert(bounds[0], new_selection, -1)
+            textbuffer.emit("end_user_action")
 
     def deselect(self):
         buffer = self.get_buffer()
@@ -162,6 +166,12 @@ class MultiLine(Gtk.TextView):
 
     def clear(self):
         self.set_text("")
+
+    def on_key_pressed(self, _event_controller_key, keyval, _keycode, state):
+        if state == Gdk.ModifierType.ALT_MASK and keyval == Gdk.KEY_u:
+            self.apply(capitalize, 4)
+            return True
+        return False
 
     def update_text(self, _=None):
         pass  # implemented by child class
@@ -206,7 +216,7 @@ class SingleLine(Gtk.Entry):
             new_text = func(text, bibstrings, n)
             pos = -1
 
-        if new_text is not None:
+        if new_text is not None and new_text != text:
             self.set_text(new_text)
             self.set_position(pos)
 

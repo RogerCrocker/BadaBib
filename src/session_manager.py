@@ -70,7 +70,7 @@ class SessionManager:
         if open_files:
             files = list(open_files.keys())
             states = list(open_files.values())
-            self.main_widget.open_files(files, states, open_tab)
+            self.main_widget.open_files(files, states, open_tab, restore=True)
         else:
             self.main_widget.new_file()
 

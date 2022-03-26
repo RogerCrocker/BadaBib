@@ -353,7 +353,7 @@ class MainWidget(Gtk.Paned):
         itemlist = self.add_itemlist(bibfile)
         self.notebook.set_current_page(itemlist.page.number)
 
-    def open_files(self, filenames, states=None, select_file=None):
+    def open_files(self, filenames, states=None, select_file=None, restore=False):
         # make sure 'filenames' is a list
         if isinstance(filenames, str):
             filenames = [filenames]
@@ -372,9 +372,9 @@ class MainWidget(Gtk.Paned):
         self.notebook.set_current_page(n_pages)
 
         # open files in thread
-        GLib.idle_add(self.open_files_thread, filenames, states, select_file, close_empty)
+        GLib.idle_add(self.open_files_thread, filenames, states, select_file, restore, close_empty)
 
-    def open_files_thread(self, filenames, states, select_file, close_empty):
+    def open_files_thread(self, filenames, states, select_file, restore, close_empty):
         # read databases
         statuses = [self.store.add_file(filename) for filename in filenames]
 
@@ -397,12 +397,12 @@ class MainWidget(Gtk.Paned):
                 continue
 
             # file is empty
-            if "empty" in status:
+            if "empty" in status and not restore:
                 message = "No BibTeX entries found in file '{}'.".format(filename)
                 messages.append(message)
 
             # could not create backup
-            if "no_backup" in status:
+            if "no_backup" in status and not restore:
                 message = (
                     "Bada Bib! could not create a backup for '{}'".format(filename)
                     + "\n\n"

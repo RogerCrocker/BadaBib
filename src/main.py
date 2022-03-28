@@ -218,7 +218,7 @@ class Application(Gtk.Application):
         # Do not grab focus in this case
         widget = self.window.get_focus()
 
-        # sinlge line entry
+        # single line entry
         if isinstance(widget, Gtk.Text):
             return widget.get_parent(), False
         # multiline entry
@@ -227,15 +227,15 @@ class Application(Gtk.Application):
 
         # Otherwise action was invoked using a right-click menu
         # We need to grab the focus in this case
-        else:
-            # source view
-            widget = self.window.main_widget.outer_stack.get_visible_child()
-            if isinstance(widget, SourceView):
-                return widget.form, True
-            else:
-                # editor/catch all - returns None is no form is active
-                editor = self.window.main_widget.get_current_editor()
-                return editor.current_form, True
+
+        # source view
+        widget = self.window.main_widget.outer_stack.get_visible_child()
+        if isinstance(widget, SourceView):
+            return widget.form, True
+
+        # editor/catch all - returns None is no form is active
+        editor = self.window.main_widget.get_current_editor()
+        return editor.current_form, True
 
     def on_update_bibtex(self, action=None, data=None):
         self.window.main_widget.update_bibtex()

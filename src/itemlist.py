@@ -442,14 +442,17 @@ class Itemlist(Gtk.ListBox):
         self.unselect_all()
         return None
 
-    def focus_on_selected_items(self):
+    def focus_on_selected_items(self, idx=None):
         items = self.get_selected_items()
-        self.focus_idx = (self.focus_idx + 1) % len(items)
-        row = items[self.focus_idx].row
-        preceeding_rows = 0
-        while row := self.get_next_row(row, -1):
-            preceeding_rows += 1
-        self.get_adjustment().set_value(preceeding_rows * ROW_HEIGHT)
+        if items:
+            if idx is None:
+                self.focus_idx = (self.focus_idx + 1) % len(items)
+                idx = self.focus_idx
+            row = items[idx].row
+            preceeding_rows = 0
+            while row := self.get_next_row(row, -1):
+                preceeding_rows += 1
+            self.get_adjustment().set_value(preceeding_rows * ROW_HEIGHT)
 
     def reselect_rows(self, rows, adj=None):
         self.unselect_all()

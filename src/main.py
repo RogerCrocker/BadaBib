@@ -96,6 +96,7 @@ class Application(Gtk.Application):
             ("find",            None,                   self.on_find,           "<Control>f"),
             ("next_tab",        None,                   self.on_next_tab,       "<Control>Tab"),
             ("prev_tab",        None,                   self.on_prev_tab,       "<Control><Shift>Tab"),
+            ("update_bibtex",   None,                   self.on_update_bibtex,  "<Control>Return"),
             ("capitalize",      None,                   self.on_capitalize,     "<Alt>u"),
             ("protect_caps",    None,                   self.on_protect_caps,   "<Alt>p"),
             ("sanitize_range",  None,                   self.on_sanitize_range, "<Alt>h"),
@@ -223,9 +224,6 @@ class Application(Gtk.Application):
         # multiline entry
         elif isinstance(widget, MultiLine):
             return widget, False
-        # source view
-        elif isinstance(widget, SourceView):
-            return widget.form, False
 
         # Otherwise action was invoked using a right-click menu
         # We need to grab the focus in this case
@@ -238,6 +236,9 @@ class Application(Gtk.Application):
                 # editor/catch all - returns None is no form is active
                 editor = self.window.main_widget.get_current_editor()
                 return editor.current_form, True
+
+    def on_update_bibtex(self, action=None, data=None):
+        self.window.main_widget.update_bibtex()
 
     def on_capitalize(self, action=None, data=None):
         form, grab_focus = self.get_active_form()

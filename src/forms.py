@@ -111,10 +111,6 @@ class MultiLine(Gtk.TextView):
 
         self.get_buffer().set_enable_undo(False)
 
-        self.event_controller_key = Gtk.EventControllerKey()
-        self.add_controller(self.event_controller_key)
-        self.event_controller_key.connect("key-pressed", self.on_key_pressed)
-
         self.event_controller_focus = Gtk.EventControllerFocus()
         self.add_controller(self.event_controller_focus)
 
@@ -166,12 +162,6 @@ class MultiLine(Gtk.TextView):
 
     def clear(self):
         self.set_text("")
-
-    def on_key_pressed(self, _event_controller_key, keyval, _keycode, state):
-        if state == Gdk.ModifierType.ALT_MASK and keyval == Gdk.KEY_u:
-            self.apply(capitalize, 4)
-            return True
-        return False
 
     def update_text(self, _=None):
         pass  # implemented by child class

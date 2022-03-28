@@ -104,7 +104,6 @@ class MainWidget(Gtk.Paned):
         self.source_view = SourceView()
         self.source_view.buffer.connect("end_user_action", self.on_source_view_modified)
         self.source_view.apply_button.connect("clicked", self.update_bibtex)
-        self.source_view.form.event_controller_key.connect("key-pressed", self.on_source_view_key_pressed)
 
         # stack of editors and source view
         self.outer_stack = Gtk.Stack()
@@ -213,11 +212,13 @@ class MainWidget(Gtk.Paned):
 
     # Item
 
-    def get_selected_items(self):
-        return self.get_current_itemlist().get_selected_items()
+    def get_selected_items(self, itemlist=None):
+        if itemlist is None:
+            itemlist = self.get_current_itemlist()
+        return itemlist.get_selected_items()
 
-    def get_current_item(self):
-        items = self.get_selected_items()
+    def get_current_item(self, itemlist=None):
+        items = self.get_selected_items(itemlist)
         if len(items) != 1:
             return None
         return items[0]
@@ -235,10 +236,6 @@ class MainWidget(Gtk.Paned):
 
     def delete_items(self, items):
         itemlist = self.get_current_itemlist()
-
-        # prevents new row from being selected on key press
-        itemlist.grab_focus()
-
         if items:
             change = Change.Hide(items)
             itemlist.change_buffer.push_change(change)
@@ -252,7 +249,9 @@ class MainWidget(Gtk.Paned):
 
     def on_selected_rows_changed(self, itemlist):
         itemlist.focus_idx = 0
-        item = self.get_current_item()
+        # work around listbox scrolling horizontally on row changes
+        scrolled = itemlist.get_parent().get_parent().get_hadjustment().set_value(0)
+        item = self.get_current_item(itemlist)
         if item:
             entrytype = item.entry["ENTRYTYPE"]
             self.show_editor(entrytype).show_item(item)
@@ -302,8 +301,8 @@ class MainWidget(Gtk.Paned):
         rows = itemlist.get_selected_rows()
         if rows:
             # work around ListBox not selecting multiple rows on page switch
-            adj = itemlist.get_adjustment().get_value()
-            GLib.idle_add(itemlist.reselect_rows, rows, adj)
+            GLib.idle_add(itemlist.reselect_rows, rows)
+            GLib.idle_add(itemlist.focus_on_selected_items, 0)
         else:
             self.source_view.set_status("empty", True)
             self.get_current_editor().clear()
@@ -315,12 +314,6 @@ class MainWidget(Gtk.Paned):
             self.update_bibtex()
         else:
             self.source_view.set_status("modified")
-
-    def on_source_view_key_pressed(self, _event_controller_key, keyval, _keycode, state):
-        if state == Gdk.ModifierType.CONTROL_MASK and keyval == Gdk.KEY_Return:
-            self.update_bibtex()
-            return True
-        return False
 
     def update_bibtex(self, _button=None):
         bibtex = self.source_view.form.get_text()

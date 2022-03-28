@@ -250,7 +250,7 @@ class MainWidget(Gtk.Paned):
     def on_selected_rows_changed(self, itemlist):
         itemlist.focus_idx = 0
         # work around listbox scrolling horizontally on row changes
-        scrolled = itemlist.get_parent().get_parent().get_hadjustment().set_value(0)
+        itemlist.get_parent().get_parent().get_hadjustment().set_value(0)
         item = self.get_current_item(itemlist)
         if item:
             entrytype = item.entry["ENTRYTYPE"]

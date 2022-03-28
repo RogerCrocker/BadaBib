@@ -16,7 +16,7 @@
 import gi
 gi.require_version("Gtk", "4.0")
 
-from gi.repository import Gtk, GLib, Gio
+from gi.repository import Gtk
 
 from .config_manager import get_recent_files
 from .config_manager import set_recent_files

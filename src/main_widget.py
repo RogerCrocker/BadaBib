@@ -447,7 +447,7 @@ class MainWidget(Gtk.Paned):
         close_empty = self.notebook.contains_empty_new_file()
 
         self.close_files(filename, force=True)
-        GLib.idle_add(self.open_files_thread, [filename], state, None, close_empty)
+        GLib.idle_add(self.open_files_thread, [filename], state, None, False, close_empty)
 
         thread = Thread(target=self.move_new_tab, args=(filename, page_number))
         thread.start()

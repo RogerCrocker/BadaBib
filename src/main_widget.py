@@ -577,7 +577,8 @@ class MainWidget(Gtk.Paned):
             return None
 
         if not new_name:
-            dialog = SaveDialog(self.get_root())
+            suggested_name = self.store.bibfiles[old_name].tail
+            dialog = SaveDialog(self.get_root(), suggested_name)
             dialog.connect("response", self.save_file_as_finalize, new_name, old_name, bibfile, close_data)
             dialog.show()
         else:

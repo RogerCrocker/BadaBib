@@ -151,7 +151,7 @@ class FileChooser(Gtk.FileChooserDialog):
 
 
 class SaveDialog(Gtk.FileChooserDialog):
-    def __init__(self, window):
+    def __init__(self, window, filename):
         super().__init__(
             title="Bada Bib! - Please choose a file name",
             transient_for=window,
@@ -163,6 +163,8 @@ class SaveDialog(Gtk.FileChooserDialog):
         # accept button (suggested action -> blue)
         accept_button = self.add_button("Save", Gtk.ResponseType.ACCEPT)
         accept_button.get_style_context().add_class("suggested-action")
+
+        self.set_current_name(filename)
 
         add_filters(self)
 

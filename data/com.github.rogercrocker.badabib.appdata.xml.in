@@ -39,6 +39,14 @@
     </provides>
 
     <releases>
+      <release version="0.6.2" date="2022-04-18">
+            <description>
+              <p>Bug fixes:</p>
+                <ul>
+                  <li>Fix reloading files that changed on disk</li>
+                </ul>
+            </description>
+      </release>
       <release version="0.6.1" date="2022-03-29">
             <description>
               <p>Maintenance and bug fixes:</p>

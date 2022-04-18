@@ -13,10 +13,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import gi
-gi.require_version("Gtk", "4.0")
 
-from gi.repository import Gtk
+from gi.repository import Gtk, Adw
 
 from .config_manager import get_recent_files
 from .config_manager import set_recent_files
@@ -32,75 +30,64 @@ from .main_widget import MainWidget
 from .session_manager import SessionManager
 
 
-class BadaBibWindow(Gtk.ApplicationWindow):
-    __gtype_name__ = "BadabibWindow"
+class Spacer(Gtk.Separator):
+    def __init__(self):
+        super().__init__()
+        self.get_style_context().add_class("spacer")
 
+
+class BadaBibWindow(Adw.ApplicationWindow):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.app = kwargs["application"]
         self.set_title("Bada Bib! - BibTeX Editor")
 
-        self.monitor = None
         self.store = BadaBibStore()
         self.main_widget = MainWidget(self.store)
-        self.set_child(self.main_widget)
+        self.header_bar = self.assemble_header_bar()
 
-        self.recent_button = Gtk.MenuButton()
-        self.recent_button.set_tooltip_text("Recently opened files")
-
-        self.assemble_headerbar()
-        self.update_recent_file_menu()
+        content_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
+        content_box.append(self.header_bar)
+        content_box.append(self.main_widget)
+        self.set_content(content_box)
 
         self.session_manager = SessionManager(self.main_widget)
         self.session_manager.restore(self.app.arg_files)
 
     def update_recent_file_menu(self):
         recent_files = get_recent_files()
-        self.recent_button.set_menu_model(RecentModel(recent_files))
+        self.open_button.set_menu_model(RecentModel(recent_files))
 
     def clear_recent_file_menu(self):
         set_recent_files({})
-        self.recent_button.set_menu_model(RecentModel({}))
+        self.open_button.set_menu_model(RecentModel({}))
 
-    def assemble_headerbar(self, *args, **kwargs):
-        headerbar = Gtk.HeaderBar(*args, **kwargs)
+    def assemble_header_bar(self):
+        header_bar = Adw.HeaderBar()
 
-        open_button = Gtk.Button.new_with_label("Open")
-        open_button.set_tooltip_text("Open file")
-        open_button.connect("clicked", self.on_open_clicked)
+        self.open_button = Adw.SplitButton()
+        self.open_button.set_label("Open")
+        self.open_button.set_tooltip_text("Open file")
+        self.open_button.connect("clicked", self.on_open_clicked)
+        self.update_recent_file_menu()
 
-        open_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
-        open_box.get_style_context().add_class("linked")
-        open_box.append(open_button)
-        open_box.append(self.recent_button)
-        headerbar.pack_start(open_box)
-
-        new_button = Gtk.Button.new_from_icon_name("document-new-symbolic")
+        new_button = Gtk.Button.new_from_icon_name("tab-new-symbolic")
         new_button.set_tooltip_text("New file")
         new_button.connect("clicked", self.on_new_clicked)
-        headerbar.pack_start(new_button)
-
-        undo_button = Gtk.Button.new_from_icon_name("edit-undo-symbolic")
-        undo_button.set_tooltip_text("Undo change")
-        undo_button.connect("clicked", self.on_undo_clicked)
 
         redo_button = Gtk.Button.new_from_icon_name("edit-redo-symbolic")
         redo_button.set_tooltip_text("Redo change")
         redo_button.connect("clicked", self.on_redo_clicked)
 
-        undo_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
-        undo_box.get_style_context().add_class("linked")
-        undo_box.append(undo_button)
-        undo_box.append(redo_button)
-        undo_box.set_margin_start(30)
-        headerbar.pack_start(undo_box)
+        undo_button = Gtk.Button.new_from_icon_name("edit-undo-symbolic")
+        undo_button.set_tooltip_text("Undo change")
+        undo_button.connect("clicked", self.on_undo_clicked)
 
         menu_button = Gtk.MenuButton()
         menu_button.set_icon_name("open-menu-symbolic")
         menu_button.set_popover(MenuPopover())
-        headerbar.pack_end(menu_button)
 
-        save_button = Gtk.Button.new_with_label("Save")
+        save_button = Gtk.Button.new_from_icon_name("document-save-symbolic")
         save_button.set_tooltip_text("Save current file")
         save_button.connect("clicked", self.on_save_clicked)
 
@@ -108,13 +95,18 @@ class BadaBibWindow(Gtk.ApplicationWindow):
         save_as_button.set_tooltip_text("Save current file as...")
         save_as_button.connect("clicked", self.on_save_as_clicked)
 
-        save_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
-        save_box.get_style_context().add_class("linked")
-        save_box.append(save_button)
-        save_box.append(save_as_button)
-        headerbar.pack_end(save_box)
+        header_bar.pack_start(self.open_button)
+        header_bar.pack_start(new_button)
+        header_bar.pack_start(Spacer())
+        header_bar.pack_start(undo_button)
+        header_bar.pack_start(redo_button)
 
-        self.set_titlebar(headerbar)
+        header_bar.pack_end(menu_button)
+        header_bar.pack_end(Spacer())
+        header_bar.pack_end(save_as_button)
+        header_bar.pack_end(save_button)
+
+        return header_bar
 
     def do_close_request(self, window=None):
         """invoked by window close button"""

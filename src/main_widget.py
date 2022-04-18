@@ -20,7 +20,6 @@ from .config_manager import add_to_recent
 from .config_manager import remove_from_recent
 from .config_manager import get_editor_layout
 from .config_manager import get_parse_on_fly
-from .config_manager import get_new_file_name
 from .config_manager import get_default_entrytype
 
 from .layout_manager import string_to_layout
@@ -42,7 +41,6 @@ from .itemlist import ItemlistToolbar
 from .dialogs import FilterPopover
 from .dialogs import SortPopover
 from .dialogs import SaveChanges
-from .dialogs import WarningDialog
 from .dialogs import SaveDialog
 from .dialogs import ConfirmSaveDialog
 
@@ -202,8 +200,7 @@ class MainWidget(Gtk.Paned):
             itemlist = self.get_current_itemlist()
         if itemlist:
             return itemlist.get_selected_items()
-        else:
-            return []
+        return []
 
     def get_current_item(self, itemlist=None):
         items = self.get_selected_items(itemlist)
@@ -290,8 +287,7 @@ class MainWidget(Gtk.Paned):
             self.source_view.set_status("empty", True)
             self.get_current_editor().clear()
             return None
-        else:
-            itemlist = page.itemlist
+        itemlist = page.itemlist
 
         # work around new row being selected on tab change
         itemlist.grab_focus()
@@ -464,6 +460,7 @@ class MainWidget(Gtk.Paned):
                 self.close_files_dialog(None, Gtk.ResponseType.CLOSE, bibfiles, n+1, force, close_app)
             else:
                 self.close_files_finalize(None, Gtk.ResponseType.CLOSE, bibfiles, n+1, force, close_app)
+        return None
 
     def close_files_finalize(self, dialog, response, bibfiles, n, force, close_app):
         handled = self.handle_close_response(dialog, response, bibfiles, n, force, close_app)
@@ -498,6 +495,7 @@ class MainWidget(Gtk.Paned):
                 self.save_file_as(close_data=close_data)
             else:
                 self.save_file_as(bibfile, bibfile.name, close_data)
+        return None
 
     def save_all_files(self):
         for bibfile in self.store.bibfiles.values():
@@ -515,6 +513,7 @@ class MainWidget(Gtk.Paned):
             else:
                 return None
         self.confirm_save_dialog(bibfile, new_name, close_data)
+        return None
 
     def confirm_save_dialog(self, bibfile, new_name, close_data):
         has_empty_keys = bibfile.has_empty_keys()

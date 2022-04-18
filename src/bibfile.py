@@ -80,6 +80,13 @@ class BadaBibFile:
     def update_filename(self, name):
         self.name = name
         self.head, self.tail = split(name)
+        if self.itemlist:
+            self.itemlist.update_filename()
+
+    def set_unsaved(self, unsaved):
+        if self.itemlist:
+            self.itemlist.set_unsaved(unsaved)
+        self.unsaved = unsaved
 
     def has_empty_keys(self):
         return any(not item.entry["ID"] and not item.deleted for item in self.items)

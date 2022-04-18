@@ -14,9 +14,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-import gi
-gi.require_version("Gtk", "4.0")
-
 from gi.repository import Gtk, Gdk, Gio
 
 from os.path import split
@@ -50,87 +47,142 @@ class ItemlistNotebook(Gtk.Notebook):
         self.current_page = None
 
         self.connect("page-reordered", self.update_pagenumbers)
-        self.connect("page-added", self.update_pagenumbers)
-        self.connect("page-removed", self.update_pagenumbers)
 
-    def append_itemlist(self, itemlist):
-        itemlist_page = ItemlistPage(itemlist)
-        itemlist_page.number = self.append_page(itemlist_page, itemlist.header)
-        self.set_menu_label_text(itemlist_page, itemlist.header.title_label.get_label())
-        self.set_tab_reorderable(itemlist_page, True)
-        self.set_current_page(itemlist_page.number)
-
-        return itemlist_page.number
+    def add_itemlist_page(self, name, page_num=None):
+        page = ItemlistPage(name)
+        if page_num is None:
+            page.number = self.append_page(page, page.header)
+        else:
+            page.number = self.insert_page(page, page.header, page_num)
+        self.set_menu_label_text(page, name)
+        self.set_tab_reorderable(page, True)
+        return page
 
     def contains_empty_new_file(self):
-        if self.get_n_pages() == 1:
-            try:
-                page = self.get_nth_page(0)
-                bibfile = page.itemlist.bibfile
-            except AttributeError:
-                return False
-            if bibfile.name == get_new_file_name() and bibfile.is_empty():
-                return True
+        if self.get_n_pages() != 1:
+            return False
+        itemlist = self.get_nth_page(0).itemlist
+        if itemlist is None:
+            return False
+        bibfile = itemlist.bibfile
+        if bibfile.name == get_new_file_name() and bibfile.is_empty():
+            return bibfile
         return False
-
-    def add_loading_pages(self, N):
-        for _ in range(N):
-            image = Gtk.Image.new_from_icon_name("preferences-system-time-symbolic")
-            image.set_pixel_size(100)
-            self.append_page(image, None)
-            self.set_tab_label_text(image, "Loading...")
-
-    def remove_loading_pages(self):
-        contains_loading_page = True
-        while contains_loading_page:
-            contains_loading_page = False
-            for n in range(self.get_n_pages()):
-                if isinstance(self.get_nth_page(n), Gtk.Image):
-                    contains_loading_page = True
-                    self.remove_page(n)
 
     def next_page(self, delta):
         n_pages = self.get_n_pages()
-        n_page = self.get_current_page()
-        self.set_current_page((n_page + delta) % n_pages)
+        if n_pages > 1:
+            n_page = self.get_current_page()
+            self.set_current_page((n_page + delta) % n_pages)
 
     @staticmethod
-    def update_pagenumbers(notebook, _itemlist, _page):
+    def update_pagenumbers(notebook, _page, _page_num):
         n_pages = notebook.get_n_pages()
         for n in range(n_pages):
-            try:
-                page = notebook.get_nth_page(n)
-                page.number = n
-            except AttributeError:
-                pass
+            notebook.get_nth_page(n).number = n
+
+
+class TabHeader(Gtk.Box):
+    def __init__(self, page, name):
+        super().__init__()
+        self.set_orientation(Gtk.Orientation.HORIZONTAL)
+        self.page = page
+
+        self.title_label = Gtk.Label()
+
+        self.close_button = Gtk.Button.new_from_icon_name("window-close-symbolic")
+        self.close_button.set_has_frame(False)
+
+        self.append(self.title_label)
+        self.append(self.close_button)
+
+        self.update(name=name)
+
+    def update(self, unsaved=False, name=None):
+        if name:
+            tail = split(name)[1]
+        elif self.page.itemlist:
+            name = self.page.itemlist.bibfile.name
+            tail = self.page.itemlist.bibfile.tail
+        if unsaved:
+            tail = "*" + tail
+
+        self.title_label.set_text(tail)
+        self.set_tooltip_text(name)
 
 
 class ItemlistPage(Gtk.Box):
-    def __init__(self, itemlist):
+    def __init__(self, name):
         super().__init__(orientation=Gtk.Orientation.VERTICAL)
+        self.itemlist = None
         self.number = -1
+        self.header = TabHeader(self, name=name)
+        self.set_vexpand(True)
+        self.set_hexpand(True)
+
+        self.loading_image = Gtk.Image.new_from_icon_name("preferences-system-time-symbolic")
+        self.loading_image.set_pixel_size(100)
+        self.loading_image.set_vexpand(True)
+
+        self.append(self.loading_image)
+
+    def add_itemlist(self, itemlist):
         self.itemlist = itemlist
         self.itemlist.page = self
 
-        self.deleted_bar = ItemlistDeletedBar()
+        self.deleted_bar = ItemlistInfoBar("File was deleted, renamed or moved.\nYou are now editing an unsaved copy.")
+        self.empty_bar = ItemlistInfoBar("File does not contain any BibTeX entries.")
+        self.backup_bar = ItemlistInfoBar("<b>Bada Bib! was unable to create a backup file!</b>\nTry deleting or renaming any .bak-files that were not created by Bada Bib!")
         self.changed_bar = ItemlistChangedBar()
 
-        scrolled = Gtk.ScrolledWindow()
-        scrolled.set_vexpand(True)
-        scrolled.set_child(itemlist)
+        scrolled_window = Gtk.ScrolledWindow()
+        scrolled_window.set_vexpand(True)
+        scrolled_window.set_child(itemlist)
 
         self.searchbar = ItemlistSearchBar()
         self.searchbar.search_entry.connect("search_changed", self.itemlist.set_search_string)
 
         self.append(self.deleted_bar)
+        self.append(self.empty_bar)
+        self.append(self.backup_bar)
         self.append(self.changed_bar)
-        self.append(scrolled)
+        self.append(scrolled_window)
         self.append(self.searchbar)
 
+        self.remove(self.loading_image)
 
-class ItemlistDeletedBar(Gtk.InfoBar):
-    def __init__(self):
+    def show_error_screen(self, status):
+        if "file_error" in status:
+            message = "Cannot open file.\nFile might have been moved or deleted."
+        elif "parse_error" in status:
+            message = "Cannot parse file.\nFile might be corrupted or might not be a BibTeX file."
+        else:
+            message = "Cannot open file."
+
+        error_image = Gtk.Image.new_from_icon_name("computer-fail-symbolic")
+        error_image.set_pixel_size(100)
+
+        error_label = Gtk.Label()
+        error_label.set_margin_top(10)
+        error_label.set_text(message)
+        error_label.set_justify(Gtk.Justification.CENTER)
+
+        error_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
+        error_box.append(error_image)
+        error_box.append(error_label)
+
+        center_box = Gtk.CenterBox(orientation=Gtk.Orientation.VERTICAL)
+        center_box.set_center_widget(error_box)
+        center_box.set_vexpand(True)
+
+        self.append(center_box)
+        self.remove(self.loading_image)
+
+
+class ItemlistInfoBar(Gtk.InfoBar):
+    def __init__(self, message):
         super().__init__()
+        self.message = message
         self.label = Gtk.Label()
         self.add_child(self.label)
         self.set_revealed(False)
@@ -139,9 +191,13 @@ class ItemlistDeletedBar(Gtk.InfoBar):
 
     def show_text(self, state):
         if state:
-            self.label.set_text("This file was deleted, renamed or moved.\nYou are now editing an unsaved copy.")
+            self.label.set_markup(self.message)
         else:
             self.label.set_text("")
+
+    def reveal(self):
+        self.show_text(True)
+        self.set_revealed(True)
 
     def on_response(self, infobar, response):
         if response == Gtk.ResponseType.CLOSE:
@@ -152,7 +208,6 @@ class ItemlistDeletedBar(Gtk.InfoBar):
 class ItemlistChangedBar(Gtk.InfoBar):
     def __init__(self):
         super().__init__()
-        self.filename = None
         self.label = Gtk.Label(label="")
         self.add_child(self.label)
         self.set_revealed(False)
@@ -167,6 +222,10 @@ class ItemlistChangedBar(Gtk.InfoBar):
         else:
             self.label.set_text("")
 
+    def reveal(self):
+        self.show_text(True)
+        self.set_revealed(True)
+
     def on_response(self, infobar, response):
         if response == Gtk.ResponseType.CLOSE:
             self.set_revealed(False)
@@ -175,8 +234,8 @@ class ItemlistChangedBar(Gtk.InfoBar):
             self.set_revealed(False)
             self.show_text(False)
             window = self.get_root()
-            file = window.main_widget.get_current_itemlist().bibfile
-            window.main_widget.reload_file(file.name)
+            bibfile = window.main_widget.get_current_itemlist().bibfile
+            window.main_widget.reload_file(bibfile)
 
 
 class ItemlistSearchBar(Gtk.SearchBar):
@@ -228,23 +287,6 @@ class ItemlistToolbar(Gtk.CenterBox):
         self.goto_button.set_tooltip_text("Go to selected entry")
         self.goto_button.set_margin_end(2)
         center_box.prepend(self.goto_button)
-
-
-class TabHeader(Gtk.Box):
-    def __init__(self, itemlist):
-        super().__init__()
-        self.set_orientation(Gtk.Orientation.HORIZONTAL)
-        self.itemlist = itemlist
-
-        head_tail = split(itemlist.bibfile.name)
-        self.title_label = Gtk.Label(label=head_tail[1])
-        self.set_tooltip_text(itemlist.bibfile.name)
-
-        self.close_button = Gtk.Button.new_from_icon_name("window-close-symbolic")
-        self.close_button.set_has_frame(False)
-
-        self.append(self.title_label)
-        self.append(self.close_button)
 
 
 class Row(Gtk.ListBoxRow):
@@ -375,7 +417,6 @@ class Itemlist(Gtk.ListBox):
         self.set_sort_func(self.sort_by_field)
         self.set_filter_func(self.filter_by_search)
 
-        self.header = TabHeader(self)
         self.set_show_separators(True)
 
         self.event_controller = Gtk.EventControllerKey()
@@ -393,21 +434,16 @@ class Itemlist(Gtk.ListBox):
 
         self.add_rows(bibfile.items)
 
-    def update_filename(self, name):
-        self.bibfile.update_filename(name)
-        self.header.set_tooltip_text(name)
-        label = self.header.get_first_child()
-        label.set_label(self.bibfile.tail)
+    def update_filename(self):
+        self.page.header.update()
 
     def set_unsaved(self, unsaved):
         if unsaved and not self.bibfile.unsaved:
-            self.bibfile.unsaved = unsaved
-            label = self.header.get_first_child()
-            text = label.get_label()
-            label.set_label("*" + text)
+            self.page.header.update(unsaved=True)
         elif not unsaved and self.bibfile.unsaved:
-            self.bibfile.unsaved = unsaved
-            self.update_filename(self.bibfile.name)
+            self.page.header.update(unsaved=False)
+            self.page.deleted_bar.set_revealed(False)
+            self.change_buffer.update_saved_state()
 
     def add_row(self, item):
         row = Row(item)

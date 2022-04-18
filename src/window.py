@@ -110,8 +110,8 @@ class BadaBibWindow(Adw.ApplicationWindow):
 
     def do_close_request(self, window=None):
         """invoked by window close button"""
-        files = list(self.store.bibfiles.keys())
-        self.main_widget.close_files(files, close_app=True)
+        bibfiles = list(self.store.bibfiles.values())
+        self.main_widget.close_files(bibfiles, close_app=True)
         return True
 
     def on_open(self, action=None, data=None):
@@ -124,8 +124,9 @@ class BadaBibWindow(Adw.ApplicationWindow):
 
     def on_open_response(self, dialog, response):
         if response == Gtk.ResponseType.ACCEPT:
-            files = dialog.get_files()
-            self.main_widget.open_files([file.get_path() for file in files])
+            gfiles = dialog.get_files()
+            open_files = [gfile.get_path() for gfile in gfiles]
+            self.main_widget.open_files(open_files)
         dialog.destroy()
 
     def on_save_as_clicked(self, _button=None):
@@ -142,8 +143,10 @@ class BadaBibWindow(Adw.ApplicationWindow):
 
     def on_undo_clicked(self, _button=None):
         itemlist = self.main_widget.get_current_itemlist()
-        itemlist.change_buffer.undo_change()
+        if itemlist:
+            itemlist.change_buffer.undo_change()
 
     def on_redo_clicked(self, _button=None):
         itemlist = self.main_widget.get_current_itemlist()
-        itemlist.change_buffer.redo_change()
+        if itemlist:
+            itemlist.change_buffer.redo_change()

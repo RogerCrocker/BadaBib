@@ -16,8 +16,9 @@
 
 import gi
 gi.require_version("Gtk", "4.0")
+gi.require_version("Adw", "1")
 
-from gi.repository import GLib, Gtk, Gio
+from gi.repository import GLib, Gtk, Gio, Adw
 
 from sys import argv
 
@@ -41,10 +42,8 @@ from .forms import MultiLine
 from .forms import SourceView
 
 
-class Application(Gtk.Application):
+class Application(Adw.Application):
     def __init__(self, version):
-        GLib.set_application_name("Bada Bib!")
-        GLib.set_prgname('badabib')
         super().__init__(
             application_id="com.github.rogercrocker.badabib",
             flags=Gio.ApplicationFlags.HANDLES_OPEN,
@@ -53,6 +52,9 @@ class Application(Gtk.Application):
         self.version = version
         self.arg_files = {}
 
+        GLib.set_application_name("Bada Bib!")
+        GLib.set_prgname('badabib')
+
     def do_activate(self):
         self.window = self.props.active_window
         if not self.window:
@@ -60,7 +62,7 @@ class Application(Gtk.Application):
         self.window.present()
 
     def do_startup(self):
-        Gtk.Application.do_startup(self)
+        Adw.Application.do_startup(self)
         self.install_actions()
         self.connect("open", self.on_open_arg_files)
 

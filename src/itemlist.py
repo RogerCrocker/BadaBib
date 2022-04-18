@@ -117,6 +117,13 @@ class ItemlistPage(Gtk.Box):
         self.itemlist = None
         self.number = -1
         self.header = TabHeader(self, name=name)
+
+        self.deleted_bar = ItemlistInfoBar("File was deleted, renamed or moved.\nYou are now editing an unsaved copy.")
+        self.empty_bar = ItemlistInfoBar("File does not contain any BibTeX entries.")
+        self.backup_bar = ItemlistInfoBar("<b>Bada Bib! was unable to create a backup file!</b>\nTry deleting or renaming any .bak-files that were not created by Bada Bib!")
+        self.changed_bar = ItemlistChangedBar()
+        self.searchbar = ItemlistSearchBar()
+
         self.set_vexpand(True)
         self.set_hexpand(True)
 
@@ -129,18 +136,11 @@ class ItemlistPage(Gtk.Box):
     def add_itemlist(self, itemlist):
         self.itemlist = itemlist
         self.itemlist.page = self
-
-        self.deleted_bar = ItemlistInfoBar("File was deleted, renamed or moved.\nYou are now editing an unsaved copy.")
-        self.empty_bar = ItemlistInfoBar("File does not contain any BibTeX entries.")
-        self.backup_bar = ItemlistInfoBar("<b>Bada Bib! was unable to create a backup file!</b>\nTry deleting or renaming any .bak-files that were not created by Bada Bib!")
-        self.changed_bar = ItemlistChangedBar()
+        self.searchbar.search_entry.connect("search_changed", self.itemlist.set_search_string)
 
         scrolled_window = Gtk.ScrolledWindow()
         scrolled_window.set_vexpand(True)
         scrolled_window.set_child(itemlist)
-
-        self.searchbar = ItemlistSearchBar()
-        self.searchbar.search_entry.connect("search_changed", self.itemlist.set_search_string)
 
         self.append(self.deleted_bar)
         self.append(self.empty_bar)

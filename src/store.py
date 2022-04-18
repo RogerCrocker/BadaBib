@@ -121,7 +121,7 @@ class BadaBibStore:
                 try:
                     database = parser.parse_file(bibtex_file)
                 except Exception:
-                    return ["parse_error"]
+                    return ["error", "parse_error"]
 
             # create backup, if desired
             backup = True
@@ -142,14 +142,14 @@ class BadaBibStore:
 
             status = []
             if not backup:
-                status.append("no_backup")
+                status.append("backup")
             if len(bibfile.database.entries) == 0:
                 status.append("empty")
 
             return status
 
         except FileNotFoundError:
-            return ["file_error"]
+            return ["error", "file_error"]
 
     def rename_file(self, old, new):
         file = self.bibfiles.pop(old)

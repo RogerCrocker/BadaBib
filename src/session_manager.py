@@ -68,9 +68,9 @@ class SessionManager:
             open_tab = get_open_tab()
 
         if open_files:
-            files = list(open_files.keys())
+            names = list(open_files.keys())
             states = list(open_files.values())
-            self.main_widget.open_files(files, states, open_tab, restore=True)
+            self.main_widget.open_files(names, states, open_tab=open_tab)
         else:
             self.main_widget.new_file()
 
@@ -78,17 +78,17 @@ class SessionManager:
         open_files = {}
         n_pages = self.main_widget.notebook.get_n_pages()
         for n in range(n_pages):
-            try:
-                itemlist = self.main_widget.notebook.get_nth_page(n).itemlist
-                if not itemlist.bibfile.created:
-                    open_files[itemlist.bibfile.name] = itemlist.state_to_string()
-            except AttributeError:
-                pass
+            itemlist = self.main_widget.notebook.get_nth_page(n).itemlist
+            if itemlist and not itemlist.bibfile.created:
+                open_files[itemlist.bibfile.name] = itemlist.state_to_string()
         set_open_files(open_files)
 
     def save_open_tab(self):
-        current_file = self.main_widget.get_current_itemlist().bibfile
-        set_open_tab(current_file.name)
+        itemlist = self.main_widget.get_current_itemlist()
+        if itemlist:
+            set_open_tab(itemlist.bibfile.name)
+        else:
+            set_open_tab("")
 
     def restore_string_imports(self):
         string_imports = get_string_imports()

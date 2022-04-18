@@ -14,14 +14,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-import gi
-gi.require_version("Gtk", "4.0")
-
-from gi.repository import Gtk, Gdk, GLib
-
-from time import sleep
-
-from threading import Thread
+from gi.repository import Gtk, Gdk, GLib, Gio
 
 from .config_manager import add_to_recent
 from .config_manager import remove_from_recent
@@ -62,7 +55,6 @@ class MainWidget(Gtk.Paned):
         super().__init__()
 
         self.store = store
-        self.itemlists = {}
         self.editors = {}
         self.watchers = {}
         self.copy_paste_buffer = None
@@ -77,6 +69,7 @@ class MainWidget(Gtk.Paned):
         # notebook to hold itemlists and toolbar
         self.notebook = ItemlistNotebook()
         self.notebook.connect("switch_page", self.on_switch_page)
+        self.notebook.connect("page_removed", self.on_page_removed)
 
         # Toolbar
         self.toolbar = ItemlistToolbar()
@@ -168,38 +161,29 @@ class MainWidget(Gtk.Paned):
         itemlist.connect("selected-rows-changed", self.on_selected_rows_changed)
         itemlist.event_controller.connect("key-pressed", self.on_itemlist_key_pressed)
         itemlist.drop_target.connect("drop", self.on_drop)
-        itemlist.header.close_button.connect("clicked", self.on_tab_closed)
 
         bibfile.itemlist = itemlist
-        self.itemlists[bibfile.name] = itemlist
-        self.notebook.append_itemlist(itemlist)
-
-        if len(bibfile.items) == 0:
-            self.source_view.set_status("empty", True)
-            self.get_current_editor().clear()
-
         return itemlist
 
-    def remove_itemlist(self, filename):
-        itemlist = self.itemlists.pop(filename)
-        self.store.bibfiles[filename].itemlist = None
-        self.notebook.remove_page(itemlist.page.number)
-
     def get_current_itemlist(self):
-        page = self.notebook.get_current_page()
-        return self.notebook.get_nth_page(page).itemlist
+        page_num = self.notebook.get_current_page()
+        return self.notebook.get_nth_page(page_num).itemlist
 
     def sort_itemlist(self, button):
         itemlist = self.get_current_itemlist()
-        SortPopover(button, itemlist)
+        if itemlist:
+            SortPopover(button, itemlist)
 
     def filter_itemlist(self, button):
         itemlist = self.get_current_itemlist()
-        FilterPopover(button, itemlist)
+        if itemlist:
+            FilterPopover(button, itemlist)
 
     def search_itemlist(self, _button=None):
-        searchbar = self.get_current_itemlist().page.searchbar
-        searchbar.set_search_mode(not searchbar.get_search_mode())
+        itemlist = self.get_current_itemlist()
+        if itemlist:
+            searchbar = itemlist.page.searchbar
+            searchbar.set_search_mode(not searchbar.get_search_mode())
 
     def on_itemlist_key_pressed(self, _event_controller_key, keyval, _keycode, _state):
         if keyval == Gdk.KEY_Delete:
@@ -208,14 +192,18 @@ class MainWidget(Gtk.Paned):
             self.focus_on_current_item()
 
     def on_drop(self, _drop_target, file, _x, _y):
-        self.open_files(file.get_path())
+        page = self.open_file(file.get_path())
+        self.notebook.set_current_page(page.number)
 
     # Item
 
     def get_selected_items(self, itemlist=None):
         if itemlist is None:
             itemlist = self.get_current_itemlist()
-        return itemlist.get_selected_items()
+        if itemlist:
+            return itemlist.get_selected_items()
+        else:
+            return []
 
     def get_current_item(self, itemlist=None):
         items = self.get_selected_items(itemlist)
@@ -228,15 +216,15 @@ class MainWidget(Gtk.Paned):
         if not entries:
             entries = [None]
 
-        items = [itemlist.bibfile.append_item(entry) for entry in entries]
-        itemlist.add_rows(items)
-
-        change = Change.Show(items)
-        itemlist.change_buffer.push_change(change)
+        if itemlist:
+            items = [itemlist.bibfile.append_item(entry) for entry in entries]
+            itemlist.add_rows(items)
+            change = Change.Show(items)
+            itemlist.change_buffer.push_change(change)
 
     def delete_items(self, items):
         itemlist = self.get_current_itemlist()
-        if items:
+        if itemlist and items:
             change = Change.Hide(items)
             itemlist.change_buffer.push_change(change)
 
@@ -245,7 +233,9 @@ class MainWidget(Gtk.Paned):
         self.delete_items(items)
 
     def focus_on_current_item(self, _button=None):
-        self.get_current_itemlist().focus_on_selected_items()
+        itemlist = self.get_current_itemlist()
+        if itemlist:
+            itemlist.focus_on_selected_items()
 
     def on_selected_rows_changed(self, itemlist):
         itemlist.focus_idx = 0
@@ -274,24 +264,38 @@ class MainWidget(Gtk.Paned):
 
     # Notebook
 
-    def on_tab_closed(self, widget=None, action=None, data=None):
-        if widget is None:
-            itemlist = self.get_current_itemlist()
+    def on_tab_closed(self, header=None, action=None, data=None):
+        if header is None:
+            page_num = self.notebook.get_current_page()
+            page = self.notebook.get_nth_page(page_num)
         else:
-            itemlist = widget.get_parent().itemlist
+            page = header.get_parent().page
             # work around notebook selecting the closed page bug
             if self.notebook.previous_page is not None:
                 self.notebook.set_current_page(self.notebook.previous_page)
-        self.close_files(itemlist.bibfile.name)
+
+        if page.itemlist:
+            self.close_files(page.itemlist.bibfile)
+        else:
+            self.notebook.remove_page(page.number)
+
+    def on_page_removed(self, notebook, page, page_num):
+        if notebook.get_n_pages() == 0:
+            self.new_file()
+        else:
+            self.notebook.update_pagenumbers(notebook, page, page_num)
 
     def on_switch_page(self, notebook, page, page_num):
-        try:
-            itemlist = page.itemlist
-        except AttributeError:
+        if page.itemlist is None:
+            self.source_view.set_status("empty", True)
+            self.get_current_editor().clear()
             return None
+        else:
+            itemlist = page.itemlist
 
         # work around new row being selected on tab change
         itemlist.grab_focus()
+        itemlist.get_parent().get_parent().get_hadjustment().set_value(0)
 
         # work around notebook switching to page when closing it
         if notebook.current_page is not None:
@@ -344,232 +348,185 @@ class MainWidget(Gtk.Paned):
     def new_file(self):
         bibfile = self.store.new_file()
         itemlist = self.add_itemlist(bibfile)
+        page = self.notebook.add_itemlist_page(bibfile.name)
+        page.header.close_button.connect("clicked", self.on_tab_closed)
+        page.add_itemlist(itemlist)
+
         self.notebook.set_current_page(itemlist.page.number)
 
-    def open_files(self, filenames, states=None, select_file=None, restore=False):
-        # make sure 'filenames' is a list
-        if isinstance(filenames, str):
-            filenames = [filenames]
-        N = len(filenames)
+    def open_files(self, names, states=None, page_nums=None, open_tab=None):
+        if not isinstance(names, list):
+            names = [names]
 
-        # close default empty file
-        close_empty = self.notebook.contains_empty_new_file()
+        if states is None:
+            states = len(names) * [None]
+        elif not isinstance(states, list):
+            states = [states]
 
-        # initialize empty state string list
-        if not states:
-            states = N * [None]
+        if page_nums is None:
+            page_nums = len(names) * [None]
+        elif not isinstance(page_nums, list):
+            page_nums = [page_nums]
 
-        # add loading pages and select first one
-        n_pages = self.notebook.get_n_pages()
-        self.notebook.add_loading_pages(N)
-        self.notebook.set_current_page(n_pages)
+        if open_tab is None:
+            open_tab = names[0]
 
-        # open files in thread
-        GLib.idle_add(self.open_files_thread, filenames, states, select_file, restore, close_empty)
+        empty_file = self.notebook.contains_empty_new_file()
 
-    def open_files_thread(self, filenames, states, select_file, restore, close_empty):
-        # read databases
-        statuses = [self.store.add_file(filename) for filename in filenames]
+        for name, state, page_num in zip(names, states, page_nums):
+            page = self.open_file(name, state, page_num)
+            if name == open_tab:
+                self.notebook.set_current_page(page.number)
 
-        # remove loading pages
-        self.notebook.remove_loading_pages()
+        if empty_file:
+            self.close_files(empty_file, force=True)
 
-        # add itemlists
-        messages = []
-        first_file = None
-        for filename, status, state in zip(filenames, statuses, states):
+    def open_file(self, name, state=None, page_num=None):
+        # add loading page to notebook
+        page = self.notebook.add_itemlist_page(name, page_num)
+        page.header.close_button.connect("clicked", self.on_tab_closed)
 
-            # file does not exist or cannot be read
-            if "file_error" in status or "parse_error" in status:
-                remove_from_recent(filename)
+        def parse_file(task, _obj, _data, _cancellable):
+            status = self.store.add_file(name)
+            task.return_value(status)
+
+        def on_file_parsed(_obj, task):
+            success, status = task.propagate_value()
+            if not success:
+                status = ["error"]
+
+            if "error" in status:
+                page.show_error_screen(status)
+                remove_from_recent(name)
                 self.get_root().update_recent_file_menu()
-                if not self.store.bibfiles:
-                    self.new_file()
-                message = "Cannot read file '{}'.".format(filename)
-                messages.append(message)
-                continue
-
-            # file is empty
-            if "empty" in status and not restore:
-                message = "No BibTeX entries found in file '{}'.".format(filename)
-                messages.append(message)
-
-            # could not create backup
-            if "no_backup" in status and not restore:
-                message = (
-                    "Bada Bib! could not create a backup for '{}'".format(filename)
-                    + "\n\n"
-                    + "To fix this, try deleting or renaming any .bak-files that were not created by Bada Bib!"
-                    + "\n\n"
-                    + "<b>Be careful when editing this file!</b>"
-                )
-                messages.append(message)
-
-            if "file_open" in status:
-                # get itemlist if file is already open
-                itemlist = self.itemlists[filename]
+            elif "file_open" in status:
+                self.notebook.remove_page(page.number)
             else:
-                # or add itemlist and watcher
-                itemlist = self.add_itemlist(self.store.bibfiles[filename], state)
-                self.add_watcher(filename)
+                bibfile = self.store.bibfiles[name]
+                itemlist = self.add_itemlist(bibfile, state)
+                page.add_itemlist(itemlist)
+                self.add_watcher(name)
+                for warning in ("empty", "backup"):
+                    if warning in status:
+                        getattr(page, f"{warning}_bar").reveal()
 
-            if not first_file:
-                first_file = filename
-                if not select_file:
-                    select_file = first_file
+        # open file in thread
+        task = Gio.Task.new(None, None, on_file_parsed)
+        task.run_in_thread(parse_file)
 
-        # remove empty default file
-        if close_empty:
-            self.close_files(get_new_file_name(), force=True)
+        return page
 
-        # select requested page
-        if select_file:
-            for n in range(self.notebook.get_n_pages()):
-                itemlist = self.notebook.get_nth_page(n).itemlist
-                if itemlist.bibfile.name == select_file:
-                    self.notebook.set_current_page(itemlist.page.number)
-                    break
+    def reload_file(self, bibfile):
+        name = bibfile.name
+        state = bibfile.itemlist.state_to_string()
+        page_num = bibfile.itemlist.page.number
 
-        # display warnings, if any
-        if messages:
-            WarningDialog(messages, self.get_root())
+        self.close_files(bibfile, force=True)
+        self.open_files(name, state, page_num, name)
 
-    def reload_file(self, filename):
-        itemlist = self.itemlists[filename]
-        state = itemlist.state_to_string()
-        page_number = itemlist.page.number
+    def declare_file_created(self, name):
+        self.store.bibfiles[name].created = True
+        self.store.bibfiles[name].set_unsaved(True)
+        self.watchers.pop(name)
 
-        self.notebook.add_loading_pages(1)
-        loading_page = self.notebook.get_nth_page(-1)
-        self.notebook.reorder_child(loading_page, page_number)
-        self.notebook.set_current_page(page_number)
+    def close_files(self, bibfiles, force=False, close_app=False):
+        # make sure 'bibfiles' is a list
+        if not isinstance(bibfiles, list):
+            bibfiles = [bibfiles]
+        self.close_files_dialog(None, Gtk.ResponseType.CLOSE, bibfiles, 0, force, close_app)
 
-        close_empty = self.notebook.contains_empty_new_file()
-
-        self.close_files(filename, force=True)
-        GLib.idle_add(self.open_files_thread, [filename], state, None, False, close_empty)
-
-        thread = Thread(target=self.move_new_tab, args=(filename, page_number))
-        thread.start()
-
-    def move_new_tab(self, filename, page_number):
-        # wait for file to finish opening
-        while True:
-            try:
-                last_page = self.notebook.get_nth_page(-1)
-                if last_page.itemlist.bibfile.name == filename:
-                    break
-            except AttributeError:
-                pass
-            sleep(0.02)
-        self.notebook.reorder_child(last_page, page_number)
-
-    def declare_file_created(self, filename):
-        self.store.bibfiles[filename].created = True
-        self.itemlists[filename].set_unsaved(True)
-        self.watchers.pop(filename)
-
-    def close_files(self, filenames, force=False, close_app=False):
-        # make sure 'filenames' is a list
-        if not isinstance(filenames, list):
-            filenames = [filenames]
-        self.close_files_dialog(None, Gtk.ResponseType.CLOSE, filenames, 0, force, close_app)
-
-    def close_files_dialog(self, dialog, response, filenames, n, force, close_app):
+    def handle_close_response(self, dialog, response, bibfiles, n, force, close_app):
         if dialog:
             dialog.destroy()
-
         if response == Gtk.ResponseType.CANCEL:
-            return None
+            return True
         if response == Gtk.ResponseType.OK:
-            close_data = (filenames, n-1, force, close_app)
-            self.save_file(filenames[n-1], close_data)
+            self.save_and_close(bibfiles, n-1, force, close_app)
+            return True
+        return False
+
+    def close_files_dialog(self, dialog, response, bibfiles, n, force, close_app):
+        handled = self.handle_close_response(dialog, response, bibfiles, n, force, close_app)
+        if handled:
             return None
 
-        itemlist = self.itemlists[filenames[n]]
-        if itemlist.bibfile.unsaved and not force:
-            self.notebook.set_current_page(itemlist.page.number)
-            dialog = SaveChanges(self.get_root(), filenames[n])
-            if n < len(filenames) - 1:
-                dialog.connect("response", self.close_files_dialog, filenames, n+1, force, close_app)
+        bibfile = bibfiles[n]
+        if bibfile.unsaved and not force:
+            self.notebook.set_current_page(bibfile.itemlist.page.number)
+            dialog = SaveChanges(self.get_root(), bibfile.name)
+            if n < len(bibfiles) - 1:
+                dialog.connect("response", self.close_files_dialog, bibfiles, n+1, force, close_app)
             else:
-                dialog.connect("response", self.close_files_finalize, filenames, n+1, force, close_app)
+                dialog.connect("response", self.close_files_finalize, bibfiles, n+1, force, close_app)
             dialog.show()
         else:
-            if n < len(filenames) - 1:
-                self.close_files_dialog(None, Gtk.ResponseType.CLOSE, filenames, n+1, force, close_app)
+            if n < len(bibfiles) - 1:
+                self.close_files_dialog(None, Gtk.ResponseType.CLOSE, bibfiles, n+1, force, close_app)
             else:
-                self.close_files_finalize(None, Gtk.ResponseType.CLOSE, filenames, n+1, force, close_app)
+                self.close_files_finalize(None, Gtk.ResponseType.CLOSE, bibfiles, n+1, force, close_app)
 
-    def close_files_finalize(self, dialog, response, filenames, n, force, close_app):
-        if dialog:
-            dialog.destroy()
-
-        if response == Gtk.ResponseType.CANCEL:
-            return None
-        if response == Gtk.ResponseType.OK:
-            close_data = (filenames, n-1, force, close_app)
-            self.save_file(filenames[n-1], close_data)
+    def close_files_finalize(self, dialog, response, bibfiles, n, force, close_app):
+        handled = self.handle_close_response(dialog, response, bibfiles, n, force, close_app)
+        if handled:
             return None
 
         if close_app:
             self.get_root().session_manager.save()
 
-        for filename in filenames:
-            bibfile = self.store.bibfiles[filename]
+        for bibfile in bibfiles:
             if not bibfile.created and not close_app:
                 add_to_recent(bibfile)
                 self.get_root().update_recent_file_menu()
 
-            self.remove_itemlist(filename)
-            self.remove_watcher(filename)
-            self.store.remove_file(filename)
-
-        if self.notebook.get_n_pages() == 0 and not close_app:
-            self.new_file()
+            self.remove_watcher(bibfile.name)
+            self.store.remove_file(bibfile.name)
+            self.notebook.remove_page(bibfile.itemlist.page.number)
 
         if close_app:
             self.get_root().destroy()
 
-    def save_file(self, filename=None, close_data=None):
-        if not filename:
+    def save_file(self, bibfile=None, close_data=None):
+        if bibfile is None:
             itemlist = self.get_current_itemlist()
-            filename = itemlist.bibfile.name
-        else:
-            itemlist = self.itemlists[filename]
-        bibfile = itemlist.bibfile
+            if itemlist:
+                bibfile = itemlist.bibfile
+            else:
+                return None
 
         if bibfile.unsaved:
             if bibfile.created:
                 self.save_file_as(close_data=close_data)
             else:
-                self.save_file_as(filename, filename, close_data)
+                self.save_file_as(bibfile, bibfile.name, close_data)
 
     def save_all_files(self):
-        for filename in self.store.bibfiles:
-            self.save_file(filename)
+        for bibfile in self.store.bibfiles.values():
+            self.save_file(bibfile)
 
-    def save_file_as(self, new_name=None, old_name=None, close_data=None):
-        if not old_name:
+    def save_and_close(self, bibfiles, n, force, close_app):
+        close_data = (bibfiles, n, force, close_app)
+        self.save_file(bibfiles[n], close_data)
+
+    def save_file_as(self, bibfile=None, new_name=None, close_data=None):
+        if bibfile is None:
             itemlist = self.get_current_itemlist()
-            old_name = itemlist.bibfile.name
-        else:
-            itemlist = self.itemlists[old_name]
-        bibfile = itemlist.bibfile
+            if itemlist:
+                bibfile = itemlist.bibfile
+            else:
+                return None
+        self.confirm_save_dialog(bibfile, new_name, close_data)
 
-        self.confirm_save_dialog(new_name, old_name, bibfile, close_data)
-
-    def confirm_save_dialog(self, new_name, old_name, bibfile, close_data):
+    def confirm_save_dialog(self, bibfile, new_name, close_data):
         has_empty_keys = bibfile.has_empty_keys()
         duplicate_keys = bibfile.get_duplicate_keys()
         if has_empty_keys or duplicate_keys:
-            dialog = ConfirmSaveDialog(self.get_root(), old_name, has_empty_keys, duplicate_keys)
-            dialog.connect("response", self.save_file_dialog, new_name, old_name, bibfile, close_data)
+            dialog = ConfirmSaveDialog(self.get_root(), bibfile.name, has_empty_keys, duplicate_keys)
+            dialog.connect("response", self.save_file_dialog, bibfile, new_name, close_data)
             dialog.show()
         else:
-            self.save_file_dialog(None, Gtk.ResponseType.YES, new_name, old_name, bibfile, close_data)
+            self.save_file_dialog(None, Gtk.ResponseType.YES, bibfile, new_name, close_data)
 
-    def save_file_dialog(self, dialog, response, new_name, old_name, bibfile, close_data):
+    def save_file_dialog(self, dialog, response, bibfile, new_name, close_data):
         if dialog:
             dialog.destroy()
 
@@ -577,14 +534,13 @@ class MainWidget(Gtk.Paned):
             return None
 
         if not new_name:
-            suggested_name = self.store.bibfiles[old_name].tail
-            dialog = SaveDialog(self.get_root(), suggested_name)
-            dialog.connect("response", self.save_file_as_finalize, new_name, old_name, bibfile, close_data)
+            dialog = SaveDialog(self.get_root(), bibfile.tail)
+            dialog.connect("response", self.save_file_as_finalize, bibfile, new_name, close_data)
             dialog.show()
         else:
-            self.save_file_as_finalize(None, None, new_name, old_name, bibfile, close_data)
+            self.save_file_as_finalize(None, None, bibfile, new_name, close_data)
 
-    def save_file_as_finalize(self, dialog, response, new_name, old_name, bibfile, close_data):
+    def save_file_as_finalize(self, dialog, response, bibfile, new_name, close_data):
         if dialog:
             dialog.destroy()
             if response == Gtk.ResponseType.ACCEPT:
@@ -595,32 +551,23 @@ class MainWidget(Gtk.Paned):
             else:
                 return None
 
-        if close_data:
-            files = close_data[0]
-            n = close_data[1]
-            files[n] = new_name
-
-        if new_name != old_name:
+        if new_name != bibfile.name:
             if new_name in self.store.bibfiles:
-                self.close_files(new_name, force=True)
+                self.close_files(self.store.bibfiles[new_name], force=True)
 
             if not bibfile.created:
                 add_to_recent(bibfile)
                 self.get_root().update_recent_file_menu()
 
-            self.itemlists.pop(old_name)
-            self.store.rename_file(old_name, new_name)
-            self.itemlists[new_name] = bibfile.itemlist
+            self.remove_watcher(bibfile.name)
+            self.store.rename_file(bibfile.name, new_name)
 
-        bibfile.created = False
-        bibfile.itemlist.update_filename(new_name)
-        bibfile.itemlist.set_unsaved(False)
-        bibfile.itemlist.page.deleted_bar.set_revealed(False)
-        bibfile.itemlist.change_buffer.update_saved_state()
-
-        self.remove_watcher(old_name)
+        self.remove_watcher(bibfile.name)
         self.store.save_file(new_name)
         self.add_watcher(new_name)
+
+        bibfile.created = False
+        bibfile.set_unsaved(False)
 
         if close_data is not None:
             self.close_files_dialog(None, Gtk.ResponseType.CLOSE, *close_data)

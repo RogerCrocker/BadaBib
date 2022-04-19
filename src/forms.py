@@ -101,6 +101,7 @@ class MultiLine(GtkSource.View):
         super().__init__()
         self.field = field
         self.editor = editor
+        self.change_case_counter = 0
         self.set_hexpand(True)
         self.set_size_request(200, 100)
         self.set_margin_top(5)
@@ -158,13 +159,19 @@ class MultiLine(GtkSource.View):
         textbuffer = self.get_buffer()
         bounds = textbuffer.get_selection_bounds()
         if not bounds:
-            bounds = (textbuffer.get_start_iter(), textbuffer.get_end_iter())
-        selection = textbuffer.get_text(bounds[0], bounds[1], True)
+            return
+
+        selection = textbuffer.get_text(*bounds, True)
         new_selection = func(selection, bibstrings, n)
 
         if new_selection is not None and new_selection != selection:
-            textbuffer.delete(bounds[0], bounds[1])
+            selection_offset = bounds[0].get_offset()
+            textbuffer.delete(*bounds)
             textbuffer.insert(bounds[0], new_selection, -1)
+            if len(new_selection) == len(selection):
+                start = textbuffer.get_iter_at_offset(selection_offset)
+                end = textbuffer.get_iter_at_mark(textbuffer.get_insert())
+                textbuffer.select_range(start, end)
             textbuffer.emit("end_user_action")
 
     def deselect(self):
@@ -205,6 +212,7 @@ class SingleLine(Gtk.Entry):
         super().__init__()
         self.field = field
         self.editor = editor
+        self.change_case_counter = 0
         self.set_icon(False)
         self.set_hexpand(True)
         self.set_enable_undo(False)
@@ -235,7 +243,10 @@ class SingleLine(Gtk.Entry):
 
         if new_text is not None and new_text != text:
             self.set_text(new_text)
-            self.set_position(pos)
+            if bounds and len(new_text) == len(text):
+                self.select_region(*bounds)
+            else:
+                self.set_position(pos)
 
     def deselect(self):
         self.select_region(0, 0)

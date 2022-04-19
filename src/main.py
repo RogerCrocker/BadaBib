@@ -22,7 +22,9 @@ from gi.repository import GLib, Gtk, Gio, Adw
 
 from sys import argv
 
-from .customization import capitalize
+from .customization import title_case
+from .customization import upper_case
+from .customization import lower_case
 from .customization import protect
 from .customization import convert_to_unicode
 from .customization import convert_to_latex
@@ -99,7 +101,7 @@ class Application(Adw.Application):
             ("next_tab",        None,                   self.on_next_tab,       "<Control>Tab"),
             ("prev_tab",        None,                   self.on_prev_tab,       "<Control><Shift>Tab"),
             ("update_bibtex",   None,                   self.on_update_bibtex,  "<Control>Return"),
-            ("capitalize",      None,                   self.on_capitalize,     "<Alt>u"),
+            ("change_case",     None,                   self.on_change_case,    "<Alt>c"),
             ("protect_caps",    None,                   self.on_protect_caps,   "<Alt>p"),
             ("sanitize_range",  None,                   self.on_sanitize_range, "<Alt>h"),
             ("to_unicode",      None,                   self.on_to_unicode,     "<Alt>o"),
@@ -242,12 +244,20 @@ class Application(Adw.Application):
     def on_update_bibtex(self, action=None, data=None):
         self.window.main_widget.update_bibtex()
 
-    def on_capitalize(self, action=None, data=None):
+    def on_change_case(self, action=None, data=None):
         form, grab_focus = self.get_active_form()
         if form:
-            form.apply(capitalize, 4)
+            counter = form.change_case_counter
+            if counter == 0:
+                form.apply(title_case, 4)
+            elif counter == 1:
+                form.apply(upper_case)
+            elif counter == 2:
+                form.apply(lower_case)
             if grab_focus:
                 form.grab_focus()
+            form.change_case_counter += 1
+            form.change_case_counter %= 3
 
     def on_protect_caps(self, action=None, data=None):
         form, grab_focus = self.get_active_form()

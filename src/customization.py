@@ -82,7 +82,7 @@ def convert_to_latex(string, bibstrings=None, n=0):
     return string_to_latex(pretty_string)
 
 
-def capitalize_word(word, bibstrings, n=0):
+def title_case_word(word, bibstrings, n=0):
     if word.lower() in bibstrings or len(word) < n:
         return word
 
@@ -97,15 +97,37 @@ def capitalize_word(word, bibstrings, n=0):
     return "-".join(Parts)
 
 
-def capitalize(value, bibstrings, n=0):
+def upper_case_word(word, bibstrings, n=0):
+    if word.lower() in bibstrings:
+        return word
+    return word.upper()
+
+
+def lower_case_word(word, bibstrings, n=0):
+    if word.lower() in bibstrings:
+        return word
+    return word.lower()
+
+
+def title_case(value, bibstrings, n=0):
     if not value:
         return None
     words = value.split(" ")
-    value_cap = capitalize_word(words[0], bibstrings, 0)
-    for word in words[1:]:
-        value_cap += " " + capitalize_word(word, bibstrings, n)
+    return " ".join(title_case_word(word, bibstrings, n) for word in words)
 
-    return value_cap
+
+def upper_case(value, bibstrings, n=0):
+    if not value:
+        return None
+    words = value.split(" ")
+    return " ".join(upper_case_word(word, bibstrings, n) for word in words)
+
+
+def lower_case(value, bibstrings, n=0):
+    if not value:
+        return None
+    words = value.split(" ")
+    return " ".join(lower_case_word(word, bibstrings, n) for word in words)
 
 
 def protect(string, bibstrings, n=0):

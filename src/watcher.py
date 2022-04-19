@@ -25,21 +25,19 @@ CHANGED_EVENTS = (Gio.FileMonitorEvent.CHANGED, Gio.FileMonitorEvent.RENAMED)
 
 
 class Watcher:
-    def __init__(self, main_widget, filename):
+    def __init__(self, main_widget, name):
         self.main_widget = main_widget
-        self.filename = filename
+        self.name = name
 
-        gfile = Gio.File.new_for_path(filename)
+        gfile = Gio.File.new_for_path(name)
         self.monitor = gfile.monitor_file(Gio.FileMonitorFlags.WATCH_MOVES, None)
         self.monitor.connect("changed", self.on_changed)
 
     def on_changed(self, file_monitor, _file, _other_file, event_type):
         file_monitor.cancel()
-        GLib.idle_add(self.main_widget.declare_file_created, self.filename)
-        page = self.main_widget.itemlists[self.filename].page
+        self.main_widget.declare_file_created(self.name)
+        page = self.main_widget.store.bibfiles[self.name].itemlist.page
         if event_type in CHANGED_EVENTS:
-            page.changed_bar.show_text(True)
-            page.changed_bar.set_revealed(True)
+            page.changed_bar.reveal()
         if event_type in DELETED_EVENTS:
-            page.deleted_bar.show_text(True)
-            page.deleted_bar.set_revealed(True)
+            page.deleted_bar.reveal()

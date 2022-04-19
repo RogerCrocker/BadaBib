@@ -193,16 +193,19 @@ class Application(Adw.Application):
 
     def on_copy(self, action=None, data=None):
         items = self.window.main_widget.get_selected_items()
-        self.window.main_widget.copy_paste_buffer = [item.entry.copy() for item in items]
+        if items:
+            self.window.main_widget.copy_paste_buffer = [item.entry.copy() for item in items]
 
     def on_cut(self, action=None, data=None):
         items = self.window.main_widget.get_selected_items()
-        self.window.main_widget.copy_paste_buffer = [item.entry.copy() for item in items]
-        self.window.main_widget.delete_items(items)
+        if items:
+            self.window.main_widget.copy_paste_buffer = [item.entry.copy() for item in items]
+            self.window.main_widget.delete_items(items)
 
     def on_paste(self, action=None, data=None):
         entries = self.window.main_widget.copy_paste_buffer
-        self.window.main_widget.add_items(None, entries)
+        if entries:
+            self.window.main_widget.add_items(None, entries)
 
     def on_find(self, action=None, data=None):
         self.window.main_widget.search_itemlist()

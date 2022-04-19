@@ -176,7 +176,12 @@ class Application(Adw.Application):
         self.window.main_widget.save_all_files()
 
     def on_close(self, action=None, data=None):
-        self.window.main_widget.on_tab_closed()
+        page_num = self.window.main_widget.notebook.get_current_page()
+        page = self.window.main_widget.notebook.get_nth_page(page_num)
+        if page.itemlist:
+            self.window.main_widget.close_files(page.itemlist.bibfile)
+        else:
+            self.window.main_widget.notebook.remove_page(page_num)
 
     def on_clear_recent(self, action=None, data=None):
         self.window.clear_recent_file_menu()

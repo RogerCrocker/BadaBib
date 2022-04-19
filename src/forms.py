@@ -15,14 +15,15 @@
 
 
 import gi
-gi.require_version("Gtk", "4.0")
+gi.require_version("GtkSource", "5")
 
-from gi.repository import Gtk, Gio
+from gi.repository import Gtk, Gio, GtkSource
 
 from .config_manager import entrytype_dict
 from .config_manager import field_dict
 from .config_manager import month_dict
 from .config_manager import get_parse_on_fly
+from .config_manager import get_highlight_syntax
 
 
 has_entry = ["ENTRYTYPE", "month"]
@@ -95,8 +96,8 @@ class FormMenu(Gio.Menu):
         self.prepend_section(None, customize_section)
 
 
-class MultiLine(Gtk.TextView):
-    def __init__(self, field, editor):
+class MultiLine(GtkSource.View):
+    def __init__(self, field, editor=None, entry_style=True):
         super().__init__()
         self.field = field
         self.editor = editor
@@ -113,6 +114,32 @@ class MultiLine(Gtk.TextView):
 
         self.event_controller_focus = Gtk.EventControllerFocus()
         self.add_controller(self.event_controller_focus)
+
+        if entry_style:
+            css_provider = Gtk.CssProvider()
+            css_provider.load_from_data(
+                b"""
+                    text {
+                      background-color: alpha(currentColor, .1);
+                    }
+
+                    text:disabled {
+                      background-color: alpha(currentColor, .05);
+                    }
+
+                    textview {
+                      border-radius: 6px;
+                    }
+
+                    textview:focus-within {
+                      outline-color: alpha(@accent_color, .5);
+                      outline-width: 2px;
+                      outline-offset: -2px;
+                      outline-style: solid;
+                    }
+                """
+            )
+            self.get_style_context().add_provider(css_provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION)
 
     def get_text(self):
         textbuffer = self.get_buffer()
@@ -394,8 +421,9 @@ class SourceView(Gtk.Box):
         super().__init__(orientation=Gtk.Orientation.VERTICAL)
         self.set_vexpand(True)
         self.status = "empty"
-        self.form = MultiLine("source", None)
+        self.form = MultiLine("source", entry_style=False)
         self.form.set_vexpand(True)
+        self.form.set_show_line_numbers(True)
         self.buffer = self.form.get_buffer()
 
         source_view_scrolled = Gtk.ScrolledWindow()
@@ -410,6 +438,8 @@ class SourceView(Gtk.Box):
         self.append(Gtk.Separator())
         self.append(self.online_bar)
         self.append(self.offline_bar)
+
+        self.highlight_syntax(get_highlight_syntax())
 
         if get_parse_on_fly():
             self.set_mode("online")
@@ -515,6 +545,14 @@ class SourceView(Gtk.Box):
             if self.mode == "offline":
                 self.offline_message.set_text("")
                 self.apply_button.set_sensitive(False)
+
+    def highlight_syntax(self, state):
+        if state:
+            manager = GtkSource.LanguageManager.get_default()
+            language = manager.get_language('bibtex')
+            self.buffer.set_language(language)
+        else:
+            self.buffer.set_language(None)
 
     def update(self, item):
         self.form.set_text(item.bibtex)

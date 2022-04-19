@@ -36,6 +36,11 @@
         <summary>Remember imported strings between sessions.</summary>
         <description>Reopen imported string files on startup.</description>
     </key>
+	  <key type="b" name="highlight-syntax">
+        <default>true</default>
+        <summary>Highlight syntax of BibTeX source</summary>
+        <description>Highlight syntax of BibTeX source.</description>
+    </key>
     <key type="ai" name="window-geom">
         <default>[1050, 600, 420]</default>
         <summary>Window size and itemlist width</summary>

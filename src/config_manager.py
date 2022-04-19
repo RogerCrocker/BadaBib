@@ -146,6 +146,14 @@ def set_remember_strings(state):
     setting.set_boolean("remember-strings", state)
 
 
+def get_highlight_syntax():
+    return setting.get_boolean("highlight-syntax")
+
+
+def set_highlight_syntax(state):
+    setting.set_boolean("highlight-syntax", state)
+
+
 def get_window_geom():
     return setting.get_value("window-geom")
 

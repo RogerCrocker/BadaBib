@@ -37,8 +37,8 @@ class Change:
             return self.main_widget.get_editor(entrytype)
 
         @property
-        def itemlist(self):
-            return self.item.bibfile.itemlist
+        def bibfile(self):
+            return self.item.bibfile
 
         @property
         def source_view(self):
@@ -65,8 +65,8 @@ class Change:
             self.source_view.update(self.item)
             self.form.update(self.item)
             if redo:
-                self.itemlist.unselect_all()
-                self.itemlist.select_row(self.item.row)
+                self.bibfile.itemlist.unselect_all()
+                self.bibfile.itemlist.select_row(self.item.row)
                 self.main_widget.focus_on_current_item()
 
     class Show(Generic):
@@ -79,18 +79,18 @@ class Change:
         def apply(self, redo=False):
             for item in self.items:
                 item.deleted = False
-            self.itemlist.invalidate_filter()
-            self.itemlist.unselect_all()
+            self.bibfile.itemlist.invalidate_filter()
+            self.bibfile.itemlist.unselect_all()
             for item in self.items:
-                self.itemlist.select_row(item.row)
+                self.bibfile.itemlist.select_row(item.row)
             self.main_widget.focus_on_current_item()
 
         def revert(self):
             for item in self.items:
                 item.deleted = True
-            self.itemlist.invalidate_filter()
-            self.itemlist.unselect_all()
-            next_row = self.itemlist.select_next_row(self.item.row)
+            self.bibfile.itemlist.invalidate_filter()
+            self.bibfile.itemlist.unselect_all()
+            next_row = self.bibfile.itemlist.select_next_row(self.item.row)
             if next_row:
                 self.main_widget.focus_on_current_item()
             else:
@@ -118,8 +118,8 @@ class Change:
             self.editor.show_item(self.item)
             if redo:
                 self.source_view.update(self.item)
-                self.itemlist.unselect_all()
-                self.itemlist.select_row(self.item.row)
+                self.bibfile.itemlist.unselect_all()
+                self.bibfile.itemlist.select_row(self.item.row)
                 self.main_widget.focus_on_current_item()
 
         def revert(self):
@@ -127,8 +127,8 @@ class Change:
             self.item.row.update()
             self.editor.show_item(self.item)
             self.source_view.update(self.item)
-            self.itemlist.unselect_all()
-            self.itemlist.select_row(self.item.row)
+            self.bibfile.itemlist.unselect_all()
+            self.bibfile.itemlist.select_row(self.item.row)
             self.main_widget.focus_on_current_item()
 
 
@@ -175,14 +175,14 @@ class ChangeBuffer:
 
         change.apply()
         self.last_save = time()
-        change.itemlist.set_unsaved(True)
+        change.bibfile.set_unsaved(True)
 
     def redo_change(self):
         if self.index < len(self.buffer) - 1:
             self.index += 1
             change = self.buffer[self.index]
             change.apply(redo=True)
-            change.itemlist.set_unsaved(self.index != self.saved_index)
+            change.bibfile.set_unsaved(self.index != self.saved_index)
             if change.form:
                 change.form.select()
                 change.form.grab_focus()
@@ -192,7 +192,7 @@ class ChangeBuffer:
         if change:
             self.index -= 1
             change.revert()
-            change.itemlist.set_unsaved(self.index != self.saved_index)
+            change.bibfile.set_unsaved(self.index != self.saved_index)
             if change.form:
                 change.form.select()
                 change.form.grab_focus()

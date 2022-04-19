@@ -151,10 +151,10 @@ class BadaBibStore:
         except FileNotFoundError:
             return ["error", "file_error"]
 
-    def rename_file(self, old, new):
-        file = self.bibfiles.pop(old)
-        file.update_filename(new)
-        self.bibfiles[new] = file
+    def rename_file(self, old_name, new_name):
+        bibfile = self.bibfiles.pop(old_name)
+        bibfile.update_filename(new_name)
+        self.bibfiles[new_name] = bibfile
         self.update_short_names()
 
     def new_file(self):

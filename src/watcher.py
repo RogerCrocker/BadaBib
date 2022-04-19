@@ -17,7 +17,7 @@
 import gi
 gi.require_version("Gtk", "4.0")
 
-from gi.repository import GLib, Gio
+from gi.repository import Gio
 
 
 DELETED_EVENTS = (Gio.FileMonitorEvent.MOVED_OUT, Gio.FileMonitorEvent.DELETED)

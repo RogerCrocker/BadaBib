@@ -98,6 +98,14 @@ sort_fields = ["ID", "author", "title", "journal", "year"]
 link_fields = ["doi", "url", "eprint", "file"]
 
 
+def get_color_scheme():
+    return setting.get_int("color-scheme")
+
+
+def set_color_scheme(n):
+    setting.set_int("color-scheme", n)
+
+
 def get_align_fields():
     return setting.get_boolean("align-fields")
 

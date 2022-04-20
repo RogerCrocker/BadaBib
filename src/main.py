@@ -22,6 +22,8 @@ from gi.repository import GLib, Gtk, Gio, Adw
 
 from sys import argv
 
+from .config_manager import get_color_scheme
+
 from .customization import title_case
 from .customization import upper_case
 from .customization import lower_case
@@ -61,6 +63,7 @@ class Application(Adw.Application):
         self.window = self.props.active_window
         if not self.window:
             self.window = BadaBibWindow(application=self)
+        self.set_color_scheme()
         self.window.present()
 
     def do_startup(self):
@@ -74,6 +77,19 @@ class Application(Adw.Application):
             self.do_activate()
         else:
             self.window.main_widget.open_files([file.get_path() for file in files])
+
+    def set_color_scheme(self):
+        # set application wide scheme
+        style_manager = Adw.StyleManager.get_default()
+        style_manager.set_color_scheme(get_color_scheme())
+
+        # manually set scheme for Gtk.SourceViews
+        self.window.main_widget.source_view.form.set_color_scheme()
+
+        for editor in self.window.main_widget.editors.values():
+            for name, form in editor.forms.items():
+                if name == "abstract":
+                    form.set_color_scheme()
 
     def get_actions(self):
         actions = [

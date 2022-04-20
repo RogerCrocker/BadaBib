@@ -14,11 +14,10 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-import gi
-gi.require_version("Gtk", "4.0")
+from gi.repository import Gtk, Adw
 
-from gi.repository import Gtk
-
+from .config_manager import get_color_scheme
+from .config_manager import set_color_scheme
 from .config_manager import get_align_fields
 from .config_manager import set_align_fields
 from .config_manager import get_field_indent
@@ -31,130 +30,141 @@ from .config_manager import get_remember_strings
 from .config_manager import set_remember_strings
 
 
-class PreferencesWindow(Gtk.Window):
+def test(switch, state):
+    print("Test")
+
+def test2(switch):
+    print("Test")
+
+
+class PreferencesWindow(Adw.PreferencesWindow):
     def __init__(self, main_window):
-        super().__init__(transient_for=main_window, title="Preferences")
+        super().__init__(title="Preferences")
         self.main_window = main_window
 
-        box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
-        box.append(self.get_align())
-        box.append(self.get_indent())
-        box.append(self.get_strings())
-        box.append(self.get_parse())
-        box.append(self.get_backup())
+        page = Adw.PreferencesPage.new()
+        page.set_title("Preferences")
 
-        self.set_size_request(500, 350)
+        page.add(self.get_group_general())
+        page.add(self.get_group_source())
 
-        self.set_child(box)
+        self.add(page)
 
         self.show()
+
+    @staticmethod
+    def assemble_action_row(title, subtitle, getter, callback):
+        row = Adw.ActionRow.new()
+        row.set_title(title)
+        if subtitle:
+            row.set_subtitle(subtitle)
+
+        switch = Gtk.Switch()
+        switch.set_active(getter())
+        switch.set_valign(Gtk.Align.CENTER)
+        switch.connect("state-set", callback)
+
+        box = row.get_child()
+        box.append(switch)
+
+        return row
+
+    def assemble_indent_row(self):
+        row = Adw.ActionRow.new()
+        row.set_title("Indentation Width")
+        row.set_subtitle("Set indentation width of fields.")
+
+        spin_button = Gtk.SpinButton.new_with_range(0, 20, 1)
+        spin_button.set_valign(Gtk.Align.CENTER)
+        spin_button.set_value(get_field_indent())
+        spin_button.set_can_focus(False)
+        spin_button.connect("value_changed", self.on_indent_changed)
+
+        box = row.get_child()
+        box.append(spin_button)
+
+        return row
+
+    def get_group_general(self):
+        title = "Dark Theme"
+        subtitle = "Use dark Adaita color scheme."
+        getter = get_color_scheme
+        callback = self.on_theme_changed
+        theme_row = self.assemble_action_row(title, subtitle, getter, callback)
+
+        title = "Create Backups"
+        subtitle = "Create backups when opening a file. Highly recommendend!"
+        getter = get_create_backup
+        callback = self.on_backup_changed
+        backup_row = self.assemble_action_row(title, subtitle, getter, callback)
+
+        title = "Remember Strings"
+        subtitle = "Remember imported string definitions between session."
+        getter = get_remember_strings
+        callback = self.on_strings_changed
+        string_row = self.assemble_action_row(title, subtitle, getter, callback)
+
+        group = Adw.PreferencesGroup.new()
+        group.set_title("General")
+        group.add(theme_row)
+        group.add(backup_row)
+        group.add(string_row)
+
+        return group
+
+    def get_group_source(self):
+        title = "Align Fields"
+        subtitle = """Align fields along the "=" sign."""
+        getter = get_align_fields
+        callback = self.on_theme_changed
+        align_row = self.assemble_action_row(title, subtitle, getter, callback)
+
+        title = "Parse BibTeX code on the fly"
+        subtitle = "Disable if editing is sluggish, for example, if a file contains many strings."
+        getter = get_parse_on_fly
+        callback = self.on_parse_changed
+        parse_row = self.assemble_action_row(title, subtitle, getter, callback)
+
+        indent_row = self.assemble_indent_row()
+
+        group = Adw.PreferencesGroup.new()
+        group.set_title("BibTeX Source")
+        group.add(align_row)
+        group.add(parse_row)
+        group.add(indent_row)
+
+        return group
 
     def update_writer(self):
         for file in self.main_window.store.bibfiles.values():
             file.writer = file.store.get_default_writer()
         item = self.main_window.main_widget.get_current_item()
-        item.update_bibtex()
-        self.main_window.main_widget.source_view.update(item)
+        if item:
+            item.update_bibtex()
+            self.main_window.main_widget.source_view.update(item)
 
-    def get_align(self):
-        align_label = Gtk.Label(xalign=0)
-        align_label.set_text("Align fields")
-        align_label.set_hexpand(True)
+    def on_theme_changed(self, _switch, dark):
+        if dark:
+            set_color_scheme(Adw.ColorScheme.PREFER_DARK)
+        else:
+            set_color_scheme(Adw.ColorScheme.DEFAULT)
+        self.main_window.app.set_color_scheme()
 
-        align_hint = Gtk.Label(xalign=0)
-        align_hint.set_markup("""<small>Align fields in the BibTeX source code along the "=" sign.</small>""")
-        align_hint.set_hexpand(True)
+    @staticmethod
+    def on_backup_changed(_switch, state):
+        set_create_backup(state)
 
-        align_switch = Gtk.Switch()
-        align_switch.set_active(get_align_fields())
-        align_switch.connect("state-set", self.on_align_changed)
-
-        vbox1 = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
-        vbox1.append(align_label)
-        vbox1.append(align_hint)
-
-        vbox2 = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
-        vbox2.append(align_switch)
-
-        box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
-        box.set_margin_start(20)
-        box.set_margin_end(20)
-        box.set_margin_top(10)
-        box.set_margin_bottom(10)
-        box.append(vbox1)
-        box.append(vbox2)
-
-        return box
+    @staticmethod
+    def on_strings_changed(_switch, state):
+        set_remember_strings(state)
 
     def on_align_changed(self, _switch, state):
         set_align_fields(state)
         self.update_writer()
 
-    def get_indent(self):
-        indent_label = Gtk.Label(xalign=0)
-        indent_label.set_text("Indentation width")
-        indent_label.set_hexpand(True)
-
-        indent_hint = Gtk.Label(xalign=0)
-        indent_hint.set_markup("<small>Set indentation width of fields in the BibTeX source code.</small>")
-        indent_hint.set_hexpand(True)
-
-        indent_spin = Gtk.SpinButton.new_with_range(0, 20, 1)
-        indent_spin.set_value(get_field_indent())
-        indent_spin.set_can_focus(False)
-        indent_spin.connect("value_changed", self.on_indent_changed)
-
-        vbox1 = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
-        vbox1.append(indent_label)
-        vbox1.append(indent_hint)
-
-        vbox2 = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
-        vbox2.append(indent_spin)
-
-        box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
-        box.set_margin_start(20)
-        box.set_margin_end(20)
-        box.set_margin_top(20)
-        box.set_margin_bottom(10)
-        box.append(vbox1)
-        box.append(vbox2)
-
-        return box
-
-    def on_indent_changed(self, button):
-        set_field_indent(button.get_value())
+    def on_indent_changed(self, spin_button):
+        set_field_indent(spin_button.get_value())
         self.update_writer()
-
-    def get_parse(self):
-        parse_label = Gtk.Label(xalign=0)
-        parse_label.set_text("Parse BibTeX code on the fly")
-        parse_label.set_hexpand(True)
-
-        parse_hint = Gtk.Label(xalign=0)
-        parse_hint.set_markup("<small>Disable if editing the source code of BibTeX entries is sluggish.\nThis can be the case if a file contains many strings.</small>")
-        parse_hint.set_justify(Gtk.Justification.LEFT)
-        parse_hint.set_hexpand(True)
-
-        parse_switch = Gtk.Switch()
-        parse_switch.set_active(get_parse_on_fly())
-        parse_switch.connect("state-set", self.on_parse_changed)
-
-        vbox1 = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
-        vbox1.append(parse_label)
-        vbox1.append(parse_hint)
-
-        vbox2 = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
-        vbox2.append(parse_switch)
-
-        box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
-        box.set_margin_start(20)
-        box.set_margin_end(20)
-        box.set_margin_top(10)
-        box.set_margin_bottom(10)
-        box.append(vbox1)
-        box.append(vbox2)
-
-        return box
 
     def on_parse_changed(self, _switch, state):
         set_parse_on_fly(state)
@@ -162,74 +172,4 @@ class PreferencesWindow(Gtk.Window):
             mode = "online"
         else:
             mode = "offline"
-        self.main_window.main_widget.source_view.set_mode(mode)
-
-    def get_backup(self):
-        backup_label = Gtk.Label(xalign=0)
-        backup_label.set_text("Create backups when opening BibTeX files.")
-        backup_label.set_hexpand(True)
-
-        backup_hint = Gtk.Label(xalign=0)
-        backup_hint.set_markup("<small>Highly recommendend!\nBada Bib! is still under development, so it might mess with your files.</small>")
-        backup_hint.set_justify(Gtk.Justification.LEFT)
-        backup_hint.set_hexpand(True)
-
-        backup_switch = Gtk.Switch()
-        backup_switch.set_active(get_create_backup())
-        backup_switch.connect("state-set", self.on_backup_changed)
-
-        vbox1 = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
-        vbox1.append(backup_label)
-        vbox1.append(backup_hint)
-
-        vbox2 = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
-        vbox2.append(backup_switch)
-
-        box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
-        box.set_margin_start(20)
-        box.set_margin_end(20)
-        box.set_margin_top(10)
-        box.set_margin_bottom(10)
-        box.append(vbox1)
-        box.append(vbox2)
-
-        return box
-
-    @staticmethod
-    def on_backup_changed(_switch, state):
-        set_create_backup(state)
-
-    def get_strings(self):
-        strings_label = Gtk.Label(xalign=0)
-        strings_label.set_text("Remember imported strings between sessions.")
-        strings_label.set_hexpand(True)
-
-        strings_hint = Gtk.Label(xalign=0)
-        strings_hint.set_markup("<small>Enable to remember imported string definitions between session.</small>")
-        strings_hint.set_justify(Gtk.Justification.LEFT)
-        strings_hint.set_hexpand(True)
-
-        strings_switch = Gtk.Switch()
-        strings_switch.set_active(get_remember_strings())
-        strings_switch.connect("state-set", self.on_strings_changed)
-
-        vbox1 = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
-        vbox1.append(strings_label)
-        vbox1.append(strings_hint)
-
-        vbox2 = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
-        vbox2.append(strings_switch)
-
-        box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
-        box.set_margin_start(20)
-        box.set_margin_end(20)
-        box.set_margin_top(10)
-        box.set_margin_bottom(10)
-        box.append(vbox1)
-        box.append(vbox2)
-
-        return box
-
-    @staticmethod
-    def on_strings_changed(_switch, state):
-        set_remember_strings(state)
+        self.main_window.main_widget.source_view.set_mode(mode)   

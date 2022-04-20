@@ -19,6 +19,7 @@ gi.require_version("GtkSource", "5")
 
 from gi.repository import Gtk, Gio, GtkSource
 
+from .config_manager import get_color_scheme
 from .config_manager import entrytype_dict
 from .config_manager import field_dict
 from .config_manager import month_dict
@@ -101,6 +102,7 @@ class MultiLine(GtkSource.View):
         super().__init__()
         self.field = field
         self.editor = editor
+        self.entry_style = entry_style
         self.change_case_counter = 0
         self.set_hexpand(True)
         self.set_size_request(200, 100)
@@ -109,38 +111,13 @@ class MultiLine(GtkSource.View):
         self.set_editable(True)
         self.set_monospace(True)
 
+        self.set_color_scheme()
         self.set_extra_menu(FormMenu(field))
 
         self.get_buffer().set_enable_undo(False)
 
         self.event_controller_focus = Gtk.EventControllerFocus()
         self.add_controller(self.event_controller_focus)
-
-        if entry_style:
-            css_provider = Gtk.CssProvider()
-            css_provider.load_from_data(
-                b"""
-                    text {
-                      background-color: alpha(currentColor, .1);
-                    }
-
-                    text:disabled {
-                      background-color: alpha(currentColor, .05);
-                    }
-
-                    textview {
-                      border-radius: 6px;
-                    }
-
-                    textview:focus-within {
-                      outline-color: alpha(@accent_color, .5);
-                      outline-width: 2px;
-                      outline-offset: -2px;
-                      outline-style: solid;
-                    }
-                """
-            )
-            self.get_style_context().add_provider(css_provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION)
 
     def get_text(self):
         textbuffer = self.get_buffer()
@@ -193,6 +170,45 @@ class MultiLine(GtkSource.View):
         elif self.get_text() != raw_value:
             self.set_text(raw_value)
         self.editor.track_changes = True
+
+    def set_color_scheme(self):
+        manager = GtkSource.StyleSchemeManager().get_default()
+        scheme = None
+        adw_scheme = get_color_scheme()
+        if adw_scheme in (0, 1, 2):
+            scheme = manager.get_scheme("Adwaita")
+        elif adw_scheme in (3, 4):
+            scheme = manager.get_scheme("Adwaita-dark")
+
+        if scheme:
+            self.get_buffer().set_style_scheme(scheme)
+
+        if self.entry_style:
+            css_provider = Gtk.CssProvider()
+            css_provider.load_from_data(
+                b"""
+                    text {
+                      background-color: alpha(currentColor, .1);
+                    }
+
+                    text:disabled {
+                      background-color: alpha(currentColor, .05);
+                    }
+
+                    textview {
+                      border-radius: 6px;
+                      color: currentColor;
+                    }
+
+                    textview:focus-within {
+                      outline-color: alpha(@accent_color, .5);
+                      outline-width: 2px;
+                      outline-offset: -2px;
+                      outline-style: solid;
+                    }
+                """
+            )
+            self.get_style_context().add_provider(css_provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION)
 
     def clear(self):
         self.set_text("")

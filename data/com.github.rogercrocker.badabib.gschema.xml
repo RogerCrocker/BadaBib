@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <schemalist gettext-domain="badabib">
 	<schema id="com.github.rogercrocker.badabib" path="/com/github/rogercrocker/badabib/">
+	  <key type="i" name="color-scheme">
+        <default>0</default>
+        <summary>Adwaita Color Scheme</summary>
+        <description>Defines light and dark theme preferences. See https://gnome.pages.gitlab.gnome.org/libadwaita/doc/main/enum.ColorScheme.html</description>
+    </key>
 	  <key type="b" name="align-fields">
         <default>true</default>
         <summary>Align fields of bibtex entries.</summary>

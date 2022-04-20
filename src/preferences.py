@@ -30,13 +30,6 @@ from .config_manager import get_remember_strings
 from .config_manager import set_remember_strings
 
 
-def test(switch, state):
-    print("Test")
-
-def test2(switch):
-    print("Test")
-
-
 class PreferencesWindow(Adw.PreferencesWindow):
     def __init__(self, main_window):
         super().__init__(title="Preferences")

@@ -109,8 +109,8 @@
             <property name="title" translatable="yes" context="Shortcut window description">Fields</property>
             <child>
               <object class="GtkShortcutsShortcut">
-                <property name="title" translatable="yes" context="Shortcut window description">Capitalize</property>
-                <property name="accelerator">&lt;Alt&gt;U</property>
+                <property name="title" translatable="yes" context="Shortcut window description">Cycle Through Titel/Upper/Lower Case</property>
+                <property name="accelerator">&lt;Alt&gt;C</property>
               </object>
             </child>
             <child>
@@ -133,8 +133,8 @@
             </child>
             <child>
               <object class="GtkShortcutsShortcut">
-                <property name="title" translatable="yes" context="Shortcut window description">Replace hyphen with n-dash</property>
-                <property name="accelerator">&lt;Alt&gt;H</property>
+                <property name="title" translatable="yes" context="Shortcut window description">Sanitize Page Ranges</property>
+                <property name="accelerator">&lt;Alt&gt;R</property>
               </object>
             </child>
             <child>

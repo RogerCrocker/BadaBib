@@ -122,7 +122,7 @@ class Application(Adw.Application):
             ("upper_case",      None,                   self.on_upper_case,     None),
             ("lower_case",      None,                   self.on_lower_case,     None),
             ("protect_caps",    None,                   self.on_protect_caps,   "<Alt>p"),
-            ("sanitize_range",  None,                   self.on_sanitize_range, "<Alt>h"),
+            ("sanitize_range",  None,                   self.on_sanitize_range, "<Alt>r"),
             ("to_unicode",      None,                   self.on_to_unicode,     "<Alt>o"),
             ("to_latex",        None,                   self.on_to_latex,       "<Alt>l"),
             ("generate_key",    None,                   self.on_generate_key,   "<Alt>k"),

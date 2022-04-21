@@ -62,7 +62,7 @@ class FormMenu(Gio.Menu):
         protect = self.create_item("Protect Upper Case", "protect_caps")
         unicode = self.create_item("Convert to Unicode", "to_unicode")
         latex = self.create_item("Convert to LaTeX", "to_latex")
-        hyphen = self.create_item("Sanitize Ranges", "sanitize_range")
+        sanitize = self.create_item("Sanitize Ranges", "sanitize_range")
         key = self.create_item("Generate Key", "generate_key")
 
         menu_case = Gio.Menu()
@@ -83,7 +83,7 @@ class FormMenu(Gio.Menu):
         customize_section.append_submenu("Customize", menu_customize)
 
         if field == "pages":
-            customize_section.append_item(hyphen)
+            customize_section.append_item(sanitize)
         if field == "ID":
             customize_section.append_item(key)
 
@@ -112,7 +112,7 @@ class MultiLine(GtkSource.View):
         self.set_monospace(True)
 
         self.set_color_scheme()
-        self.set_extra_menu(FormMenu(self))
+        self.set_extra_menu(FormMenu(self.field))
 
         self.get_buffer().set_enable_undo(False)
 
@@ -235,7 +235,7 @@ class SingleLine(Gtk.Entry):
         self.set_hexpand(True)
         self.set_enable_undo(False)
 
-        self.set_extra_menu(FormMenu(self))
+        self.set_extra_menu(FormMenu(self.field))
 
         self.event_controller_focus = Gtk.EventControllerFocus()
         self.add_controller(self.event_controller_focus)

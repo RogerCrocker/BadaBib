@@ -56,38 +56,31 @@ class FormMenu(Gio.Menu):
     def __init__(self, field):
         super().__init__()
 
-        capitalize = Gio.MenuItem()
-        capitalize.set_label("Capitalize")
-        capitalize.set_action_and_target_value("app.capitalize", None)
+        title_case = self.create_item("Title Case", "title_case")
+        upper_case = self.create_item("Upper Case", "upper_case")
+        lower_case = self.create_item("Lower Case", "lower_case")
+        protect = self.create_item("Protect Upper Case", "protect_caps")
+        unicode = self.create_item("Convert to Unicode", "to_unicode")
+        latex = self.create_item("Convert to LaTeX", "to_latex")
+        hyphen = self.create_item("Sanitize Ranges", "sanitize_range")
+        key = self.create_item("Generate Key", "generate_key")
 
-        protect = Gio.MenuItem()
-        protect.set_label("Protect upper case")
-        protect.set_action_and_target_value("app.protect_caps", None)
+        menu_case = Gio.Menu()
+        menu_case.append_item(title_case)
+        menu_case.append_item(upper_case)
+        menu_case.append_item(lower_case)
 
-        unicode = Gio.MenuItem()
-        unicode.set_label("Convert to Unicode")
-        unicode.set_action_and_target_value("app.to_unicode", None)
+        menu_convert = Gio.Menu()
+        menu_convert.append_item(protect)
+        menu_convert.append_item(unicode)
+        menu_convert.append_item(latex)
 
-        latex = Gio.MenuItem()
-        latex.set_label("Convert to LaTeX")
-        latex.set_action_and_target_value("app.to_latex", None)
-
-        hyphen = Gio.MenuItem()
-        hyphen.set_label("Sanitize ranges")
-        hyphen.set_action_and_target_value("app.on_sanitize_range", None)
-
-        key = Gio.MenuItem()
-        key.set_label("Generate key")
-        key.set_action_and_target_value("app.generate_key", None)
-
-        customize_menu = Gio.Menu()
-        customize_menu.append_item(capitalize)
-        customize_menu.append_item(protect)
-        customize_menu.append_item(unicode)
-        customize_menu.append_item(latex)
+        menu_customize = Gio.Menu()
+        menu_customize.append_section(None, menu_case)
+        menu_customize.append_section(None, menu_convert)
 
         customize_section = Gio.Menu()
-        customize_section.append_submenu("Customize", customize_menu)
+        customize_section.append_submenu("Customize", menu_customize)
 
         if field == "pages":
             customize_section.append_item(hyphen)
@@ -95,6 +88,13 @@ class FormMenu(Gio.Menu):
             customize_section.append_item(key)
 
         self.prepend_section(None, customize_section)
+
+    @staticmethod
+    def create_item(label, action):
+        item = Gio.MenuItem()
+        item.set_label(label)
+        item.set_action_and_target_value(f"app.{action}", None)
+        return item
 
 
 class MultiLine(GtkSource.View):
@@ -112,7 +112,7 @@ class MultiLine(GtkSource.View):
         self.set_monospace(True)
 
         self.set_color_scheme()
-        self.set_extra_menu(FormMenu(field))
+        self.set_extra_menu(FormMenu(self))
 
         self.get_buffer().set_enable_undo(False)
 
@@ -135,8 +135,10 @@ class MultiLine(GtkSource.View):
 
         textbuffer = self.get_buffer()
         bounds = textbuffer.get_selection_bounds()
+        selected = True
         if not bounds:
-            return
+            bounds = (textbuffer.get_start_iter(), textbuffer.get_end_iter())
+            selected = False
 
         selection = textbuffer.get_text(*bounds, True)
         new_selection = func(selection, bibstrings, n)
@@ -145,7 +147,7 @@ class MultiLine(GtkSource.View):
             selection_offset = bounds[0].get_offset()
             textbuffer.delete(*bounds)
             textbuffer.insert(bounds[0], new_selection, -1)
-            if len(new_selection) == len(selection):
+            if selected and len(new_selection) == len(selection):
                 start = textbuffer.get_iter_at_offset(selection_offset)
                 end = textbuffer.get_iter_at_mark(textbuffer.get_insert())
                 textbuffer.select_range(start, end)
@@ -233,7 +235,7 @@ class SingleLine(Gtk.Entry):
         self.set_hexpand(True)
         self.set_enable_undo(False)
 
-        self.set_extra_menu(FormMenu(field))
+        self.set_extra_menu(FormMenu(self))
 
         self.event_controller_focus = Gtk.EventControllerFocus()
         self.add_controller(self.event_controller_focus)

@@ -27,7 +27,7 @@ from .config_manager import get_color_scheme
 from .customization import title_case
 from .customization import upper_case
 from .customization import lower_case
-from .customization import protect
+from .customization import protect_caps
 from .customization import convert_to_unicode
 from .customization import convert_to_latex
 from .customization import correct_hyphen
@@ -118,6 +118,9 @@ class Application(Adw.Application):
             ("prev_tab",        None,                   self.on_prev_tab,       "<Control><Shift>Tab"),
             ("update_bibtex",   None,                   self.on_update_bibtex,  "<Control>Return"),
             ("change_case",     None,                   self.on_change_case,    "<Alt>c"),
+            ("title_case",      None,                   self.on_title_case,     None),
+            ("upper_case",      None,                   self.on_upper_case,     None),
+            ("lower_case",      None,                   self.on_lower_case,     None),
             ("protect_caps",    None,                   self.on_protect_caps,   "<Alt>p"),
             ("sanitize_range",  None,                   self.on_sanitize_range, "<Alt>h"),
             ("to_unicode",      None,                   self.on_to_unicode,     "<Alt>o"),
@@ -265,6 +268,13 @@ class Application(Adw.Application):
         editor = self.window.main_widget.get_current_editor()
         return editor.current_form, True
 
+    def apply_customization(self, customization, n=None):
+        form, grab_focus = self.get_active_form()
+        if form:
+            form.apply(customization, n)
+            if grab_focus:
+                form.grab_focus()
+
     def on_update_bibtex(self, action=None, data=None):
         self.window.main_widget.update_bibtex()
 
@@ -283,33 +293,26 @@ class Application(Adw.Application):
             form.change_case_counter += 1
             form.change_case_counter %= 3
 
+    def on_title_case(self, action=None, data=None):
+        self.apply_customization(title_case)
+
+    def on_upper_case(self, action=None, data=None):
+        self.apply_customization(upper_case)
+
+    def on_lower_case(self, action=None, data=None):
+        self.apply_customization(lower_case)
+
     def on_protect_caps(self, action=None, data=None):
-        form, grab_focus = self.get_active_form()
-        if form:
-            form.apply(protect)
-            if grab_focus:
-                form.grab_focus()
+        self.apply_customization(protect_caps)
 
     def on_sanitize_range(self, action=None, data=None):
-        form, grab_focus = self.get_active_form()
-        if form:
-            form.apply(correct_hyphen)
-            if grab_focus:
-                form.grab_focus()
+        self.apply_customization(correct_hyphen)
 
     def on_to_unicode(self, action=None, data=None):
-        form, grab_focus = self.get_active_form()
-        if form:
-            form.apply(convert_to_unicode)
-            if grab_focus:
-                form.grab_focus()
+        self.apply_customization(convert_to_unicode)
 
     def on_to_latex(self, action=None, data=None):
-        form, grab_focus = self.get_active_form()
-        if form:
-            form.apply(convert_to_latex)
-            if grab_focus:
-                form.grab_focus()
+        self.apply_customization(convert_to_latex)
 
     def on_generate_key(self, action=None, data=None):
         self.window.main_widget.generate_key()

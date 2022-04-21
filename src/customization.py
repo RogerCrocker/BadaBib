@@ -130,7 +130,7 @@ def lower_case(value, bibstrings, n=0):
     return " ".join(lower_case_word(word, bibstrings, n) for word in words)
 
 
-def protect(string, bibstrings, n=0):
+def protect_caps(string, bibstrings, n=0):
     if not string:
         return None
 

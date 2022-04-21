@@ -289,10 +289,6 @@ class MainWidget(Gtk.Paned):
             return None
         itemlist = page.itemlist
 
-        # work around new row being selected on tab change
-        itemlist.grab_focus()
-        itemlist.get_parent().get_parent().get_hadjustment().set_value(0)
-
         # work around notebook switching to page when closing it
         if notebook.current_page is not None:
             notebook.previous_page = notebook.current_page

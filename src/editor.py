@@ -134,6 +134,8 @@ class Editor(Gtk.ScrolledWindow):
         for form in self.forms.values():
             if form != current_form:
                 form.deselect()
+        return False
 
     def on_leave(self, _event_controller_focus, current_form):
         self.current_form = None
+        return False

@@ -468,7 +468,7 @@ class SourceView(Gtk.Box):
         self.append(self.online_bar)
         self.append(self.offline_bar)
 
-        self.highlight_syntax(get_highlight_syntax())
+        self.highlight_syntax()
 
         if get_parse_on_fly():
             self.set_mode("online")
@@ -575,8 +575,8 @@ class SourceView(Gtk.Box):
                 self.offline_message.set_text("")
                 self.apply_button.set_sensitive(False)
 
-    def highlight_syntax(self, state):
-        if state:
+    def highlight_syntax(self):
+        if get_highlight_syntax():
             manager = GtkSource.LanguageManager.get_default()
             language = manager.get_language('bibtex')
             self.buffer.set_language(language)

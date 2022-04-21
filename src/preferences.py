@@ -22,6 +22,8 @@ from .config_manager import get_align_fields
 from .config_manager import set_align_fields
 from .config_manager import get_field_indent
 from .config_manager import set_field_indent
+from .config_manager import get_highlight_syntax
+from .config_manager import set_highlight_syntax
 from .config_manager import get_parse_on_fly
 from .config_manager import set_parse_on_fly
 from .config_manager import get_create_backup
@@ -109,7 +111,7 @@ class PreferencesWindow(Adw.PreferencesWindow):
         title = "Align Fields"
         subtitle = """Align fields along the "=" sign."""
         getter = get_align_fields
-        callback = self.on_theme_changed
+        callback = self.on_align_changed
         align_row = self.assemble_action_row(title, subtitle, getter, callback)
 
         title = "Parse BibTeX code on the fly"
@@ -118,12 +120,19 @@ class PreferencesWindow(Adw.PreferencesWindow):
         callback = self.on_parse_changed
         parse_row = self.assemble_action_row(title, subtitle, getter, callback)
 
+        title = "Highlight Syntax"
+        subtitle = "Use syntax highlighting for BibTeX entries."
+        getter = get_highlight_syntax
+        callback = self.on_syntax_changed
+        syntax_row = self.assemble_action_row(title, subtitle, getter, callback)
+
         indent_row = self.assemble_indent_row()
 
         group = Adw.PreferencesGroup.new()
         group.set_title("BibTeX Source")
         group.add(align_row)
         group.add(parse_row)
+        group.add(syntax_row)
         group.add(indent_row)
 
         return group
@@ -154,6 +163,10 @@ class PreferencesWindow(Adw.PreferencesWindow):
     def on_align_changed(self, _switch, state):
         set_align_fields(state)
         self.update_writer()
+
+    def on_syntax_changed(self, _switch, state):
+        set_highlight_syntax(state)
+        self.main_window.main_widget.source_view.highlight_syntax()
 
     def on_indent_changed(self, spin_button):
         set_field_indent(spin_button.get_value())

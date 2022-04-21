@@ -14,9 +14,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-import gi
-gi.require_version("Gtk", "4.0")
-
 from platform import python_version
 
 from gi.repository import Gtk, Gio, GLib

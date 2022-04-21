@@ -27,7 +27,7 @@ configure_file(
 
 badabib_sources = [
   '__init__.py',
-  'main.py',
+  'application.py',
   'window.py',
   'customization.py',
   'bibitem.py',

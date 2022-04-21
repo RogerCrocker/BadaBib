@@ -288,6 +288,7 @@ class MainWidget(Gtk.Paned):
             self.get_current_editor().clear()
             return None
         itemlist = page.itemlist
+        itemlist.grab_focus()
 
         # work around notebook switching to page when closing it
         if notebook.current_page is not None:

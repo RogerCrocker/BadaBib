@@ -59,8 +59,7 @@ class Change:
             self.update_display(redo)
 
         def revert(self):
-            if self.form:
-                self.form.grab_focus()
+            self.form.grab_focus()
             self.item.update_field(self.form.field, self.old_value, True)
             self.update_display(redo=True)
 

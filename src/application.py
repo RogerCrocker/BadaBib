@@ -42,6 +42,7 @@ from .preferences import PreferencesWindow
 
 from .dialogs import AboutDialog
 
+from .forms import SingleLine
 from .forms import MultiLine
 from .forms import SourceView
 
@@ -248,10 +249,13 @@ class Application(Adw.Application):
         # Check if action is invoked via shortcut
         # Do not grab focus in this case
         widget = self.window.get_focus()
-
-        # single line entry
         if isinstance(widget, Gtk.Text):
-            return widget.get_parent(), False
+            form = widget.get_parent()
+            # single line entry
+            if isinstance(form, SingleLine):
+                return form, False
+            # combo box entry
+            return None, False
         # multiline entry
         elif isinstance(widget, MultiLine):
             return widget, False

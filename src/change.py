@@ -53,10 +53,14 @@ class Change:
             self.new_value = new_value
 
         def apply(self, redo=False):
+            if redo:
+                self.form.grab_focus()
             self.item.update_field(self.form.field, self.new_value, True)
             self.update_display(redo)
 
         def revert(self):
+            if self.form:
+                self.form.grab_focus()
             self.item.update_field(self.form.field, self.old_value, True)
             self.update_display(redo=True)
 

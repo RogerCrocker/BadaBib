@@ -503,16 +503,14 @@ class Itemlist(Gtk.ListBox):
         return [row.item for row in self.get_selected_rows()]
 
     def refresh(self):
-        current_rows = self.get_selected_rows()
-        row = self.get_row_at_index(0)
-        while row:
+        index = 0
+        while True:
+            row = self.get_row_at_index(index)
+            if not row:
+                break
             row.item.refresh()
             row.update()
-            row = self.get_next_row(row, 1)
-
-        self.unselect_all()
-        for row in current_rows:
-            self.select_row(row)
+            index += 1
 
     def clear(self):
         self.foreach(lambda row, data : self.remove(row), None)

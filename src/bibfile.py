@@ -36,7 +36,7 @@ class BadaBibFile:
         self.store = store
         self.name = name
         self.short_name = None
-        self.head, self.tail = split(name)
+        self.base_name = split(name)[1]
         self.database = database
         self.local_strings = {}
         self.writer = store.get_default_writer()
@@ -79,7 +79,7 @@ class BadaBibFile:
 
     def update_filename(self, name):
         self.name = name
-        self.head, self.tail = split(name)
+        self.base_name = split(name)[1]
         if self.itemlist:
             self.itemlist.update_filename()
 

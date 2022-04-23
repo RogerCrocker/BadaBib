@@ -482,11 +482,11 @@ class StringManagerWindow(Gtk.Window):
 
             # file does not exist or cannot be read
             if status in ("file_error", "parse_error"):
-                messages.append("Cannot read file '{}'.".format(filename))
+                messages.append(f"Cannot read file '{filename}'.")
 
             # file is empty
             elif status == "empty":
-                messages.append("File '{}' does not contain string definitions.".format(filename))
+                messages.append(f"File '{filename}' does not contain string definitions.")
 
             elif status == "success":
                 if filename in [row.filename for row in self.import_list]:

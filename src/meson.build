@@ -46,6 +46,7 @@ badabib_sources = [
   'session_manager.py',
   'preferences.py',
   'watcher.py',
+  'menus.py',
 ]
 
 install_data(badabib_sources, install_dir: moduledir)

@@ -95,10 +95,10 @@ class SessionManager:
         statuses = [self.main_widget.store.import_strings(filename) for filename in string_imports]
         for filename, status in zip(string_imports, statuses):
             if status in ("file_error", "parse_error"):
-                message = "Importing strings failed: Cannot read file '{}'.".format(filename)
+                message = f"Importing strings failed: Cannot read file '{filename}'."
                 WarningDialog(message, window=self.main_widget.get_root())
             elif status == "empty":
-                message = "Importing strings failed: File '{}' does not contain string definitions.".format(filename)
+                message = f"Importing strings failed: File '{filename}' does not contain string definitions."
                 WarningDialog(message, window=self.main_widget.get_root())
 
     def save_string_imports(self):

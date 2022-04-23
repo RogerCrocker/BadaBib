@@ -38,9 +38,10 @@ from .itemlist import Itemlist
 from .itemlist import ItemlistNotebook
 from .itemlist import ItemlistToolbar
 
-from .dialogs import FilterPopover
-from .dialogs import SortPopover
-from .dialogs import SaveChanges
+from .menus import FilterPopover
+from .menus import SortPopover
+
+from .dialogs import SaveChangesDialog
 from .dialogs import SaveDialog
 from .dialogs import ConfirmSaveDialog
 
@@ -446,7 +447,7 @@ class MainWidget(Gtk.Paned):
         bibfile = bibfiles[n]
         if bibfile.unsaved and not force:
             self.notebook.set_current_page(bibfile.itemlist.page.number)
-            dialog = SaveChanges(self.get_root(), bibfile.name)
+            dialog = SaveChangesDialog(self.get_root(), bibfile.name)
             if n < len(bibfiles) - 1:
                 dialog.connect("response", self.close_files_dialog, bibfiles, n+1, force, close_app)
             else:
@@ -530,7 +531,7 @@ class MainWidget(Gtk.Paned):
             return None
 
         if not new_name:
-            dialog = SaveDialog(self.get_root(), bibfile.tail)
+            dialog = SaveDialog(self.get_root(), bibfile.base_name)
             dialog.connect("response", self.save_file_as_finalize, bibfile, new_name, close_data)
             dialog.show()
         else:

@@ -14,9 +14,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-import gi
-gi.require_version("GtkSource", "5")
-
 from gi.repository import Gtk, Gio, GtkSource
 
 from .config_manager import get_color_scheme
@@ -25,6 +22,8 @@ from .config_manager import field_dict
 from .config_manager import month_dict
 from .config_manager import get_parse_on_fly
 from .config_manager import get_highlight_syntax
+
+from .menus import FormMenu
 
 
 has_entry = ["ENTRYTYPE", "month"]
@@ -50,51 +49,6 @@ def fields_to_forms(fields, editor):
             form = SingleLine(field, editor)
         forms.append(form)
     return forms
-
-
-class FormMenu(Gio.Menu):
-    def __init__(self, field):
-        super().__init__()
-
-        title_case = self.create_item("Title Case", "title_case")
-        upper_case = self.create_item("Upper Case", "upper_case")
-        lower_case = self.create_item("Lower Case", "lower_case")
-        protect = self.create_item("Protect Upper Case", "protect_caps")
-        unicode = self.create_item("Convert to Unicode", "to_unicode")
-        latex = self.create_item("Convert to LaTeX", "to_latex")
-        sanitize = self.create_item("Sanitize Ranges", "sanitize_range")
-        key = self.create_item("Generate Key", "generate_key")
-
-        menu_case = Gio.Menu()
-        menu_case.append_item(title_case)
-        menu_case.append_item(upper_case)
-        menu_case.append_item(lower_case)
-
-        menu_convert = Gio.Menu()
-        menu_convert.append_item(protect)
-        menu_convert.append_item(unicode)
-        menu_convert.append_item(latex)
-
-        menu_customize = Gio.Menu()
-        menu_customize.append_section(None, menu_case)
-        menu_customize.append_section(None, menu_convert)
-
-        customize_section = Gio.Menu()
-        customize_section.append_submenu("Customize", menu_customize)
-
-        if field == "pages":
-            customize_section.append_item(sanitize)
-        if field == "ID":
-            customize_section.append_item(key)
-
-        self.prepend_section(None, customize_section)
-
-    @staticmethod
-    def create_item(label, action):
-        item = Gio.MenuItem()
-        item.set_label(label)
-        item.set_action_and_target_value(f"app.{action}", None)
-        return item
 
 
 class MultiLine(GtkSource.View):

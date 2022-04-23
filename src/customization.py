@@ -164,7 +164,7 @@ def protect_caps(string, bibstrings, n=0):
     return protected
 
 
-def correct_hyphen(string, bibstrings, n=0):
+def sanitize_range(string, bibstrings, n=0):
     string_out = string
     for separator in SEPARATORS:
         if separator in string_out:

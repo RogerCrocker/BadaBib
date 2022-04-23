@@ -37,6 +37,8 @@ class PreferencesWindow(Adw.PreferencesWindow):
         super().__init__(title="Preferences")
         self.main_window = main_window
 
+        self.set_size_request(600, 650)
+
         page = Adw.PreferencesPage.new()
         page.set_title("Preferences")
 

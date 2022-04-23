@@ -20,8 +20,9 @@ from .config_manager import get_recent_files
 from .config_manager import set_recent_files
 
 from .dialogs import FileChooser
-from .dialogs import MenuPopover
-from .dialogs import RecentModel
+
+from .menus import RecentFilesMenu
+from .menus import MainMenu
 
 from .store import BadaBibStore
 
@@ -56,11 +57,11 @@ class BadaBibWindow(Adw.ApplicationWindow):
 
     def update_recent_file_menu(self):
         recent_files = get_recent_files()
-        self.open_button.set_menu_model(RecentModel(recent_files))
+        self.open_button.set_menu_model(RecentFilesMenu(recent_files))
 
     def clear_recent_file_menu(self):
         set_recent_files({})
-        self.open_button.set_menu_model(RecentModel({}))
+        self.open_button.set_menu_model(RecentFilesMenu({}))
 
     def assemble_header_bar(self):
         header_bar = Adw.HeaderBar()
@@ -85,7 +86,7 @@ class BadaBibWindow(Adw.ApplicationWindow):
 
         menu_button = Gtk.MenuButton()
         menu_button.set_icon_name("open-menu-symbolic")
-        menu_button.set_popover(MenuPopover())
+        menu_button.set_popover(MainMenu())
 
         save_button = Gtk.Button.new_from_icon_name("document-save-symbolic")
         save_button.set_tooltip_text("Save current file")
@@ -111,8 +112,10 @@ class BadaBibWindow(Adw.ApplicationWindow):
     def do_close_request(self, window=None):
         """invoked by window close button"""
         bibfiles = list(self.store.bibfiles.values())
-        self.main_widget.close_files(bibfiles, close_app=True)
-        return True
+        if bibfiles:
+            self.main_widget.close_files(bibfiles, close_app=True)
+            return True
+        return False
 
     def on_open(self, action=None, data=None):
         self.on_open_clicked()

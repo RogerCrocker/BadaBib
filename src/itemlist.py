@@ -25,6 +25,8 @@ from .config_manager import link_fields
 from .config_manager import get_row_indent
 from .config_manager import get_new_file_name
 
+from .dialogs import WarningDialog
+
 
 row_indent = get_row_indent() * " "
 
@@ -100,14 +102,14 @@ class TabHeader(Gtk.Box):
 
     def update(self, unsaved=False, name=None):
         if name:
-            tail = split(name)[1]
+            base_name = split(name)[1]
         elif self.page.itemlist:
             name = self.page.itemlist.bibfile.name
-            tail = self.page.itemlist.bibfile.tail
+            base_name = self.page.itemlist.bibfile.base_name
         if unsaved:
-            tail = "*" + tail
+            base_name = "*" + base_name
 
-        self.title_label.set_text(tail)
+        self.title_label.set_text(base_name)
         self.set_tooltip_text(name)
 
 
@@ -345,7 +347,7 @@ class Row(Gtk.ListBoxRow):
         label = row_indent
         if "ID" in self.item.entry:
             label += self.item.entry["ID"]
-        label = "<b>{}</b> ({})".format(label, self.item.pretty_field("ENTRYTYPE"))
+        label = f"""<b>{label}</b> ({self.item.pretty_field("ENTRYTYPE")})"""
         self.id_label.set_markup(label)
         self.changed()
 
@@ -356,7 +358,7 @@ class Row(Gtk.ListBoxRow):
         if "editor" in self.item.entry:
             if label != row_indent:
                 label += ", "
-            label += "Ed: {}".format(self.item.pretty_field("editor"))
+            label += f"""Ed: {self.item.pretty_field("editor")}"""
         self.author_label.set_markup(label)
         self.changed()
 
@@ -370,11 +372,11 @@ class Row(Gtk.ListBoxRow):
     def update_journal(self):
         label = row_indent
         if "journal" in self.item.entry:
-            label += "<i>{}</i>".format(self.item.pretty_field("journal"))
+            label += f"""<i>{self.item.pretty_field("journal")}</i>"""
         if "booktitle" in self.item.entry:
             if label != row_indent:
                 label += ", "
-            label += "<i>{}</i>".format(self.item.pretty_field("booktitle"))
+            label += f"""<i>{self.item.pretty_field("booktitle")}</i>"""
         self.journal_label.set_markup(label)
         self.changed()
 
@@ -578,9 +580,9 @@ class Itemlist(Gtk.ListBox):
         return True
 
     def state_to_string(self):
-        string = "{}|{}".format(self.sort_key, self.sort_reverse)
+        string = f"{self.sort_key}|{self.sort_reverse}"
         for value in self.fltr.values():
-            string += "|{}".format(value)
+            string += f"|{value}"
         return string
 
     def string_to_state(self, text):

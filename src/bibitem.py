@@ -141,24 +141,25 @@ class BadaBibItem:
         return max([len(field) for field in self.entry if field != "ENTRYTYPE"])
 
     def raw_field(self, field):
-        if field in self.entry:
-            if isinstance(self.entry[field], BibDataStringExpression):
-                return expression_to_string(self.entry[field])
-            return self.entry[field]
-        return None
+        if field not in self.entry:
+            return None
+
+        if isinstance(self.entry[field], BibDataStringExpression):
+            return expression_to_string(self.entry[field])
+        return self.entry[field]
 
     def pretty_field(self, field):
-        if field in self.entry:
-            value = expand(self.entry[field])
-            value = latex_to_unicode(value)
-            value = prettify_unicode_field(field, value)
-            return value
-        return None
+        if field not in self.entry:
+            return None
+
+        value = expand(self.entry[field])
+        value = latex_to_unicode(value)
+        value = prettify_unicode_field(field, value)
+        return value
 
     def bibstring_status(self, field):
         if field not in self.entry:
             return None
-
         n_strings = get_n_strings(self.entry[field])
         n_strings_raw = get_n_strings_raw(self.raw_field(field), self.bibfile.database.strings)
         if n_strings > 0:

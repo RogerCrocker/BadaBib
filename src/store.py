@@ -170,10 +170,10 @@ class BadaBibStore:
 
         return bibfile
 
-    def save_file(self, filename):
-        with open(filename, "w") as file:
+    def save_file(self, name):
+        with open(name, "w") as file:
             file.seek(0)
-            file.write(self.bibfiles[filename].to_text())
+            file.write(self.bibfiles[name].to_text())
             file.truncate()
 
     def remove_file(self, name):
@@ -206,21 +206,21 @@ class BadaBibStore:
         else:
             return "success"
 
-    def update_global_strings(self, file=None):
+    def update_global_strings(self, bibfile=None):
         global_strings = {}
         for strings in self.string_files.values():
             global_strings = {**strings, **global_strings}
         self.global_strings = global_strings
 
         # update files
-        if file:
-            files = [file]
+        if bibfile:
+            bibfiles = [bibfile]
         else:
-            files = self.bibfiles.values()
-        for f in files:
-            f.database.strings = {**self.global_strings, **f.local_strings}
+            bibfiles = self.bibfiles.values()
+        for file in bibfiles:
+            file.database.strings = {**self.global_strings, **file.local_strings}
 
-    def update_file_strings(self, filename, strings):
-        file = self.bibfiles[filename]
+    def update_file_strings(self, name, strings):
+        file = self.bibfiles[name]
         file.local_strings = strings
         file.database.strings = {**self.global_strings, **file.local_strings}

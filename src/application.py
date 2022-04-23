@@ -17,6 +17,7 @@
 import gi
 gi.require_version("Gtk", "4.0")
 gi.require_version("Adw", "1")
+gi.require_version("GtkSource", "5")
 
 from gi.repository import GLib, Gtk, Gio, Adw
 
@@ -30,7 +31,7 @@ from .customization import lower_case
 from .customization import protect_caps
 from .customization import convert_to_unicode
 from .customization import convert_to_latex
-from .customization import correct_hyphen
+from .customization import sanitize_range
 
 from .window import BadaBibWindow
 
@@ -310,7 +311,7 @@ class Application(Adw.Application):
         self.apply_customization(protect_caps)
 
     def on_sanitize_range(self, action=None, data=None):
-        self.apply_customization(correct_hyphen)
+        self.apply_customization(sanitize_range)
 
     def on_to_unicode(self, action=None, data=None):
         self.apply_customization(convert_to_unicode)

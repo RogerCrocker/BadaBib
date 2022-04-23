@@ -25,8 +25,6 @@ from .config_manager import link_fields
 from .config_manager import get_row_indent
 from .config_manager import get_new_file_name
 
-from .dialogs import WarningDialog
-
 
 row_indent = get_row_indent() * " "
 

@@ -14,7 +14,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-from gi.repository import Gtk, Gio, GtkSource
+from gi.repository import Gtk, GtkSource
 
 from .config_manager import get_color_scheme
 from .config_manager import entrytype_dict

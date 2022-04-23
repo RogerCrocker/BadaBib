@@ -16,7 +16,7 @@
 
 from platform import python_version
 
-from gi.repository import Gtk, Gio, GLib
+from gi.repository import Gtk
 
 
 def add_filters(dialog):

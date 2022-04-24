@@ -283,7 +283,9 @@ class ItemlistToolbar(Gtk.CenterBox):
         self.filter_button.set_margin_end(2)
         center_box.prepend(self.filter_button)
 
-        self.goto_button = Gtk.Button.new_from_icon_name("find-location-symbolic")
+        image = Gtk.Image.new_from_resource("/com/github/rogercrocker/badabib/icons/find-location-symbolic.svg")
+        self.goto_button = Gtk.Button()
+        self.goto_button.set_child(image)
         self.goto_button.set_tooltip_text("Go to selected entry")
         self.goto_button.set_margin_end(2)
         center_box.prepend(self.goto_button)

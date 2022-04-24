@@ -195,7 +195,7 @@ class StringRow(Gtk.ListBoxRow):
             self.value_entry.set_editable(False)
             self.value_entry.set_can_focus(False)
 
-        arrow_image = Gtk.Image.new_from_icon_name("media-playlist-consecutive-symbolic")
+        arrow_image = Gtk.Image.new_from_resource("/com/github/rogercrocker/badabib/icons/arrow1-right-symbolic.svg")
         arrow_image.set_margin_start(10)
         arrow_image.set_margin_end(10)
 

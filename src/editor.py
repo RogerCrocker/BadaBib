@@ -30,6 +30,7 @@ class Editor(Gtk.ScrolledWindow):
     def __init__(self, layout, entrytype=None):
         super().__init__()
         self.set_vexpand(True)
+        self.app = Gtk.Application.get_default()
 
         self.grid = Gtk.Grid()
         self.set_child(self.grid)
@@ -128,6 +129,7 @@ class Editor(Gtk.ScrolledWindow):
 
     def on_enter(self, _event_controller_focus, current_form):
         self.current_form = current_form
+        self.app.enable_menu_actions(current_form.get_text() != "")
         for form in self.forms.values():
             if form != current_form:
                 form.deselect()

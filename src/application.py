@@ -48,6 +48,16 @@ from .forms import MultiLine
 from .forms import SourceView
 
 
+menu_actions = [
+    "title_case",
+    "upper_case",
+    "lower_case",
+    "protect_caps",
+    "to_latex",
+    "to_unicode",
+    ]
+
+
 class Application(Adw.Application):
     def __init__(self, version):
         super().__init__(
@@ -56,7 +66,7 @@ class Application(Adw.Application):
             )
         self.window = None
         self.version = version
-        self.actions = {}
+        self.menu_actions_active = True
         self.arg_files = {}
 
         GLib.set_application_name("Bada Bib!")
@@ -139,12 +149,12 @@ class Application(Adw.Application):
             action.connect("activate", func)
             self.set_accels_for_action(f"app.{name}", [accel])
             self.add_action(action)
-            self.actions[name] = action
 
-        # disabled dummy action
-        dummy_action = Gio.SimpleAction.new("dummy", None)
-        dummy_action.set_enabled(False)
-        self.add_action(dummy_action)
+    def enable_menu_actions(self, state):
+        if self.menu_actions_active != state:
+            self.menu_actions_active = state
+            for name in menu_actions:
+                self.lookup_action(name).set_enabled(state)
 
     # Window
 

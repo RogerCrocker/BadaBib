@@ -35,21 +35,17 @@ class RecentFilesMenu(Gio.Menu):
         super().__init__()
 
         menu_section = Gio.Menu()
-        if not recent_files:
-            empty_item = create_menu_item("No recently opened files", "dummy")
-            menu_section.prepend_item(empty_item)
-        else:
-            short_names = get_shortest_unique_names(recent_files)
-            for file, label in short_names.items():
-                filename = GLib.Variant.new_string(file)
-                # gio.menu swallows underscores
-                menu_item = create_menu_item(label.replace("_", "__"), "open_file", filename)
-                menu_section.prepend_item(menu_item)
+        short_names = get_shortest_unique_names(recent_files)
+        for file, label in short_names.items():
+            filename = GLib.Variant.new_string(file)
+            # gio.menu swallows underscores
+            menu_item = create_menu_item(label.replace("_", "__"), "open_file", filename)
+            menu_section.prepend_item(menu_item)
 
-            menu_item = create_menu_item("Clear history", "clear_recent")
-            clear_section = Gio.Menu()
-            clear_section.prepend_item(menu_item)
-            self.append_section(None, clear_section)
+        menu_item = create_menu_item("Clear history", "clear_recent")
+        clear_section = Gio.Menu()
+        clear_section.prepend_item(menu_item)
+        self.append_section(None, clear_section)
 
         self.prepend_section(None, menu_section)
 

@@ -56,6 +56,7 @@ class Application(Adw.Application):
             )
         self.window = None
         self.version = version
+        self.actions = {}
         self.arg_files = {}
 
         GLib.set_application_name("Bada Bib!")
@@ -138,6 +139,7 @@ class Application(Adw.Application):
             action.connect("activate", func)
             self.set_accels_for_action(f"app.{name}", [accel])
             self.add_action(action)
+            self.actions[name] = action
 
         # disabled dummy action
         dummy_action = Gio.SimpleAction.new("dummy", None)

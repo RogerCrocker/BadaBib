@@ -123,9 +123,20 @@ class BadaBibStore:
                 except Exception:
                     return ["error", "parse_error"]
 
+            # initialize bibfile
+            status = []
+            bibfile = BadaBibFile(self, name, database)
+            self.bibfiles[name] = bibfile
+            self.update_global_strings(bibfile)
+            self.update_short_names()
+
+            # check if file contain bibtex entries
+            if len(bibfile.database.entries) == 0:
+                status.append("empty")
+
             # create backup, if desired
             backup = True
-            if get_create_backup():
+            if get_create_backup() and "empty" not in status:
                 if exists(name + ".bak"):
                     backup = backup_file(name + ".bak")
                 backup = backup and backup_file(name)
@@ -134,17 +145,9 @@ class BadaBibStore:
             while BACKUP_TAG in database.comments:
                 database.comments.remove(BACKUP_TAG)
 
-            # initialize bibfile
-            bibfile = BadaBibFile(self, name, database)
-            self.bibfiles[name] = bibfile
-            self.update_global_strings(bibfile)
-            self.update_short_names()
-
-            status = []
-            if not backup:
+            # check if backup was created
+            if not backup and "empty" not in status:
                 status.append("backup")
-            if len(bibfile.database.entries) == 0:
-                status.append("empty")
 
             return status
 

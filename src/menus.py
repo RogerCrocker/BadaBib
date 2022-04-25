@@ -42,7 +42,11 @@ class RecentFilesMenu(Gio.Menu):
             menu_item = create_menu_item(label.replace("_", "__"), "open_file", filename)
             menu_section.prepend_item(menu_item)
 
-        menu_item = create_menu_item("Clear history", "clear_recent")
+        if recent_files:
+            clear_label = "Clear History"
+        else:
+            clear_label = "No Recently Opened Files"
+        menu_item = create_menu_item(clear_label, "clear_recent")
         clear_section = Gio.Menu()
         clear_section.prepend_item(menu_item)
         self.append_section(None, clear_section)

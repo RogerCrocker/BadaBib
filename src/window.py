@@ -57,7 +57,7 @@ class BadaBibWindow(Adw.ApplicationWindow):
 
     def update_recent_file_menu(self):
         recent_files = get_recent_files()
-        self.app.lookup_action("clear_recent").set_enabled(False)
+        self.app.lookup_action("clear_recent").set_enabled(True)
         self.open_button.set_menu_model(RecentFilesMenu(recent_files))
 
     def clear_recent_file_menu(self):

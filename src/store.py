@@ -42,7 +42,7 @@ def has_backup_tag(filename):
         with open(filename, 'r') as file:
             tag = file.read(len(BACKUP_TAG))
         return tag == BACKUP_TAG
-    except Exception:
+    except OSError:
         return False
 
 
@@ -59,7 +59,7 @@ def backup_file(filename):
                 data = original.read()
             with open(backup, 'w') as modifed:
                 modifed.write(BACKUP_TAG + "\n\n" + data)
-    except Exception:
+    except OSError:
         return False
 
     return True
@@ -120,7 +120,7 @@ class BadaBibStore:
                 parser = self.get_default_parser()
                 try:
                     database = parser.parse_file(bibtex_file)
-                except Exception:
+                except UnicodeDecodeError:
                     return ["error", "parse_error"]
 
             # initialize bibfile
@@ -151,7 +151,7 @@ class BadaBibStore:
 
             return status
 
-        except FileNotFoundError:
+        except OSError:
             return ["error", "file_error"]
 
     def rename_file(self, old_name, new_name):
@@ -202,9 +202,9 @@ class BadaBibStore:
                         self.string_files[filename] = database.strings
                         self.update_global_strings()
                         return "success"
-                    except Exception:
+                    except UnicodeDecodeError:
                         return "parse_error"
-            except FileNotFoundError:
+            except OSError:
                 return "file_error"
         else:
             return "success"

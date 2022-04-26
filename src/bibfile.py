@@ -154,7 +154,7 @@ class BadaBibFile:
         strings_and_bibtex = writer._strings_to_bibtex(self.database) + bibtex
         try:
             test_database = parser.parse(strings_and_bibtex)
-        except Exception:
+        except UnicodeDecodeError:
             return None
 
         # we expect a database with a single entry

@@ -193,7 +193,7 @@ class MainWidget(Gtk.Paned):
             self.focus_on_current_item()
 
     def on_drop(self, _drop_target, file, _x, _y):
-        page = self.open_files(file.get_path())
+        self.open_files(file.get_path())
 
     # Item
 
@@ -330,7 +330,7 @@ class MainWidget(Gtk.Paned):
     # File watcher
 
     def add_watcher(self, filename):
-        sleep(0.1) # give file time to settle
+        sleep(0.1)  # give file time to settle
         self.watchers[filename] = Watcher(self, filename)
 
     def remove_watcher(self, filename):
@@ -576,4 +576,4 @@ class MainWidget(Gtk.Paned):
         bibfile.set_unsaved(False)
 
         if close_data is not None:
-            self.close_files_dialog(None, Gtk.ResponseType.CLOSE, *close_data)    
+            self.close_files_dialog(None, Gtk.ResponseType.CLOSE, *close_data)

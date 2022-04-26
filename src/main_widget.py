@@ -16,6 +16,8 @@
 
 from gi.repository import Gtk, Gdk, GLib, Gio
 
+from time import sleep
+
 from .config_manager import add_to_recent
 from .config_manager import remove_from_recent
 from .config_manager import get_editor_layout
@@ -191,8 +193,7 @@ class MainWidget(Gtk.Paned):
             self.focus_on_current_item()
 
     def on_drop(self, _drop_target, file, _x, _y):
-        page = self.open_file(file.get_path())
-        self.notebook.set_current_page(page.number)
+        page = self.open_files(file.get_path())
 
     # Item
 
@@ -280,8 +281,7 @@ class MainWidget(Gtk.Paned):
     def on_page_removed(self, notebook, page, page_num):
         if notebook.get_n_pages() == 0:
             self.new_file()
-        else:
-            self.notebook.update_pagenumbers(notebook, page, page_num)
+        self.notebook.update_pagenumbers(notebook, page, page_num)
 
     def on_switch_page(self, notebook, page, page_num):
         if page.itemlist is None:
@@ -330,6 +330,7 @@ class MainWidget(Gtk.Paned):
     # File watcher
 
     def add_watcher(self, filename):
+        sleep(0.1) # give file time to settle
         self.watchers[filename] = Watcher(self, filename)
 
     def remove_watcher(self, filename):
@@ -399,10 +400,9 @@ class MainWidget(Gtk.Paned):
                 bibfile = self.store.bibfiles[name]
                 itemlist = self.add_itemlist(bibfile, state)
                 page.add_itemlist(itemlist)
-                self.add_watcher(name)
-                for warning in ("empty", "backup"):
-                    if warning in status:
-                        getattr(page, f"{warning}_bar").reveal()
+                GLib.idle_add(self.add_watcher, name)
+                if "empty" in status:
+                    page.empty_bar.reveal()
 
         # open file in thread
         task = Gio.Task.new(None, None, on_file_parsed)
@@ -560,11 +560,20 @@ class MainWidget(Gtk.Paned):
             self.store.rename_file(bibfile.name, new_name)
 
         self.remove_watcher(bibfile.name)
-        self.store.save_file(new_name)
-        self.add_watcher(new_name)
+        errors = self.store.save_file(new_name)
 
+        if "save" in errors:
+            bibfile.created = True
+            bibfile.set_unsaved(True)
+            bibfile.itemlist.page.save_bar.reveal()
+            return None
+
+        if "backup" in errors:
+            bibfile.itemlist.page.backup_bar.reveal()
+
+        GLib.idle_add(self.add_watcher, new_name)
         bibfile.created = False
         bibfile.set_unsaved(False)
 
         if close_data is not None:
-            self.close_files_dialog(None, Gtk.ResponseType.CLOSE, *close_data)
+            self.close_files_dialog(None, Gtk.ResponseType.CLOSE, *close_data)    

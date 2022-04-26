@@ -47,6 +47,7 @@ class ItemlistNotebook(Gtk.Notebook):
         self.current_page = None
 
         self.connect("page-reordered", self.update_pagenumbers)
+        self.connect("page-added", self.update_pagenumbers)
 
     def add_itemlist_page(self, name, page_num=None):
         page = ItemlistPage(name)
@@ -121,6 +122,7 @@ class ItemlistPage(Gtk.Box):
         self.deleted_bar = ItemlistInfoBar("File was deleted, renamed or moved.\nYou are now editing an unsaved copy.")
         self.empty_bar = ItemlistInfoBar("File does not contain any BibTeX entries.")
         self.backup_bar = ItemlistInfoBar("<b>Bada Bib! was unable to create a backup file!</b>\nTry deleting or renaming any .bak-files that were not created by Bada Bib!")
+        self.save_bar = ItemlistInfoBar("<b>File could not be saved!</b>\nYou might not have write permissions for this file or folder.")
         self.changed_bar = ItemlistChangedBar()
         self.searchbar = ItemlistSearchBar()
 
@@ -145,6 +147,7 @@ class ItemlistPage(Gtk.Box):
         self.append(self.deleted_bar)
         self.append(self.empty_bar)
         self.append(self.backup_bar)
+        self.append(self.save_bar)
         self.append(self.changed_bar)
         self.append(scrolled_window)
         self.append(self.searchbar)

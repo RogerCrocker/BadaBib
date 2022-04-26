@@ -44,6 +44,7 @@ class BadaBibFile:
         self.itemlist = None
         self.unsaved = False
         self.created = created
+        self.backup_on_save = True
 
         self.read_database()
 

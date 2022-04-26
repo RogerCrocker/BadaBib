@@ -46,19 +46,19 @@ def has_backup_tag(filename):
         return False
 
 
-def backup_file(filename):
-    backup = filename + ".bak"
+def backup_file(name):
+    backup = name + ".bak"
     if exists(backup) and not has_backup_tag(backup):
         return False
 
     try:
-        if has_backup_tag(filename):
-            copyfile(filename, backup)
+        if has_backup_tag(name):
+            copyfile(name, backup)
         else:
-            with open(filename, 'r') as original:
-                data = original.read()
-            with open(backup, 'w') as modifed:
-                modifed.write(BACKUP_TAG + "\n\n" + data)
+            with open(name, 'r') as infile, open(backup, 'w+') as outfile:
+                outfile.write(BACKUP_TAG + "\n\n")
+                for line in infile:
+                    outfile.write(line)
     except OSError:
         return False
 
@@ -124,32 +124,21 @@ class BadaBibStore:
                     return ["error", "parse_error"]
 
             # initialize bibfile
-            status = []
             bibfile = BadaBibFile(self, name, database)
             self.bibfiles[name] = bibfile
             self.update_global_strings(bibfile)
             self.update_short_names()
 
-            # check if file contain bibtex entries
-            if len(bibfile.database.entries) == 0:
-                status.append("empty")
-
-            # create backup, if desired
-            backup = True
-            if get_create_backup() and "empty" not in status:
-                if exists(name + ".bak"):
-                    backup = backup_file(name + ".bak")
-                backup = backup and backup_file(name)
-
             # remove backup tags, if present
             while BACKUP_TAG in database.comments:
                 database.comments.remove(BACKUP_TAG)
 
-            # check if backup was created
-            if not backup and "empty" not in status:
-                status.append("backup")
+            # check if file contain bibtex entries
+            if len(bibfile.database.entries) == 0:
+                bibfile.backup_on_save = False
+                return ["empty"]
 
-            return status
+            return []
 
         except OSError:
             return ["error", "file_error"]
@@ -174,13 +163,34 @@ class BadaBibStore:
         return bibfile
 
     def save_file(self, name):
-        with open(name, "w") as file:
-            file.seek(0)
-            file.write(self.bibfiles[name].to_text())
-            file.truncate()
+        bibfile = self.bibfiles[name]
+        errors = []
+
+        # create backup, if desired
+        backup = True
+        if get_create_backup() and bibfile.backup_on_save:
+            bibfile.backup_on_save = False
+            if exists(name + ".bak"):
+                backup = backup_file(name + ".bak")
+            backup = backup and backup_file(name)
+
+        if not backup:
+            errors.append("backup")
+
+        try:
+            with open(name, "w") as file:
+                file.seek(0)
+                file.write(bibfile.to_text())
+                file.truncate()
+        except OSError:
+            errors.append("save")
+
+        return errors
 
     def remove_file(self, name):
-        return self.bibfiles.pop(name)
+        if name in self.bibfiles:
+            return self.bibfiles.pop(name)
+        return None
 
     def get_state_strings(self):
         return [file.itemlist.state_to_string() for file in self.bibfiles.values()]

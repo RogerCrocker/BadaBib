@@ -269,8 +269,9 @@ class Application(Adw.Application):
                 return form, False
             # combo box entry
             return None, False
+
         # multiline entry
-        elif isinstance(widget, MultiLine):
+        if isinstance(widget, MultiLine):
             return widget, False
 
         # Otherwise action was invoked using a right-click menu

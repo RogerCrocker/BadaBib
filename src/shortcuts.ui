@@ -109,7 +109,7 @@
             <property name="title" translatable="yes" context="Shortcut window description">Fields</property>
             <child>
               <object class="GtkShortcutsShortcut">
-                <property name="title" translatable="yes" context="Shortcut window description">Cycle Through Titel/Upper/Lower Case</property>
+                <property name="title" translatable="yes" context="Shortcut window description">Cycle Through Title/Upper/Lower Case</property>
                 <property name="accelerator">&lt;Alt&gt;C</property>
               </object>
             </child>

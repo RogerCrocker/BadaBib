@@ -286,7 +286,7 @@ class Application(Adw.Application):
         editor = self.window.main_widget.get_current_editor()
         return editor.current_form, True
 
-    def apply_customization(self, customization, n=None):
+    def apply_customization(self, customization, n=0):
         form, grab_focus = self.get_active_form()
         if form:
             form.apply(customization, n)

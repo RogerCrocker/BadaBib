@@ -90,7 +90,7 @@ def title_case_word(word, bibstrings, n=0):
     Parts = []
     for part in parts:
         if part and part[0] != "{":
-            Parts.append(part[0].upper() + part[1:])
+            Parts.append(part[0].upper() + part[1:].lower())
         else:
             Parts.append(part)
 

@@ -39,6 +39,23 @@
     </provides>
 
     <releases>
+      <release version="0.7.0" date="2022-04-27">
+            <description>
+              <p>Bada Bib! now uses libadwaita, giving it a more modern appearance that better itegrates with the GNOME desktop. Other new features include:</p>
+                <ul>
+                  <li>Optional dark mode</li>
+                  <li>Line numbers and syntax highlighting for BibTeX source code</li>
+                  <li>Easier switching between title/upper/lower case</li>
+                  <li>Nicer preferences window</li>
+                </ul>
+                <p>Bug fixes:</p>
+                <ul>
+                  <li>String imports no longer hang if an open file contains multiple identical entries</li>
+                  <li>Hopefully fixed a bug where files asked to be reloaded when saving</li>
+                  <li>No longer create backups for unchanged files</li>
+                </ul>
+            </description>
+      </release>
       <release version="0.6.2" date="2022-04-18">
             <description>
               <p>Bug fixes:</p>

@@ -119,6 +119,9 @@ class ItemlistPage(Gtk.Box):
         self.number = -1
         self.header = TabHeader(self, name=name)
 
+        self.center_box = Gtk.CenterBox(orientation=Gtk.Orientation.VERTICAL)
+        self.center_box.set_vexpand(True)
+
         self.deleted_bar = ItemlistInfoBar("File was deleted, renamed or moved.\nYou are now editing an unsaved copy.")
         self.empty_bar = ItemlistInfoBar("File does not contain any BibTeX entries.")
         self.backup_bar = ItemlistInfoBar("<b>Bada Bib! was unable to create a backup file!</b>\nTry deleting or renaming any .bak-files that were not created by Bada Bib!")
@@ -129,11 +132,7 @@ class ItemlistPage(Gtk.Box):
         self.set_vexpand(True)
         self.set_hexpand(True)
 
-        self.loading_image = Gtk.Image.new_from_icon_name("preferences-system-time-symbolic")
-        self.loading_image.set_pixel_size(100)
-        self.loading_image.set_vexpand(True)
-
-        self.append(self.loading_image)
+        self.show_loading_screen()
 
     def add_itemlist(self, itemlist):
         self.itemlist = itemlist
@@ -152,7 +151,23 @@ class ItemlistPage(Gtk.Box):
         self.append(scrolled_window)
         self.append(self.searchbar)
 
-        self.remove(self.loading_image)
+        self.remove(self.center_box)
+
+    def show_loading_screen(self):
+        loading_image = Gtk.Image.new_from_icon_name("preferences-system-time-symbolic")
+        loading_image.set_pixel_size(100)
+
+        loading_label = Gtk.Label()
+        loading_label.set_margin_top(10)
+        loading_label.set_markup("<big>Loading...</big>")
+        loading_label.set_justify(Gtk.Justification.CENTER)
+
+        loading_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
+        loading_box.append(loading_image)
+        loading_box.append(loading_label)
+
+        self.center_box.set_center_widget(loading_box)
+        self.append(self.center_box)
 
     def show_error_screen(self, status):
         if "file_error" in status:
@@ -174,12 +189,7 @@ class ItemlistPage(Gtk.Box):
         error_box.append(error_image)
         error_box.append(error_label)
 
-        center_box = Gtk.CenterBox(orientation=Gtk.Orientation.VERTICAL)
-        center_box.set_center_widget(error_box)
-        center_box.set_vexpand(True)
-
-        self.append(center_box)
-        self.remove(self.loading_image)
+        self.center_box.set_center_widget(error_box)
 
 
 class ItemlistInfoBar(Gtk.InfoBar):

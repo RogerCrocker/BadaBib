@@ -121,6 +121,7 @@ class ItemlistPage(Gtk.Box):
     def __init__(self, name):
         super().__init__(orientation=Gtk.Orientation.VERTICAL)
         self.itemlist = None
+        self.scrolled_window = None
         self.number = -1
         self.header = TabHeader(self, name=name)
 
@@ -600,7 +601,6 @@ class Itemlist(Gtk.ListBox):
 
     def filter(self, row):
         search = self.search_string.lower()
-        selected = row.is_selected()
         item = row.item
 
         if item.deleted:

@@ -48,6 +48,15 @@ class BadaBibFile:
 
         self.read_database()
 
+    def unref(self):
+        for item in self.items:
+            item.unref()
+        self.itemlist.unref()
+        self.writer = None
+        self.database = None
+        self.local_strings = None
+        self.itemlist = None
+
     def read_database(self):
         """
         Convert entries of a database to BadaBibItems. This function should only

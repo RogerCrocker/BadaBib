@@ -148,6 +148,12 @@ class BadaBibItem:
             return expression_to_string(self.entry[field])
         return self.entry[field]
 
+    def unref(self):
+        self.bibfile = None
+        self.row = None
+        self.sort_values = None
+        self.bibtex = None
+
     def pretty_field(self, field):
         if field not in self.entry:
             return None

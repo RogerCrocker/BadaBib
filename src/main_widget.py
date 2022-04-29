@@ -474,8 +474,8 @@ class MainWidget(Gtk.Paned):
                 self.get_root().update_recent_file_menu()
 
             self.remove_watcher(bibfile.name)
-            self.store.remove_file(bibfile.name)
             self.notebook.remove_page(bibfile.itemlist.page.number)
+            self.store.remove_file(bibfile.name)
 
         if close_app:
             self.get_root().destroy()

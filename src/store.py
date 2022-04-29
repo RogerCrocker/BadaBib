@@ -189,8 +189,8 @@ class BadaBibStore:
 
     def remove_file(self, name):
         if name in self.bibfiles:
-            return self.bibfiles.pop(name)
-        return None
+            bibfile = self.bibfiles.pop(name)
+            bibfile.unref()
 
     def get_state_strings(self):
         return [file.itemlist.state_to_string() for file in self.bibfiles.values()]

@@ -99,6 +99,11 @@ class TabHeader(Gtk.Box):
 
         self.update(name=name)
 
+    def disassemble(self):
+        self.remove(self.title_label)
+        self.remove(self.close_button)
+        self.page = None
+
     def update(self, unsaved=False, name=None):
         if name:
             base_name = split(name)[1]
@@ -134,21 +139,33 @@ class ItemlistPage(Gtk.Box):
 
         self.show_loading_screen()
 
+    def disassemble(self):
+        self.header.disassemble()
+        self.remove(self.deleted_bar)
+        self.remove(self.empty_bar)
+        self.remove(self.backup_bar)
+        self.remove(self.save_bar)
+        self.remove(self.changed_bar)
+        self.remove(self.scrolled_window)
+        self.remove(self.searchbar)
+        self.itemlist = None
+        self.header = None
+
     def add_itemlist(self, itemlist):
         self.itemlist = itemlist
         self.itemlist.page = self
         self.searchbar.search_entry.connect("search_changed", self.itemlist.set_search_string)
 
-        scrolled_window = Gtk.ScrolledWindow()
-        scrolled_window.set_vexpand(True)
-        scrolled_window.set_child(itemlist)
+        self.scrolled_window = Gtk.ScrolledWindow()
+        self.scrolled_window.set_vexpand(True)
+        self.scrolled_window.set_child(itemlist)
 
         self.append(self.deleted_bar)
         self.append(self.empty_bar)
         self.append(self.backup_bar)
         self.append(self.save_bar)
         self.append(self.changed_bar)
-        self.append(scrolled_window)
+        self.append(self.scrolled_window)
         self.append(self.searchbar)
 
         self.remove(self.center_box)
@@ -323,19 +340,27 @@ class Row(Gtk.ListBoxRow):
         self.update()
 
     def assemble(self):
-        idbox = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
-        idbox.set_margin_top(5)
-        idbox.append(self.id_label)
-        idbox.append(self.link_image)
+        self.idbox = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
+        self.idbox.set_margin_top(5)
+        self.idbox.append(self.id_label)
+        self.idbox.append(self.link_image)
 
-        vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
-        vbox.append(idbox)
-        vbox.append(self.author_label)
-        vbox.append(self.title_label)
-        vbox.append(self.journal_label)
-        vbox.append(self.publisher_label)
+        self.vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
+        self.vbox.append(self.idbox)
+        self.vbox.append(self.author_label)
+        self.vbox.append(self.title_label)
+        self.vbox.append(self.journal_label)
+        self.vbox.append(self.publisher_label)
 
-        self.set_child(vbox)
+        self.set_child(self.vbox)
+
+    def disassemble(self):
+        self.vbox.remove(self.idbox)
+        self.vbox.remove(self.author_label)
+        self.vbox.remove(self.title_label)
+        self.vbox.remove(self.journal_label)
+        self.vbox.remove(self.publisher_label)
+        self.item = None
 
     def update(self):
         for field in ["ID", "author", "title", "journal", "publisher"]:
@@ -449,6 +474,18 @@ class Itemlist(Gtk.ListBox):
 
         self.add_rows(bibfile.items)
 
+    def unref(self):
+        self.page.disassemble()
+        while True:
+            row = self.get_row_at_index(0)
+            if not row:
+                break
+            row.disassemble()
+            self.remove(row)
+        self.page = None
+        self.bibfile = None
+        self.change_buffer = None
+
     def update_filename(self):
         self.page.header.update()
 
@@ -524,9 +561,6 @@ class Itemlist(Gtk.ListBox):
             row.item.refresh()
             row.update()
             index += 1
-
-    def clear(self):
-        self.foreach(lambda row, data : self.remove(row), None)
 
     def set_search_string(self, search_entry):
         self.search_string = search_entry.get_text()

@@ -436,7 +436,7 @@ class StringManagerWindow(Gtk.Window):
         file = self.store.bibfiles[filename]
 
         self.string_toolbar.apply_button.set_sensitive(False)
-        file.itemlist.set_unsaved(True)
+        file.set_unsaved(True)
         string_list = self.string_lists[filename]
         string_list.delete_empty_rows()
         string_dict, duplicates = string_list.to_dict()

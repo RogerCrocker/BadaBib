@@ -561,6 +561,8 @@ class Itemlist(Gtk.ListBox):
             row.item.refresh()
             row.update()
             index += 1
+        rows = self.get_selected_rows()
+        self.reselect_rows(rows)
 
     def set_search_string(self, search_entry):
         self.search_string = search_entry.get_text()

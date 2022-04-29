@@ -214,7 +214,8 @@ class FilterPopover(Gtk.Popover):
                     self.switches[-1].set_state(True)
                 self.track_changes = True
 
-            GLib.idle_add(self.itemlist.invalidate_filter)
+            self.itemlist.invalidate_filter()
+            self.itemlist.reselect_rows()
 
 
 class SortPopover(Gtk.Popover):
@@ -264,10 +265,10 @@ class SortPopover(Gtk.Popover):
         is_active = radio_button.get_active()
         if is_active and field != self.itemlist.sort_key:
             self.itemlist.sort_key = field
-            GLib.idle_add(self.itemlist.invalidate_sort)
+            self.itemlist.invalidate_sort()
 
     def on_order_clicked(self, radio_button, reverse):
         is_active = radio_button.get_active()
         if is_active and self.itemlist.sort_reverse != reverse:
             self.itemlist.sort_reverse = reverse
-            GLib.idle_add(self.itemlist.invalidate_sort)
+            self.itemlist.invalidate_sort()

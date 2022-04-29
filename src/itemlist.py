@@ -455,7 +455,7 @@ class Itemlist(Gtk.ListBox):
             self.string_to_state(state_string)
 
         self.set_sort_func(self.sort_by_field)
-        self.set_filter_func(self.filter_by_search)
+        self.set_filter_func(self.filter_and_unselect)
 
         self.set_show_separators(True)
 
@@ -511,7 +511,7 @@ class Itemlist(Gtk.ListBox):
         while row:
             index = row.get_index()
             row = self.get_row_at_index(index + increment)
-            if row and self.filter_by_search(row):
+            if row and self.filter(row):
                 return row
         return None
 
@@ -542,10 +542,13 @@ class Itemlist(Gtk.ListBox):
                 preceeding_rows += 1
             self.get_adjustment().set_value(preceeding_rows * ROW_HEIGHT)
 
-    def reselect_rows(self, rows, adj=None):
+    def reselect_rows(self, rows=None, adj=None):
+        if rows is None:
+            rows = self.get_selected_rows()
         self.unselect_all()
         for row in rows:
-            self.select_row(row)
+            if self.filter(row):
+                self.select_row(row)
         if adj is not None:
             self.get_adjustment().set_value(adj)
 
@@ -561,8 +564,7 @@ class Itemlist(Gtk.ListBox):
             row.item.refresh()
             row.update()
             index += 1
-        rows = self.get_selected_rows()
-        self.reselect_rows(rows)
+        self.reselect_rows()
 
     def set_search_string(self, search_entry):
         self.search_string = search_entry.get_text()
@@ -590,8 +592,15 @@ class Itemlist(Gtk.ListBox):
 
         return comp
 
-    def filter_by_search(self, row):
+    def filter_and_unselect(self, row):
+        visible = self.filter(row)
+        if row.is_selected() and not visible:
+            self.unselect_row(row)
+        return visible
+
+    def filter(self, row):
         search = self.search_string.lower()
+        selected = row.is_selected()
         item = row.item
 
         if item.deleted:

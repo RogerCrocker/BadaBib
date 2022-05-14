@@ -39,6 +39,16 @@
     </provides>
 
     <releases>
+      <release version="0.7.1" date="2022-05-14">
+            <description>
+              <p>Bug fixes:</p>
+                <ul>
+                  <li>Unselect filtered-out entries when filter changes</li>
+                  <li>Properly update editor when adding local strings</li>
+                  <li>Manually delete closed entry lists to reduce memory useage</li>
+                </ul>
+            </description>
+      </release>
       <release version="0.7.0" date="2022-04-27">
             <description>
               <p>Bada Bib! now uses libadwaita, giving it a more modern appearance that better itegrates with the GNOME desktop. Other new features include:</p>

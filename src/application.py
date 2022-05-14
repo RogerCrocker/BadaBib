@@ -72,11 +72,14 @@ class Application(Adw.Application):
         GLib.set_application_name("Bada Bib!")
         GLib.set_prgname('badabib')
 
+    def do_activate(self):
+        self.do_open([])
+
     def do_startup(self):
         Adw.Application.do_startup(self)
         self.install_actions()
 
-    def do_open(self, gfiles, _n_files, _hint):
+    def do_open(self, gfiles, _n_files=None, _hint=None):
         self.window = self.props.active_window
         if not self.window:
             self.arg_files = {file.get_path() : None for file in gfiles}

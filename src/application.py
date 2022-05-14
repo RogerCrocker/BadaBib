@@ -72,24 +72,19 @@ class Application(Adw.Application):
         GLib.set_application_name("Bada Bib!")
         GLib.set_prgname('badabib')
 
-    def do_activate(self):
-        self.window = self.props.active_window
-        if not self.window:
-            self.window = BadaBibWindow(application=self)
-        self.set_color_scheme()
-        self.window.present()
-
     def do_startup(self):
         Adw.Application.do_startup(self)
         self.install_actions()
-        self.connect("open", self.on_open_arg_files)
 
-    def on_open_arg_files(self, application, files, hint, _):
-        if not self.props.active_window:
-            self.arg_files = {file.get_path() : None for file in files}
-            self.do_activate()
+    def do_open(self, gfiles, _n_files, _hint):
+        self.window = self.props.active_window
+        if not self.window:
+            self.arg_files = {file.get_path() : None for file in gfiles}
+            self.window = BadaBibWindow(application=self)
+            self.set_color_scheme()
+            self.window.present()
         else:
-            self.window.main_widget.open_files([file.get_path() for file in files])
+            self.window.main_widget.open_files([file.get_path() for file in gfiles])
 
     def set_color_scheme(self):
         # set application wide scheme

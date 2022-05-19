@@ -18,10 +18,10 @@ Bada Bib! is a simple BibTeX Viewer and Editor written in Python and GTK. It is 
 
 ## Screenshots
 Main Window
-![Main window](/data/screenshots/editor.png)
+![Main window](/data/screenshots/gtk4/editor.png)
 
 String Manager
-![String Manager](/data/screenshots/string_manager.png)
+![String Manager](/data/screenshots/gtk4/string_manager.png)
 
 Icon by [svgrepo.com](https://www.svgrepo.com/)
 

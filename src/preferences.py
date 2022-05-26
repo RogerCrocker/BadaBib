@@ -16,8 +16,6 @@
 
 from gi.repository import Gtk, Adw
 
-from .config_manager import get_color_scheme
-from .config_manager import set_color_scheme
 from .config_manager import get_align_fields
 from .config_manager import set_align_fields
 from .config_manager import get_field_indent
@@ -85,7 +83,7 @@ class PreferencesWindow(Adw.PreferencesWindow):
     def get_group_general(self):
         title = "Dark Theme"
         subtitle = "Use dark Adaita color scheme."
-        getter = get_color_scheme
+        getter = lambda : Adw.StyleManager.get_default().get_property("dark")
         callback = self.on_theme_changed
         theme_row = self.assemble_action_row(title, subtitle, getter, callback)
 
@@ -148,11 +146,11 @@ class PreferencesWindow(Adw.PreferencesWindow):
             self.main_window.main_widget.source_view.update(item)
 
     def on_theme_changed(self, _switch, dark):
+        style_manager = Adw.StyleManager.get_default()
         if dark:
-            set_color_scheme(Adw.ColorScheme.PREFER_DARK)
+            style_manager.set_color_scheme(Adw.ColorScheme.PREFER_DARK)
         else:
-            set_color_scheme(Adw.ColorScheme.DEFAULT)
-        self.main_window.app.set_color_scheme()
+            style_manager.set_color_scheme(Adw.ColorScheme.PREFER_LIGHT)
 
     @staticmethod
     def on_backup_changed(_switch, state):

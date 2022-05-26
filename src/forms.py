@@ -14,9 +14,8 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-from gi.repository import Gtk, GtkSource
+from gi.repository import Gtk, Adw, GtkSource
 
-from .config_manager import get_color_scheme
 from .config_manager import entrytype_dict
 from .config_manager import field_dict
 from .config_manager import month_dict
@@ -129,12 +128,12 @@ class MultiLine(GtkSource.View):
 
     def set_color_scheme(self):
         manager = GtkSource.StyleSchemeManager().get_default()
+        dark = Adw.StyleManager.get_default().get_property("dark")
         scheme = None
-        adw_scheme = get_color_scheme()
-        if adw_scheme in (0, 1, 2):
-            scheme = manager.get_scheme("Adwaita")
-        elif adw_scheme in (3, 4):
+        if dark:
             scheme = manager.get_scheme("Adwaita-dark")
+        else:
+            scheme = manager.get_scheme("Adwaita")
 
         if scheme:
             self.get_buffer().set_style_scheme(scheme)

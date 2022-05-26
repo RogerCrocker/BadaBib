@@ -141,7 +141,7 @@ class Application(Adw.Application):
 
     # Theme
 
-    def on_color_scheme_changed(self, settings, gparam):
+    def on_color_scheme_changed(self, _settings, _gparam):
         """manually set scheme for Gtk.SourceViews"""
         self.window.main_widget.source_view.form.set_color_scheme()
         for editor in self.window.main_widget.editors.values():

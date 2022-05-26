@@ -83,9 +83,9 @@ class PreferencesWindow(Adw.PreferencesWindow):
     def get_group_general(self):
         title = "Dark Theme"
         subtitle = "Use dark Adaita color scheme."
-        getter = lambda : Adw.StyleManager.get_default().get_property("dark")
+        dark = Adw.StyleManager.get_default().get_property("dark")
         callback = self.on_theme_changed
-        theme_row = self.assemble_action_row(title, subtitle, getter, callback)
+        theme_row = self.assemble_action_row(title, subtitle, lambda : dark, callback)
 
         title = "Create Backups"
         subtitle = "Create backups when opening a file. Highly recommendend!"
@@ -145,12 +145,13 @@ class PreferencesWindow(Adw.PreferencesWindow):
             item.update_bibtex()
             self.main_window.main_widget.source_view.update(item)
 
-    def on_theme_changed(self, _switch, dark):
+    @staticmethod
+    def on_theme_changed(_switch, dark):
         style_manager = Adw.StyleManager.get_default()
         if dark:
-            style_manager.set_color_scheme(Adw.ColorScheme.PREFER_DARK)
+            style_manager.set_color_scheme(Adw.ColorScheme.FORCE_DARK)
         else:
-            style_manager.set_color_scheme(Adw.ColorScheme.PREFER_LIGHT)
+            style_manager.set_color_scheme(Adw.ColorScheme.FORCE_LIGHT)
 
     @staticmethod
     def on_backup_changed(_switch, state):

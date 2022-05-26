@@ -116,7 +116,7 @@ class PreferencesWindow(Adw.PreferencesWindow):
 
         title = "Parse BibTeX code on the fly"
         subtitle = "Disable if editing is sluggish, for example, if a file contains many strings."
-        stae = get_parse_on_fly()
+        state = get_parse_on_fly()
         callback = self.on_parse_changed
         parse_row = self.assemble_action_row(title, subtitle, state, callback)
 

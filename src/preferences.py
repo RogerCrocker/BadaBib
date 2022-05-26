@@ -48,14 +48,14 @@ class PreferencesWindow(Adw.PreferencesWindow):
         self.show()
 
     @staticmethod
-    def assemble_action_row(title, subtitle, getter, callback):
+    def assemble_action_row(title, subtitle, state, callback):
         row = Adw.ActionRow.new()
         row.set_title(title)
         if subtitle:
             row.set_subtitle(subtitle)
 
         switch = Gtk.Switch()
-        switch.set_active(getter())
+        switch.set_active(state)
         switch.set_valign(Gtk.Align.CENTER)
         switch.connect("state-set", callback)
 
@@ -83,21 +83,21 @@ class PreferencesWindow(Adw.PreferencesWindow):
     def get_group_general(self):
         title = "Dark Theme"
         subtitle = "Use dark Adaita color scheme."
-        dark = Adw.StyleManager.get_default().get_property("dark")
+        state = Adw.StyleManager.get_default().get_property("dark")
         callback = self.on_theme_changed
-        theme_row = self.assemble_action_row(title, subtitle, lambda : dark, callback)
+        theme_row = self.assemble_action_row(title, subtitle, state, callback)
 
         title = "Create Backups"
         subtitle = "Create backups when opening a file. Highly recommendend!"
-        getter = get_create_backup
+        state = get_create_backup()
         callback = self.on_backup_changed
-        backup_row = self.assemble_action_row(title, subtitle, getter, callback)
+        backup_row = self.assemble_action_row(title, subtitle, state, callback)
 
         title = "Remember Strings"
         subtitle = "Remember imported string definitions between session."
-        getter = get_remember_strings
+        state = get_remember_strings()
         callback = self.on_strings_changed
-        string_row = self.assemble_action_row(title, subtitle, getter, callback)
+        string_row = self.assemble_action_row(title, subtitle, state, callback)
 
         group = Adw.PreferencesGroup.new()
         group.set_title("General")
@@ -110,21 +110,21 @@ class PreferencesWindow(Adw.PreferencesWindow):
     def get_group_source(self):
         title = "Align Fields"
         subtitle = """Align fields along the "=" sign."""
-        getter = get_align_fields
+        state = get_align_fields()
         callback = self.on_align_changed
-        align_row = self.assemble_action_row(title, subtitle, getter, callback)
+        align_row = self.assemble_action_row(title, subtitle, state, callback)
 
         title = "Parse BibTeX code on the fly"
         subtitle = "Disable if editing is sluggish, for example, if a file contains many strings."
-        getter = get_parse_on_fly
+        stae = get_parse_on_fly()
         callback = self.on_parse_changed
-        parse_row = self.assemble_action_row(title, subtitle, getter, callback)
+        parse_row = self.assemble_action_row(title, subtitle, state, callback)
 
         title = "Highlight Syntax"
         subtitle = "Use syntax highlighting for BibTeX entries."
-        getter = get_highlight_syntax
+        state = get_highlight_syntax()
         callback = self.on_syntax_changed
-        syntax_row = self.assemble_action_row(title, subtitle, getter, callback)
+        syntax_row = self.assemble_action_row(title, subtitle, state, callback)
 
         indent_row = self.assemble_indent_row()
 

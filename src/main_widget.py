@@ -577,4 +577,3 @@ class MainWidget(Gtk.Paned):
 
         if close_data is not None:
             self.close_files_dialog(None, Gtk.ResponseType.CLOSE, *close_data)
-

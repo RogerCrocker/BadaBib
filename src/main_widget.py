@@ -241,7 +241,7 @@ class MainWidget(Gtk.Paned):
         # work around listbox scrolling horizontally on row changes
         itemlist.get_parent().get_parent().get_hadjustment().set_value(0)
         item = self.get_current_item(itemlist)
-        if item:
+        if item and item.bibfile:
             entrytype = item.entry["ENTRYTYPE"]
             self.show_editor(entrytype).show_item(item)
             self.source_view.set_status("valid")
@@ -577,3 +577,4 @@ class MainWidget(Gtk.Paned):
 
         if close_data is not None:
             self.close_files_dialog(None, Gtk.ResponseType.CLOSE, *close_data)
+

@@ -532,6 +532,9 @@ class Itemlist(Gtk.ListBox):
         return None
 
     def focus_on_selected_items(self, idx=None):
+        if self.bibfile is None:
+            return
+
         items = self.get_selected_items()
         if items:
             if idx is None:
@@ -544,6 +547,9 @@ class Itemlist(Gtk.ListBox):
             self.get_adjustment().set_value(preceeding_rows * ROW_HEIGHT)
 
     def reselect_rows(self, rows=None, adj=None):
+        if self.bibfile is None:
+            return
+
         if rows is None:
             rows = self.get_selected_rows()
         self.unselect_all()

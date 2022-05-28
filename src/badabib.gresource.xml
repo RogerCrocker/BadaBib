@@ -2,7 +2,7 @@
 <gresources>
   <gresource prefix="/com/github/rogercrocker/badabib">
     <file>shortcuts.ui</file>
-    <file>icons/arrow1-right-symbolic.svg</file>
-    <file>icons/find-location-symbolic.svg</file>
+    <file preprocess="xml-stripblanks">icons/scalable/actions/arrow1-right-symbolic.svg</file>
+    <file preprocess="xml-stripblanks">icons/scalable/actions/find-location-symbolic.svg</file>
   </gresource>
 </gresources>

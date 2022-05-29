@@ -39,6 +39,16 @@
     </provides>
 
     <releases>
+      <release version="0.7.2" date="2022-05-29">
+            <description>
+              <p>Bug fixes:</p>
+                <ul>
+                  <li>Update color scheme of BibTeX Source and Abstract field when style is changed from GNOME settings</li>
+                  <li>Make sure bundled icons adapt to color scheme</li>
+                  <li>Fix rare error when closing large files</li>
+                </ul>
+            </description>
+      </release>
       <release version="0.7.1" date="2022-05-14">
             <description>
               <p>Bug fixes:</p>

@@ -41,7 +41,7 @@
     <releases>
       <release version="0.8.0" date="2022-08-07">
             <description>
-              <p>Use ADW TabView instead of GTK Notebook. This makes for a more consitent appearance and fixes a couple of minor bugs.</p>
+              <p>Use ADW TabView instead of GTK Notebook. This makes for a more consistent look and fixes a couple of minor bugs.</p>
             </description>
       </release>
       <release version="0.7.2" date="2022-05-29">

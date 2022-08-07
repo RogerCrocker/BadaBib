@@ -265,7 +265,7 @@ class MainWidget(Gtk.Paned):
 
     # TabView
 
-    def on_tab_closed(self, tabview, tabview_page, data=None):
+    def on_tab_closed(self, tabview, tabview_page, _data=None):
         itemlist = tabview_page.get_child().itemlist
 
         # Close tab if it is empty
@@ -273,7 +273,7 @@ class MainWidget(Gtk.Paned):
             return False
 
         # Otherwise try closing the file
-        self.tabbox.tabview.close_page_finish(tabview_page, False)
+        tabview.close_page_finish(tabview_page, False)
         self.close_files(itemlist.bibfile)
         return True
 
@@ -331,7 +331,7 @@ class MainWidget(Gtk.Paned):
         bibfile = self.store.new_file()
         itemlist = self.new_itemlist(bibfile)
 
-        page = ItemlistPage(bibfile.name)
+        page = ItemlistPage()
         page.add_itemlist(itemlist)
 
         page.tabview_page = self.tabbox.tabview.append(page)
@@ -340,7 +340,7 @@ class MainWidget(Gtk.Paned):
 
         self.tabbox.tabview.set_selected_page(page.tabview_page)
 
-    def open_files(self, names, states=None, page_nums=None, open_tab=None):
+    def open_files(self, names, states=None, positions=None, open_tab=None):
         if not isinstance(names, list):
             names = [names]
 
@@ -349,28 +349,31 @@ class MainWidget(Gtk.Paned):
         elif not isinstance(states, list):
             states = [states]
 
-        if page_nums is None:
-            page_nums = len(names) * [None]
-        elif not isinstance(page_nums, list):
-            page_nums = [page_nums]
+        if positions is None:
+            positions = len(names) * [None]
+        elif not isinstance(positions, list):
+            positions = [positions]
 
         if open_tab is None:
             open_tab = names[0]
 
         empty_tabview_page = self.tabbox.contains_empty_file()
 
-        for name, state, page_num in zip(names, states, page_nums):
-            page = self.open_file(name, state, page_num)
+        for name, state, position in zip(names, states, positions):
+            page = self.open_file(name, state, position)
             if name == open_tab:
                 self.tabbox.tabview.set_selected_page(page.tabview_page)
 
         if empty_tabview_page is not None:
             self.tabbox.tabview.close_page(empty_tabview_page)
 
-    def open_file(self, name, state=None, page_num=None):
+    def open_file(self, name, state=None, position=None):
         # add page to TabView
-        page = ItemlistPage(name)
-        page.tabview_page = self.tabbox.tabview.append(page)
+        page = ItemlistPage()
+        if position is None:
+            page.tabview_page = self.tabbox.tabview.append(page)
+        else:
+            page.tabview_page = self.tabbox.tabview.insert(page, position)
         page.tabview_page.set_loading(True)
 
         def parse_file(task, _obj, _data, _cancellable):
@@ -409,10 +412,11 @@ class MainWidget(Gtk.Paned):
     def reload_file(self, bibfile):
         name = bibfile.name
         state = bibfile.itemlist.state_to_string()
-        page_num = bibfile.itemlist.page.number
+        tabview_page = bibfile.itemlist.page.tabview_page
+        position = self.tabbox.tabview.get_page_position(tabview_page)
 
         self.close_files(bibfile, force=True)
-        self.open_files(name, state, page_num, name)
+        self.open_files(name, state, position, name)
 
     def declare_file_created(self, name):
         self.store.bibfiles[name].created = True

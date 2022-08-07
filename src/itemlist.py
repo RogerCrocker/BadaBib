@@ -23,7 +23,6 @@ from .change import ChangeBuffer
 from .config_manager import entrytype_dict
 from .config_manager import link_fields
 from .config_manager import get_row_indent
-from .config_manager import get_new_file_name
 
 
 row_indent = get_row_indent() * " "
@@ -68,7 +67,7 @@ class ItemlistTabView(Gtk.Box):
 
 
 class ItemlistPage(Gtk.Box):
-    def __init__(self, name):
+    def __init__(self):
         super().__init__(orientation=Gtk.Orientation.VERTICAL)
         self.itemlist = None
         self.scrolled_window = None

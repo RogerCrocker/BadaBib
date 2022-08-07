@@ -202,12 +202,8 @@ class Application(Adw.Application):
         self.window.main_widget.save_all_files()
 
     def on_close(self, action=None, data=None):
-        page_num = self.window.main_widget.notebook.get_current_page()
-        page = self.window.main_widget.notebook.get_nth_page(page_num)
-        if page.itemlist:
-            self.window.main_widget.close_files(page.itemlist.bibfile)
-        else:
-            self.window.main_widget.notebook.remove_page(page_num)
+        tabview_page = self.window.main_widget.tabbox.tabview.get_selected_page()
+        self.window.main_widget.tabbox.tabview.close_page(tabview_page)
 
     def on_clear_recent(self, action=None, data=None):
         self.window.clear_recent_file_menu()
@@ -242,12 +238,10 @@ class Application(Adw.Application):
     # Notebook
 
     def on_next_tab(self, action=None, data=None):
-        self.window.main_widget.get_current_itemlist().grab_focus()
-        self.window.main_widget.notebook.next_page(1)
+        self.window.main_widget.tabbox.next_page(1)
 
     def on_prev_tab(self, action=None, data=None):
-        self.window.main_widget.get_current_itemlist().grab_focus()
-        self.window.main_widget.notebook.next_page(-1)
+        self.window.main_widget.tabbox.next_page(-1)
 
     # Customizations
 

@@ -150,11 +150,15 @@ class BadaBibStore:
         self.update_short_names()
 
     def new_file(self):
-        n = 1
         name = get_new_file_name()
+        basename = name.split(".")[0]
+
+        # Append unique number if file already exists
+        n = 1
         while name in self.bibfiles:
-            name = get_new_file_name().replace(".bib", " ") + str(n) + ".bib"
+            name = f"{basename} {n}.bib"
             n += 1
+
         database = BibDatabase()
         bibfile = BadaBibFile(self, name, database, created=True)
         self.bibfiles[name] = bibfile

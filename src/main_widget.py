@@ -18,6 +18,8 @@ from gi.repository import Gtk, Gdk, GLib, Gio
 
 from time import sleep
 
+from os.path import split
+
 from .config_manager import add_to_recent
 from .config_manager import remove_from_recent
 from .config_manager import get_editor_layout
@@ -37,7 +39,8 @@ from .editor import Editor
 from .watcher import Watcher
 
 from .itemlist import Itemlist
-from .itemlist import ItemlistNotebook
+from .itemlist import ItemlistPage
+from .itemlist import ItemlistTabView
 from .itemlist import ItemlistToolbar
 
 from .menus import FilterPopover
@@ -67,10 +70,10 @@ class MainWidget(Gtk.Paned):
         self.outer_stack.set_visible_child_name("editor")
 
     def assemble_left_pane(self):
-        # notebook to hold itemlists and toolbar
-        self.notebook = ItemlistNotebook()
-        self.notebook.connect("switch_page", self.on_switch_page)
-        self.notebook.connect("page_removed", self.on_page_removed)
+        # TabView to hold itemlists and toolbar
+        self.tabbox = ItemlistTabView()
+        self.tabbox.tabview.connect("close-page", self.on_tab_closed)
+        self.tabbox.tabview.connect("notify::selected-page", self.on_switch_page)
 
         # Toolbar
         self.toolbar = ItemlistToolbar()
@@ -81,9 +84,9 @@ class MainWidget(Gtk.Paned):
         self.toolbar.goto_button.connect("clicked", self.focus_on_current_item)
         self.toolbar.search_button.connect("clicked", self.search_itemlist)
 
-        # box notebook and toolbar
+        # box TabView and toolbar
         self.left_pane = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
-        self.left_pane.append(self.notebook)
+        self.left_pane.append(self.tabbox)
         self.left_pane.append(self.toolbar)
 
         self.set_start_child(self.left_pane)
@@ -157,7 +160,7 @@ class MainWidget(Gtk.Paned):
 
     # Itemlist
 
-    def add_itemlist(self, bibfile, state=None, change_buffer=None):
+    def new_itemlist(self, bibfile, state=None, change_buffer=None):
         itemlist = Itemlist(bibfile, state, change_buffer)
         itemlist.connect("selected-rows-changed", self.on_selected_rows_changed)
         itemlist.event_controller.connect("key-pressed", self.on_itemlist_key_pressed)
@@ -167,8 +170,8 @@ class MainWidget(Gtk.Paned):
         return itemlist
 
     def get_current_itemlist(self):
-        page_num = self.notebook.get_current_page()
-        return self.notebook.get_nth_page(page_num).itemlist
+        tabview_page = self.tabbox.tabview.get_selected_page()
+        return tabview_page.get_child().itemlist
 
     def sort_itemlist(self, button):
         itemlist = self.get_current_itemlist()
@@ -237,7 +240,6 @@ class MainWidget(Gtk.Paned):
             itemlist.focus_on_selected_items()
 
     def on_selected_rows_changed(self, itemlist):
-        itemlist.focus_idx = 0
         # work around listbox scrolling horizontally on row changes
         itemlist.get_parent().get_parent().get_hadjustment().set_value(0)
         item = self.get_current_item(itemlist)
@@ -261,49 +263,34 @@ class MainWidget(Gtk.Paned):
             change = Change.Edit(item, form, old_key, new_key)
             item.bibfile.itemlist.change_buffer.push_change(change)
 
-    # Notebook
+    # TabView
 
-    def on_tab_closed(self, header=None, action=None, data=None):
-        if header is None:
-            page_num = self.notebook.get_current_page()
-            page = self.notebook.get_nth_page(page_num)
-        else:
-            page = header.get_parent().page
-            # work around notebook selecting the closed page bug
-            if self.notebook.previous_page is not None:
-                self.notebook.set_current_page(self.notebook.previous_page)
+    def on_tab_closed(self, tabview, tabview_page, data=None):
+        itemlist = tabview_page.get_child().itemlist
 
-        if page.itemlist:
-            self.close_files(page.itemlist.bibfile)
-        else:
-            self.notebook.remove_page(page.number)
+        # Close tab if it is empty
+        if itemlist is None:
+            return False
 
-    def on_page_removed(self, notebook, page, page_num):
-        if notebook.get_n_pages() == 0:
+        # Otherwise try closing the file
+        self.tabbox.tabview.close_page_finish(tabview_page, False)
+        self.close_files(itemlist.bibfile)
+        return True
+
+    def on_switch_page(self, tabview, _gparam):
+        tabview_page = tabview.get_selected_page()
+        # Catch empty TabView
+        if tabview_page is None:
             self.new_file()
-        self.notebook.update_pagenumbers(notebook, page, page_num)
-
-    def on_switch_page(self, notebook, page, page_num):
-        if page.itemlist is None:
-            self.source_view.set_status("empty", True)
-            self.get_current_editor().clear()
-            return None
-        itemlist = page.itemlist
-        itemlist.grab_focus()
-
-        # work around notebook switching to page when closing it
-        if notebook.current_page is not None:
-            notebook.previous_page = notebook.current_page
-        notebook.current_page = itemlist.page.number
-
-        rows = itemlist.get_selected_rows()
-        if rows:
-            # work around ListBox not selecting multiple rows on page switch
-            GLib.idle_add(itemlist.reselect_rows, rows)
-            GLib.idle_add(itemlist.focus_on_selected_items, 0)
         else:
-            self.source_view.set_status("empty", True)
-            self.get_current_editor().clear()
+            itemlist = tabview_page.get_child().itemlist
+            # Page cotains itemlist
+            if itemlist:
+                self.on_selected_rows_changed(itemlist)
+            # Page is empty
+            else:
+                self.source_view.set_status("empty", True)
+                self.get_current_editor().clear()
 
     # Source view
 
@@ -342,12 +329,16 @@ class MainWidget(Gtk.Paned):
 
     def new_file(self):
         bibfile = self.store.new_file()
-        itemlist = self.add_itemlist(bibfile)
-        page = self.notebook.add_itemlist_page(bibfile.name)
-        page.header.close_button.connect("clicked", self.on_tab_closed)
+        itemlist = self.new_itemlist(bibfile)
+
+        page = ItemlistPage(bibfile.name)
         page.add_itemlist(itemlist)
 
-        self.notebook.set_current_page(itemlist.page.number)
+        page.tabview_page = self.tabbox.tabview.append(page)
+        page.tabview_page.set_title(split(bibfile.name)[1])
+        page.tabview_page.set_tooltip(bibfile.name)
+
+        self.tabbox.tabview.set_selected_page(page.tabview_page)
 
     def open_files(self, names, states=None, page_nums=None, open_tab=None):
         if not isinstance(names, list):
@@ -366,20 +357,21 @@ class MainWidget(Gtk.Paned):
         if open_tab is None:
             open_tab = names[0]
 
-        empty_file = self.notebook.contains_empty_new_file()
+        empty_tabview_page = self.tabbox.contains_empty_file()
 
         for name, state, page_num in zip(names, states, page_nums):
             page = self.open_file(name, state, page_num)
             if name == open_tab:
-                self.notebook.set_current_page(page.number)
+                self.tabbox.tabview.set_selected_page(page.tabview_page)
 
-        if empty_file:
-            self.close_files(empty_file, force=True)
+        if empty_tabview_page is not None:
+            self.tabbox.tabview.close_page(empty_tabview_page)
 
     def open_file(self, name, state=None, page_num=None):
-        # add loading page to notebook
-        page = self.notebook.add_itemlist_page(name, page_num)
-        page.header.close_button.connect("clicked", self.on_tab_closed)
+        # add page to TabView
+        page = ItemlistPage(name)
+        page.tabview_page = self.tabbox.tabview.append(page)
+        page.tabview_page.set_loading(True)
 
         def parse_file(task, _obj, _data, _cancellable):
             status = self.store.add_file(name)
@@ -390,15 +382,19 @@ class MainWidget(Gtk.Paned):
             if not success:
                 status = ["error"]
 
+            page.tabview_page.set_title(split(name)[1])
+            page.tabview_page.set_tooltip(name)
+            page.tabview_page.set_loading(False)
+
             if "error" in status:
                 page.show_error_screen(status)
                 remove_from_recent(name)
                 self.get_root().update_recent_file_menu()
             elif "file_open" in status:
-                self.notebook.remove_page(page.number)
+                self.tabbox.tabview.close_page(page.tabview_page)
             else:
                 bibfile = self.store.bibfiles[name]
-                itemlist = self.add_itemlist(bibfile, state)
+                itemlist = self.new_itemlist(bibfile, state)
                 page.add_itemlist(itemlist)
                 GLib.idle_add(self.add_watcher, name)
                 if "empty" in status:
@@ -446,7 +442,7 @@ class MainWidget(Gtk.Paned):
 
         bibfile = bibfiles[n]
         if bibfile.unsaved and not force:
-            self.notebook.set_current_page(bibfile.itemlist.page.number)
+            self.tabbox.tabview.set_selected_page(bibfile.itemlist.page.tabview_page)
             dialog = SaveChangesDialog(self.get_root(), bibfile.name)
             if n < len(bibfiles) - 1:
                 dialog.connect("response", self.close_files_dialog, bibfiles, n+1, force, close_app)
@@ -473,8 +469,13 @@ class MainWidget(Gtk.Paned):
                 add_to_recent(bibfile)
                 self.get_root().update_recent_file_menu()
 
+            # Remove itemlist from TabView page and close Tab
+            page = bibfile.itemlist.page
+            page.remove_itemlist()
+            self.tabbox.tabview.close_page(page.tabview_page)
+
+            # Clean up
             self.remove_watcher(bibfile.name)
-            self.notebook.remove_page(bibfile.itemlist.page.number)
             self.store.remove_file(bibfile.name)
 
         if close_app:

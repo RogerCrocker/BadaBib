@@ -76,9 +76,9 @@ class SessionManager:
 
     def save_open_files(self):
         open_files = {}
-        n_pages = self.main_widget.notebook.get_n_pages()
-        for n in range(n_pages):
-            itemlist = self.main_widget.notebook.get_nth_page(n).itemlist
+        tabview_pages = self.main_widget.tabbox.tabview.get_pages()
+        for tabview_page in tabview_pages:
+            itemlist = tabview_page.get_child().itemlist
             if itemlist and not itemlist.bibfile.created:
                 open_files[itemlist.bibfile.name] = itemlist.state_to_string()
         set_open_files(open_files)

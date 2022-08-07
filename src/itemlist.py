@@ -14,7 +14,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-from gi.repository import Gtk, Gdk, Gio
+from gi.repository import Gtk, Gdk, Gio, Adw
 
 from os.path import split
 
@@ -34,87 +34,37 @@ MIN_MAX_CHAR = ('', chr(0x10FFFF))
 ROW_HEIGHT = 95
 
 
-class ItemlistNotebook(Gtk.Notebook):
+class ItemlistTabView(Gtk.Box):
     def __init__(self):
-        super().__init__()
-        self.set_scrollable(True)
-        self.set_vexpand(True)
-        self.set_hexpand(True)
-        self.popup_enable()
+        super().__init__(orientation=Gtk.Orientation.VERTICAL)
 
-        # work around notebook selecting the closed page bug
-        self.previous_page = None
-        self.current_page = None
+        self.tabview = Adw.TabView()
+        self.tabbar = Adw.TabBar()
+        self.tabbar.set_autohide(False)
+        self.tabbar.set_view(self.tabview)
 
-        self.connect("page-reordered", self.update_pagenumbers)
-        self.connect("page-added", self.update_pagenumbers)
+        self.append(self.tabbar)
+        self.append(self.tabview)
 
-    def add_itemlist_page(self, name, page_num=None):
-        page = ItemlistPage(name)
-        if page_num is None:
-            page.number = self.append_page(page, page.header)
-        else:
-            page.number = self.insert_page(page, page.header, page_num)
-        self.set_menu_label_text(page, name)
-        self.set_tab_reorderable(page, True)
-        return page
+    def contains_empty_file(self):
+        if self.tabview.get_n_pages() == 1:
+            try:
+                tabview_page = self.tabview.get_nth_page(0)
+                bibfile = tabview_page.get_child().itemlist.bibfile
+            except AttributeError:
+                return None
+            if bibfile.is_empty():
+                return tabview_page
+        return None
 
-    def contains_empty_new_file(self):
-        if self.get_n_pages() != 1:
-            return False
-        itemlist = self.get_nth_page(0).itemlist
-        if itemlist is None:
-            return False
-        bibfile = itemlist.bibfile
-        if bibfile.name == get_new_file_name() and bibfile.is_empty():
-            return bibfile
-        return False
-
+    # Work around ctrl-Tab bug
     def next_page(self, delta):
-        n_pages = self.get_n_pages()
+        n_pages = self.tabview.get_n_pages()
         if n_pages > 1:
-            n_page = self.get_current_page()
-            self.set_current_page((n_page + delta) % n_pages)
-
-    @staticmethod
-    def update_pagenumbers(notebook, _page, _page_num):
-        n_pages = notebook.get_n_pages()
-        for n in range(n_pages):
-            notebook.get_nth_page(n).number = n
-
-
-class TabHeader(Gtk.Box):
-    def __init__(self, page, name):
-        super().__init__()
-        self.set_orientation(Gtk.Orientation.HORIZONTAL)
-        self.page = page
-
-        self.title_label = Gtk.Label()
-
-        self.close_button = Gtk.Button.new_from_icon_name("window-close-symbolic")
-        self.close_button.set_has_frame(False)
-
-        self.append(self.title_label)
-        self.append(self.close_button)
-
-        self.update(name=name)
-
-    def disassemble(self):
-        self.remove(self.title_label)
-        self.remove(self.close_button)
-        self.page = None
-
-    def update(self, unsaved=False, name=None):
-        if name:
-            base_name = split(name)[1]
-        elif self.page.itemlist:
-            name = self.page.itemlist.bibfile.name
-            base_name = self.page.itemlist.bibfile.base_name
-        if unsaved:
-            base_name = "*" + base_name
-
-        self.title_label.set_text(base_name)
-        self.set_tooltip_text(name)
+            tabview_page = self.tabview.get_selected_page()
+            position = self.tabview.get_page_position(tabview_page)
+            tabview_page_next = self.tabview.get_nth_page((position + delta) % n_pages)
+            self.tabview.set_selected_page(tabview_page_next)
 
 
 class ItemlistPage(Gtk.Box):
@@ -122,8 +72,8 @@ class ItemlistPage(Gtk.Box):
         super().__init__(orientation=Gtk.Orientation.VERTICAL)
         self.itemlist = None
         self.scrolled_window = None
+        self.tabview_page = None
         self.number = -1
-        self.header = TabHeader(self, name=name)
 
         self.center_box = Gtk.CenterBox(orientation=Gtk.Orientation.VERTICAL)
         self.center_box.set_vexpand(True)
@@ -140,21 +90,10 @@ class ItemlistPage(Gtk.Box):
 
         self.show_loading_screen()
 
-    def disassemble(self):
-        self.header.disassemble()
-        self.remove(self.deleted_bar)
-        self.remove(self.empty_bar)
-        self.remove(self.backup_bar)
-        self.remove(self.save_bar)
-        self.remove(self.changed_bar)
-        self.remove(self.scrolled_window)
-        self.remove(self.searchbar)
-        self.itemlist = None
-        self.header = None
-
     def add_itemlist(self, itemlist):
         self.itemlist = itemlist
         self.itemlist.page = self
+
         self.searchbar.search_entry.connect("search_changed", self.itemlist.set_search_string)
 
         self.scrolled_window = Gtk.ScrolledWindow()
@@ -170,6 +109,16 @@ class ItemlistPage(Gtk.Box):
         self.append(self.searchbar)
 
         self.remove(self.center_box)
+
+    def remove_itemlist(self):
+        self.remove(self.deleted_bar)
+        self.remove(self.empty_bar)
+        self.remove(self.backup_bar)
+        self.remove(self.save_bar)
+        self.remove(self.changed_bar)
+        self.remove(self.scrolled_window)
+        self.remove(self.searchbar)
+        self.itemlist = None
 
     def show_loading_screen(self):
         loading_image = Gtk.Image.new_from_icon_name("preferences-system-time-symbolic")
@@ -474,7 +423,6 @@ class Itemlist(Gtk.ListBox):
         self.add_rows(bibfile.items)
 
     def unref(self):
-        self.page.disassemble()
         while True:
             row = self.get_row_at_index(0)
             if not row:
@@ -485,14 +433,23 @@ class Itemlist(Gtk.ListBox):
         self.bibfile = None
         self.change_buffer = None
 
-    def update_filename(self):
-        self.page.header.update()
+    def update_filename(self, unsaved=False, name=None):
+        if name:
+            base_name = split(name)[1]
+        else:
+            name = self.bibfile.name
+            base_name = self.bibfile.base_name
+        if unsaved:
+            base_name = "*" + base_name
+
+        self.page.tabview_page.set_title(base_name)
+        self.page.tabview_page.set_tooltip(name)
 
     def set_unsaved(self, unsaved):
         if unsaved and not self.bibfile.unsaved:
-            self.page.header.update(unsaved=True)
+            self.update_filename(unsaved=True)
         elif not unsaved and self.bibfile.unsaved:
-            self.page.header.update(unsaved=False)
+            self.update_filename(unsaved=False)
             self.page.deleted_bar.set_revealed(False)
             self.change_buffer.update_saved_state()
 

@@ -375,6 +375,8 @@ class MainWidget(Gtk.Paned):
         else:
             page.tabview_page = self.tabbox.tabview.insert(page, position)
         page.tabview_page.set_loading(True)
+        page.tabview_page.set_title(split(name)[1])
+        page.tabview_page.set_tooltip(name)
 
         def parse_file(task, _obj, _data, _cancellable):
             status = self.store.add_file(name)
@@ -385,8 +387,6 @@ class MainWidget(Gtk.Paned):
             if not success:
                 status = ["error"]
 
-            page.tabview_page.set_title(split(name)[1])
-            page.tabview_page.set_tooltip(name)
             page.tabview_page.set_loading(False)
 
             if "error" in status:

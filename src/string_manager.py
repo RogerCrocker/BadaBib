@@ -17,7 +17,6 @@
 from gi.repository import Gtk, GLib
 
 from bibtexparser.bibdatabase import BibDataString
-from bibtexparser.bibdatabase import BibDataStringExpression
 
 from .bibitem import expand_pretty as expand
 

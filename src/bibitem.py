@@ -136,9 +136,9 @@ def text_to_expression(text, database):
     -------
     BibDataStringExpression
     """
-    words = text.split(" ") # split text argument
-    expr_list = []          # initialize list of expressions
-    text_sequence = ""      # sequence of words that are not strings
+    words = text.split(" ")     # split text argument
+    expr_list = []              # initialize list of expressions
+    text_sequence = ""          # sequence of words
 
     # iterate over all words in text
     for word in words:

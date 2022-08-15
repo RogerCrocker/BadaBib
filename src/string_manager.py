@@ -19,11 +19,10 @@ from gi.repository import Gtk, GLib
 from bibtexparser.bibdatabase import BibDataString
 from bibtexparser.bibdatabase import BibDataStringExpression
 
+from .bibitem import expand_pretty as expand
+
 from .dialogs import FileChooser
 from .dialogs import WarningDialog
-
-
-expand = BibDataStringExpression.expand_if_expression
 
 
 class FileList(Gtk.ListBox):

@@ -38,7 +38,6 @@ class BadaBibFile:
     Representation of a .bib file and its entries. BadaBibFiles wrap around a
     bibtexparser database and are managed by a BadaBibStore.
     """
-
     def __init__(self, store, name, database, created=False):
         """
         Initilize BadaBibFile.
@@ -289,7 +288,6 @@ class BadaBibFile:
         """
         def sort_key_func(item):
             return item.sort_values[field]
-        print(type(sort_key_func))
         return sort_key_func
 
     def parse_entry(self, bibtex):
@@ -330,7 +328,7 @@ class BadaBibFile:
         text: str
             String of comments
         """
-        text = self.writer._comments_to_bibtex  (self.database)
+        text = self.writer._comments_to_bibtex(self.database)
         text = text.replace("\n\n", "\n")   # Use single line break between comments
         return text
 

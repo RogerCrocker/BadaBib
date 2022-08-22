@@ -21,6 +21,8 @@ gi.require_version("GtkSource", "5")
 
 from gi.repository import GLib, Gtk, Gio, Adw
 
+from sys import argv
+
 from .customization import title_case
 from .customization import upper_case
 from .customization import lower_case
@@ -476,4 +478,4 @@ def main(version):
         App version. Passed from badabib.in, defined in meson.build
     """
     app = Application(version)
-    return app.run()
+    return app.run(argv)

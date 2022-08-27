@@ -325,4 +325,3 @@ class ChangeBuffer:
             if change.form:
                 change.form.select()
                 change.form.grab_focus()
-

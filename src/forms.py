@@ -344,7 +344,7 @@ class EntrytypeBox(Box):
         editor = window.main_widget.get_current_editor()
         entrytype = item.raw_field("ENTRYTYPE")
 
-        if entrytype == self.editor.entrytype == editor.entrytype:
+        if editor and entrytype == self.editor.entrytype == editor.entrytype:
             self.editor.track_changes = False
             self.set_text(entrytype)
             self.editor.track_changes = True

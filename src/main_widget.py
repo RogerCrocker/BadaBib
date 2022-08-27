@@ -250,14 +250,16 @@ class MainWidget(Gtk.Paned):
             self.source_view.form.set_sensitive(True)
             self.source_view.form.set_text(item.bibtex)
         else:
-            self.get_current_editor().clear()
             self.source_view.clear()
+            editor = self.get_current_editor()
+            if editor:
+                editor.clear()
 
     def generate_key(self):
         item = self.get_current_item()
+        editor = self.get_current_editor()
         new_key = item.bibfile.generate_key_for_item(item)
-        if new_key != item.entry["ID"]:
-            editor = self.get_current_editor()
+        if editor and new_key != item.entry["ID"]:
             form = editor.forms["ID"]
             old_key = item.entry["ID"]
             change = Change.Edit(item, form, old_key, new_key)
@@ -290,7 +292,9 @@ class MainWidget(Gtk.Paned):
             # Page is empty
             else:
                 self.source_view.set_status("empty", True)
-                self.get_current_editor().clear()
+                editor = self.get_current_editor()
+                if editor:
+                    editor.clear()
 
     # Source view
 

@@ -395,7 +395,9 @@ class Application(Adw.Application):
 
         # editor/catch all - returns None is no form is active
         editor = self.window.main_widget.get_current_editor()
-        return editor.current_form, True
+        if editor:
+            return editor.current_form, True
+        return None, False
 
     def apply_customization(self, customization, n=0):
         """

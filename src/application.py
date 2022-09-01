@@ -412,7 +412,7 @@ class Application(Adw.Application):
         """
         form, grab_focus = self.get_active_form()
         if form:
-            form.apply(customization, n)
+            form.apply(customization)
             if grab_focus:
                 form.grab_focus()
 

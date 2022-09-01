@@ -81,7 +81,7 @@ class MultiLine(GtkSource.View):
         textbuffer = self.get_buffer()
         textbuffer.set_text(text)
 
-    def apply(self, func, n=0):
+    def apply(self, func):
         window = self.get_root()
         itemlist = window.main_widget.get_current_itemlist()
         bibstrings = itemlist.bibfile.database.strings
@@ -94,7 +94,7 @@ class MultiLine(GtkSource.View):
             selected = False
 
         selection = textbuffer.get_text(*bounds, True)
-        new_selection = func(selection, bibstrings, n)
+        new_selection = func(selection, bibstrings)
 
         if new_selection is not None and new_selection != selection:
             selection_offset = bounds[0].get_offset()
@@ -193,7 +193,7 @@ class SingleLine(Gtk.Entry):
         self.event_controller_focus = Gtk.EventControllerFocus()
         self.add_controller(self.event_controller_focus)
 
-    def apply(self, func, n=0):
+    def apply(self, func):
         window = self.get_root()
         itemlist = window.main_widget.get_current_itemlist()
         bibstrings = itemlist.bibfile.database.strings
@@ -205,11 +205,11 @@ class SingleLine(Gtk.Entry):
             prefix = text[: bounds[0]]
             selection = text[bounds[0] : bounds[1]]
             postfix = text[bounds[1] :]
-            new_selection = func(selection, bibstrings, n)
+            new_selection = func(selection, bibstrings)
             new_text = prefix + new_selection + postfix
             pos = len(new_text) - offset
         else:
-            new_text = func(text, bibstrings, n)
+            new_text = func(text, bibstrings)
             pos = -1
 
         if new_text is not None and new_text != text:

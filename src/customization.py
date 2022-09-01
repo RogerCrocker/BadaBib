@@ -20,6 +20,9 @@ from bibtexparser.latexenc import string_to_latex
 from bibtexparser.customization import getnames
 from bibtexparser.customization import InvalidName
 
+from .config_manager import get_title_case_n
+
+
 # Dashes potentially used in page ranges
 DASHES = ["-",      # minus
           "－",     # fullwidth minus
@@ -113,26 +116,26 @@ def prettify_unicode_field(field, value):
 # of the form (str, dict, int) and return a str.
 
 
-def convert_to_unicode(string, bibstrings=None, n=0):
+def convert_to_unicode(string, bibstrings=None):
     """Convert LaTeX to pretty unicode."""
     unicode_string = latex_to_unicode(string)
     return prettify_unicode_string(unicode_string)
 
 
-def convert_to_latex(string, bibstrings=None, n=0):
+def convert_to_latex(string, bibstrings=None):
     """Prettify unicode and convert to LaTeX."""
     unicode_string = latex_to_unicode(string)
     pretty_string = prettify_unicode_string(unicode_string)
     return string_to_latex(pretty_string)
 
 
-def title_case_word(word, bibstrings, n=0):
+def title_case_word(word, bibstrings):
     """
     Capitalize word if it contains more than n characters. Do not capitalize LaTeX
     strings/macros.
     """
     # Check if word is too short or a LaTeX macro
-    if word.lower() in bibstrings or len(word) < n:
+    if word.lower() in bibstrings or len(word) < get_title_case_n():
         return word
 
     # Capitalize all parts of hyphenated words
@@ -146,45 +149,45 @@ def title_case_word(word, bibstrings, n=0):
     return "-".join(Parts)
 
 
-def upper_case_word(word, bibstrings, n=0):
+def upper_case_word(word, bibstrings):
     """Convert word to upper case unless it is a macro."""
     if word.lower() in bibstrings:
         return word
     return word.upper()
 
 
-def lower_case_word(word, bibstrings, n=0):
+def lower_case_word(word, bibstrings):
     """Convert word to lower case unless it is a macro."""
     if word.lower() in bibstrings:
         return word
     return word.lower()
 
 
-def title_case(value, bibstrings, n=0):
+def title_case(value, bibstrings):
     """Convert field to title case, capitalize words longer than n characters."""
     if not value:
         return None
     words = value.split(" ")
-    return " ".join(title_case_word(word, bibstrings, n) for word in words)
+    return " ".join(title_case_word(word, bibstrings) for word in words)
 
 
-def upper_case(value, bibstrings, n=0):
+def upper_case(value, bibstrings):
     """Convert field to upper case."""
     if not value:
         return None
     words = value.split(" ")
-    return " ".join(upper_case_word(word, bibstrings, n) for word in words)
+    return " ".join(upper_case_word(word, bibstrings) for word in words)
 
 
-def lower_case(value, bibstrings, n=0):
+def lower_case(value, bibstrings):
     """Convert field to lower case."""
     if not value:
         return None
     words = value.split(" ")
-    return " ".join(lower_case_word(word, bibstrings, n) for word in words)
+    return " ".join(lower_case_word(word, bibstrings) for word in words)
 
 
-def protect_caps(string, bibstrings, n=0):
+def protect_caps(string, bibstrings):
     """
     Protect upper case characters by putting them in brackets. Sequences of
     upper case characters are put in a single pair of brackets.
@@ -237,7 +240,7 @@ def protect_caps(string, bibstrings, n=0):
     return protected
 
 
-def sanitize_range(range_raw, bibstrings, n=0):
+def sanitize_range(range_raw, bibstrings):
     """Replace all kinds of dashes in page ranges with "--"."""
     range_clean = range_raw
     for dash in DASHES:

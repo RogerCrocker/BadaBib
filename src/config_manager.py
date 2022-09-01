@@ -103,6 +103,75 @@ sort_fields = ["ID", "author", "title", "journal", "year"]
 link_fields = ["doi", "url", "eprint", "file"]
 
 
+def add_to_recent(badabib_file):
+    """
+    Add file to list of recently opened files.
+
+    Parameters
+    ----------
+    badabib_file: BadaBibFile
+    """
+    recent_files = get_recent_files()
+
+    # If file already in recent, remove and re-add at top of list
+    if badabib_file.name in recent_files:
+        recent_files.pop(badabib_file.name)
+    recent_files[badabib_file.name] = badabib_file.itemlist.state_to_string()
+
+    # Truncate list to maximum number of files
+    if len(recent_files) > get_num_recent():
+        first_file = list(recent_files.keys())[0]
+        recent_files.pop(first_file)
+
+    # Set recent files
+    set_recent_files(recent_files)
+
+
+def remove_from_recent(filename):
+    """
+    Remove file from list of recently opened files.
+
+    Parameters
+    ----------
+    filename: str
+    """
+    recent_files = get_recent_files()
+    # Remove file
+    if filename in recent_files:
+        recent_files.pop(filename)
+    # Update list of recent files
+    set_recent_files(recent_files)
+
+
+# Getter and setter for unified access to settings.
+# See gschema.xml for details.
+
+def get_align_fields():
+    return setting.get_boolean("align-fields")
+
+
+def set_align_fields(state):
+    """state: bool"""
+    setting.set_boolean("align-fields", state)
+
+
+def get_create_backup():
+    return setting.get_boolean("create-backup")
+
+
+def set_create_backup(state):
+    """state: bool"""
+    setting.set_boolean("create-backup", state)
+
+
+def get_default_entrytype():
+    return setting.get_string("default-entrytype")
+
+
+def set_default_entrytype(entrytype):
+    setting.set_string("default-entrytype", entrytype)
+
+
 def get_editor_layout(entrytype):
     """
     Returns a string that decribes the editor layout for the given entrytype.
@@ -160,18 +229,6 @@ def set_editor_layout(entrytype, layout):
         setting.set_value("editor-layouts", g_variant)
 
 
-# Getter and setter for unified access to settings.
-# See gschema.xml for details.
-
-def get_align_fields():
-    return setting.get_boolean("align-fields")
-
-
-def set_align_fields(state):
-    """state: bool"""
-    setting.set_boolean("align-fields", state)
-
-
 def get_field_indent():
     return setting.get_int("field-indent")
 
@@ -179,41 +236,6 @@ def get_field_indent():
 def set_field_indent(n):
     """n: int"""
     setting.set_int("field-indent", n)
-
-
-def get_homogenize_fields():
-    return setting.get_boolean("homogenize-fields")
-
-
-def get_homogenize_latex():
-    return setting.get_boolean("homogenize-latex-encoding")
-
-
-def get_parse_on_fly():
-    return setting.get_boolean("parse-on-fly")
-
-
-def set_parse_on_fly(state):
-    """state: bool"""
-    setting.set_boolean("parse-on-fly", state)
-
-
-def get_create_backup():
-    return setting.get_boolean("create-backup")
-
-
-def set_create_backup(state):
-    """state: bool"""
-    setting.set_boolean("create-backup", state)
-
-
-def get_remember_strings():
-    return setting.get_boolean("remember-strings")
-
-
-def set_remember_strings(state):
-    """state: bool"""
-    setting.set_boolean("remember-strings", state)
 
 
 def get_highlight_syntax():
@@ -225,40 +247,22 @@ def set_highlight_syntax(state):
     setting.set_boolean("highlight-syntax", state)
 
 
-def get_window_geom():
-    return setting.get_value("window-geom")
+def get_homogenize_fields():
+    return setting.get_boolean("homogenize-fields")
 
 
-def set_window_geom(geom):
-    """geom: list of int"""
-    g_variant = GLib.Variant("ai", geom)
-    setting.set_value("window-geom", g_variant)
+def set_homogenize_fields(state):
+    """state: bool"""
+    return setting.set_boolean("homogenize-fields", state)
 
 
-def get_undo_delay():
-    return setting.get_double("undo-delay")
+def get_homogenize_latex():
+    return setting.get_boolean("homogenize-latex-encoding")
 
 
-def set_undo_delay(d):
-    """d: float"""
-    setting.set_double("undo-delay", d)
-
-
-def get_row_indent():
-    return setting.get_int("row-indent")
-
-
-def set_row_indent(n):
-    """n: int"""
-    setting.set_int("row-indent", n)
-
-
-def get_default_entrytype():
-    return setting.get_string("default-entrytype")
-
-
-def set_default_entrytype(entrytype):
-    setting.set_string("default-entrytype", entrytype)
+def set_homogenize_latex(state):
+    """state: bool"""
+    return setting.set_boolean("homogenize-latex-encoding", state)
 
 
 def get_new_file_name():
@@ -268,6 +272,15 @@ def get_new_file_name():
 def set_new_file_name(name):
     """name: str"""
     setting.set_string("new-file-name", name)
+
+
+def get_num_recent():
+    return setting.get_int("num-recent")
+
+
+def set_num_recent(n):
+    """n: int"""
+    setting.set_int("num-recent", n)
 
 
 def get_open_files():
@@ -292,13 +305,13 @@ def set_open_tab(filename):
     setting.set_string("open-tab", filename)
 
 
-def get_num_recent():
-    return setting.get_int("num-recent")
+def get_parse_on_fly():
+    return setting.get_boolean("parse-on-fly")
 
 
-def set_num_recent(n):
-    """n: int"""
-    setting.set_int("num-recent", n)
+def set_parse_on_fly(state):
+    """state: bool"""
+    setting.set_boolean("parse-on-fly", state)
 
 
 def get_recent_files():
@@ -315,31 +328,22 @@ def set_recent_files(recent_files):
     setting.set_value("recent-file-states", g_variant_states)
 
 
-def add_to_recent(badabib_file):
-    """badabib_file: BadaBibFile"""
-    recent_files = get_recent_files()
-    # If file already in recent, remove and re-add at top of list
-    if badabib_file.name in recent_files:
-        recent_files.pop(badabib_file.name)
-    recent_files[badabib_file.name] = badabib_file.itemlist.state_to_string()
-
-    # Truncate list to set number of files
-    if len(recent_files) > get_num_recent():
-        first_file = list(recent_files.keys())[0]
-        recent_files.pop(first_file)
-
-    # Set recent files
-    set_recent_files(recent_files)
+def get_remember_strings():
+    return setting.get_boolean("remember-strings")
 
 
-def remove_from_recent(filename):
-    """filename: str"""
-    recent_files = get_recent_files()
-    # Remove file
-    if filename in recent_files:
-        recent_files.pop(filename)
-    # Update list of recent files
-    set_recent_files(recent_files)
+def set_remember_strings(state):
+    """state: bool"""
+    setting.set_boolean("remember-strings", state)
+
+
+def get_row_indent():
+    return setting.get_int("row-indent")
+
+
+def set_row_indent(n):
+    """n: int"""
+    setting.set_int("row-indent", n)
 
 
 def get_string_imports():
@@ -353,3 +357,31 @@ def set_string_imports(string_files):
     """
     g_variant_files = GLib.Variant("as", list(string_files.keys()))
     setting.set_value("string-imports", g_variant_files)
+
+
+def get_title_case_n():
+    return setting.get_int("title-case-n")
+
+
+def set_title_case_n(n):
+    """n: int"""
+    setting.set_int("title-case-n", n)
+
+
+def get_undo_delay():
+    return setting.get_double("undo-delay")
+
+
+def set_undo_delay(d):
+    """d: float"""
+    setting.set_double("undo-delay", d)
+
+
+def get_window_geom():
+    return setting.get_value("window-geom")
+
+
+def set_window_geom(geom):
+    """geom: list of int"""
+    g_variant = GLib.Variant("ai", geom)
+    setting.set_value("window-geom", g_variant)

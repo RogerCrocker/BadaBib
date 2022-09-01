@@ -399,7 +399,7 @@ class Application(Adw.Application):
             return editor.current_form, True
         return None, False
 
-    def apply_customization(self, customization, n=0):
+    def apply_customization(self, customization):
         """
         Apply customization function to text of form.
 
@@ -427,7 +427,7 @@ class Application(Adw.Application):
             # Cycle through case types
             counter = form.change_case_counter
             if counter == 0:
-                form.apply(title_case, 4)
+                form.apply(title_case)
             elif counter == 1:
                 form.apply(upper_case)
             elif counter == 2:

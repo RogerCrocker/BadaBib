@@ -6,10 +6,30 @@
         <summary>Align fields of bibtex entries.</summary>
         <description>Align fields of bibtex entries.</description>
     </key>
+	  <key type="b" name="create-backup">
+        <default>true</default>
+        <summary>Create backups when opening a file.</summary>
+        <description>Create backups when opening a file.</description>
+    </key>
+	  <key type="s" name="default-entrytype">
+        <default>"article"</default>
+        <summary>Default Entrytype</summary>
+        <description>Entrytype created by default. Also used if no entrytype information is available.</description>
+    </key>
+	  <key type="as" name="editor-layouts">
+        <default>[]</default>
+        <summary>Editor layouts</summary>
+        <description>A list of strings defining the respective editor layouts.</description>
+    </key>
 	  <key type="i" name="field-indent">
         <default>4</default>
         <summary>Indentation of fields.</summary>
         <description>Number of spaces used to indent fields in bibtex entries.</description>
+    </key>
+	  <key type="b" name="highlight-syntax">
+        <default>true</default>
+        <summary>Highlight syntax of BibTeX source</summary>
+        <description>Highlight syntax of BibTeX source.</description>
     </key>
 	  <key type="b" name="homogenize-fields">
         <default>false</default>
@@ -21,42 +41,22 @@
         <summary>Homogenize the latex enconding style for bibtex.</summary>
         <description>Convert latex code to canonical form.</description>
     </key>
-  	<key type="b" name="parse-on-fly">
-        <default>true</default>
-        <summary>Parsing bibtex on the fly</summary>
-        <description>Enables parsing bibtex source code on the fly.</description>
+	  <key type="s" name="new-file-name">
+        <default>"New File.bib"</default>
+        <summary>Name of new file</summary>
+        <description>Name given to new files created in BadaBib.</description>
     </key>
-	  <key type="b" name="create-backup">
-        <default>true</default>
-        <summary>Create backups when opening a file.</summary>
-        <description>Create backups when opening a file.</description>
+	  <key type="i" name="num-recent">
+        <default>10</default>
+        <summary>Number of recent files</summary>
+        <description>Number of recently opened files shown.</description>
     </key>
-	  <key type="b" name="remember-strings">
-        <default>false</default>
-        <summary>Remember imported strings between sessions.</summary>
-        <description>Reopen imported string files on startup.</description>
-    </key>
-	  <key type="b" name="highlight-syntax">
-        <default>true</default>
-        <summary>Highlight syntax of BibTeX source</summary>
-        <description>Highlight syntax of BibTeX source.</description>
-    </key>
-    <key type="ai" name="window-geom">
-        <default>[1050, 600, 420]</default>
-        <summary>Window size and itemlist width</summary>
-        <description>Remember the window size and itemlist width.</description>
-    </key>
-    <key type="as" name="open-files">
+	  <key type="as" name="open-files">
         <default>[]</default>
         <summary>Last opened files</summary>
         <description>A list of the last opened files.</description>
     </key>
-	  <key type="as" name="string-imports">
-        <default>[]</default>
-        <summary>Currently imported string files</summary>
-        <description>A list of the currently imported string files.</description>
-    </key>
-    <key type="as" name="open-file-states">
+	  <key type="as" name="open-file-states">
         <default>[]</default>
         <summary>States of last opened files</summary>
         <description>A list of the states of the last opened files.</description>
@@ -66,12 +66,12 @@
         <summary>Currently viewed file</summary>
         <description>Name of file that was being edited when closing the app.</description>
     </key>
-    <key type="i" name="num-recent">
-        <default>10</default>
-        <summary>Number of recent files</summary>
-        <description>Number of recently opened files shown.</description>
+  	<key type="b" name="parse-on-fly">
+        <default>true</default>
+        <summary>Parsing bibtex on the fly</summary>
+        <description>Enables parsing bibtex source code on the fly.</description>
     </key>
-    <key type="as" name="recent-files">
+	  <key type="as" name="recent-files">
         <default>[]</default>
         <summary>Recently opened files</summary>
         <description>A list of the recently opened files.</description>
@@ -81,30 +81,35 @@
         <summary>States of recently opened files</summary>
         <description>A list of the states of recently opened files.</description>
     </key>
-	  <key type="as" name="editor-layouts">
-        <default>[]</default>
-        <summary>Editor layouts</summary>
-        <description>A list of strings defining the respective editor layouts.</description>
-    </key>
-	  <key type="d" name="undo-delay">
-        <default>0.3</default>
-        <summary>Undo delay</summary>
-        <description>Duration (in seconds) for which changes are grouped in the same undo-action.</description>
+	  <key type="b" name="remember-strings">
+        <default>false</default>
+        <summary>Remember imported strings between sessions.</summary>
+        <description>Reopen imported string files on startup.</description>
     </key>
 	  <key type="i" name="row-indent">
         <default>3</default>
         <summary>Row indentation in itemlist</summary>
         <description>Number of spaces used to indent labels in itemlist.</description>
     </key>
-	  <key type="s" name="default-entrytype">
-        <default>"article"</default>
-        <summary>Default Entrytype</summary>
-        <description>Entrytype created by default. Also used if no entrytype information is available.</description>
+	  <key type="as" name="string-imports">
+        <default>[]</default>
+        <summary>Currently imported string files</summary>
+        <description>A list of the currently imported string files.</description>
     </key>
-	  <key type="s" name="new-file-name">
-        <default>"New File.bib"</default>
-        <summary>Name of new file</summary>
-        <description>Name given to new files created in BadaBib.</description>
+	  <key type="i" name="title-case-n">
+        <default>4</default>
+        <summary>Capitalize words with more than n characters.</summary>
+        <description>When converting a field to title case, capitalize words with more than n characters.</description>
+    </key>
+	  <key type="d" name="undo-delay">
+        <default>0.3</default>
+        <summary>Undo delay</summary>
+        <description>Duration (in seconds) for which changes are grouped in the same undo-action.</description>
+    </key>
+    <key type="ai" name="window-geom">
+        <default>[1050, 600, 420]</default>
+        <summary>Window size and itemlist width</summary>
+        <description>Remember the window size and itemlist width.</description>
     </key>
 	</schema>
 </schemalist>

@@ -20,6 +20,13 @@ from gi.repository import Gtk
 
 
 def add_filters(dialog):
+    """
+    Add ".bib" and "all files" categories to file chooser dialog.
+
+    Parameters
+    ----------
+    dialog: Gtk.FileChooserDialog
+    """
     filter_bibtex = Gtk.FileFilter()
     filter_bibtex.set_name("BibTeX files")
     filter_bibtex.add_pattern("*.bib")
@@ -32,43 +39,48 @@ def add_filters(dialog):
 
 
 class WarningDialog(Gtk.MessageDialog):
-    def __init__(self, texts, window, title="Bada Bib! - Warning"):
-        if not isinstance(texts, list):
-            texts = [texts]
-        if len(texts) > 0:
-            WarningDialogChain(None, None, texts, window, title)
-
-
-class WarningDialogChain(Gtk.MessageDialog):
-    def __init__(self, dialog, response, texts, window, title="Bada Bib! - Warning", n=0):
+    """
+    A dialog that displays a warning message. The user can only acknowledge
+    the message.
+    """
+    def __init__(self, text, window, title="Bada Bib! - Warning"):
+        """
+        text: str
+            Message text
+        window: Gtk.Window
+            Parent window of the dialog
+        title: str, optional
+            Dialog title. The default is "Bada Bib! - Warning".
+        """
         super().__init__(
             transient_for=window,
             message_type=Gtk.MessageType.WARNING,
             buttons=Gtk.ButtonsType.OK,
-            text=texts[n],
+            text=text,
             title=title,
         )
-
-        if dialog:
-            dialog.destroy()
-
         self.set_modal(True)
         self.props.use_markup = True
-
-        if n < len(texts) - 1:
-            self.connect("response", WarningDialogChain, texts, window, title, n+1)
-        else:
-            self.connect("response", self.end)
-
+        self.connect("response", self.close)
         self.show()
 
     @staticmethod
-    def end(dialog, response):
+    def close(dialog, _response):
+        """Close dialog, irrespective of response."""
         dialog.destroy()
 
 
 class SaveChangesDialog(Gtk.MessageDialog):
+    """
+    Alert user that file contains unsaved changes.
+    """
     def __init__(self, window, filename):
+        """
+        window: Gtk.Window
+            Parent window of the dialog
+        filename: str
+            Name of file with unsaved changes
+        """
         super().__init__(
             transient_for=window,
             message_type=Gtk.MessageType.QUESTION,
@@ -86,22 +98,36 @@ class SaveChangesDialog(Gtk.MessageDialog):
 
 
 class ConfirmSaveDialog(Gtk.MessageDialog):
+    """
+    Confirm that user wants to save file, although it contains empty and/or
+    duplicate keys.
+    """
     def __init__(self, window, filename, has_empty_keys, duplicate_keys):
-        if has_empty_keys:
-            if duplicate_keys:
-                empty_warning = " <b>empty keys</b> and"
-            else:
-                empty_warning = " <b>empty keys</b>."
-        else:
-            empty_warning = ""
-
+        """
+        window: Gtk.Window
+            Parent window of the dialog
+        filename: str
+            Name of file with empty/duplicate keys
+        has_empty_keys: bool
+            True if file contains empty keys, False otherwise
+        duplicate_keys: list of str
+            List of duplicate keys, can be empty
+        """
+        # Compose case-by-case warning
         if duplicate_keys:
-            duplicate_warning = " the following <b>duplicate keys</b>:\n\n" + "\n".join(duplicate_keys)
+            warning = (
+                f"contains {'<b>empty keys</b> and ' if has_empty_keys else ''}"
+                + "the following <b>duplicate keys</b>:"
+                + "\n\n"
+                + "\n".join(duplicate_keys)
+            )
         else:
-            duplicate_warning = ""
+            warning = "contains <b>empty keys</b>."
 
         text = (
-            f"File '{filename}' contains{empty_warning}{duplicate_warning}"
+            f"'{filename}'"
+            + "\n\n"
+            + f"{warning}"
             + "\n\n"
             + "Save anyhow?"
         )
@@ -123,50 +149,70 @@ class ConfirmSaveDialog(Gtk.MessageDialog):
 
 
 class FileChooser(Gtk.FileChooserDialog):
+    """
+    Customized file chooser.
+    """
     def __init__(self, window):
+        """
+        window: Gtk.Window
+            Parent window of the dialog
+        """
         super().__init__(
             title="Bada Bib! - Please choose a file",
             transient_for=window,
             action=Gtk.FileChooserAction.OPEN
         )
-        # cancel button
         self.add_button("Cancel", Gtk.ResponseType.CANCEL)
-
-        # accept button (suggested action -> blue)
         accept_button = self.add_button("Open", Gtk.ResponseType.ACCEPT)
         accept_button.get_style_context().add_class("suggested-action")
 
-        self.set_select_multiple(True)
+        self.set_select_multiple(True)  # Allow selecting multiple files
         add_filters(self)
 
 
 class SaveDialog(Gtk.FileChooserDialog):
+    """
+    Customized save dialog.
+    """
     def __init__(self, window, filename):
+        """
+        window: Gtk.Window
+            Parent window of the dialog
+        filename: str
+            File to be saved
+        """
         super().__init__(
             title="Bada Bib! - Please choose a file name",
             transient_for=window,
             action=Gtk.FileChooserAction.SAVE,
         )
-        # cancel button
         self.add_button("Cancel", Gtk.ResponseType.CANCEL)
-
-        # accept button (suggested action -> blue)
         accept_button = self.add_button("Save", Gtk.ResponseType.ACCEPT)
         accept_button.get_style_context().add_class("suggested-action")
 
-        self.set_current_name(filename)
-
+        self.set_current_name(filename)  # Suggest name
         add_filters(self)
 
 
 class AboutDialog(Gtk.AboutDialog):
+    """
+    About Bada Bib!
+    """
     def __init__(self, window):
+        """
+        window: Gtk.Window
+            Parent window of the dialog
+        """
         super().__init__(modal=True, transient_for=window)
+
+        # Print name and version of Bada Bib!
         self.set_program_name(self.get_program_name() + " " + window.app.version)
 
+        # Print Python and GTK version
         gtk_version = f"{Gtk.get_major_version()}.{Gtk.get_minor_version()}.{Gtk.get_micro_version()}"
         self.set_version(f"Python {python_version()}, GTK {gtk_version}")
 
+        # App details
         self.set_comments("View, search and edit your BibTeX files")
         self.set_logo_icon_name("com.github.rogercrocker.badabib")
         self.set_website("https://github.com/RogerCrocker/BadaBib")

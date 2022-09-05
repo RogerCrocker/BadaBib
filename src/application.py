@@ -344,7 +344,7 @@ class Application(Adw.Application):
         """
         entries = self.window.main_widget.copy_paste_buffer
         if entries:
-            self.window.main_widget.add_items(None, [entry.copy() for entry in entries])
+            self.window.main_widget.add_items(entries=[entry.copy() for entry in entries])
 
     def on_find(self, action=None, data=None):
         """Handle find signal. See on_quit for parameters."""

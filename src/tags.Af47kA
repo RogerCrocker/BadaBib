@@ -1,0 +1,286 @@
+layout_string_article	default_layouts.py	/^layout_string_article = """$/;"	v
+layout_string_book	default_layouts.py	/^layout_string_book = """$/;"	v
+layout_string_booklet	default_layouts.py	/^layout_string_booklet = """$/;"	v
+layout_string_conference	default_layouts.py	/^layout_string_conference = """$/;"	v
+layout_string_inbook	default_layouts.py	/^layout_string_inbook = """$/;"	v
+layout_string_incollection	default_layouts.py	/^layout_string_incollection = """$/;"	v
+layout_string_inproceedings	default_layouts.py	/^layout_string_inproceedings = """$/;"	v
+layout_string_manual	default_layouts.py	/^layout_string_manual = """$/;"	v
+layout_string_matherthesis	default_layouts.py	/^layout_string_matherthesis = """$/;"	v
+layout_string_misc	default_layouts.py	/^layout_string_misc = """$/;"	v
+layout_string_online	default_layouts.py	/^layout_string_online = """$/;"	v
+layout_string_phdthesis	default_layouts.py	/^layout_string_phdthesis = """$/;"	v
+layout_string_proceedings	default_layouts.py	/^layout_string_proceedings = """$/;"	v
+layout_string_techreport	default_layouts.py	/^layout_string_techreport = """$/;"	v
+layout_string_unpublished	default_layouts.py	/^layout_string_unpublished = """$/;"	v
+default_layout_strings	default_layouts.py	/^default_layout_strings = {$/;"	v
+Editor	editor.py	/^class Editor(Gtk.ScrolledWindow):$/;"	c
+__init__	editor.py	/^    def __init__(self, layout, entrytype=None):$/;"	m	class:Editor
+set_spacings	editor.py	/^    def set_spacings(self):$/;"	m	class:Editor
+apply_layout	editor.py	/^    def apply_layout(self, layout):$/;"	m	class:Editor
+add_field_with_form	editor.py	/^    def add_field_with_form(self, field, form, left, top, width):$/;"	m	class:Editor
+connect_forms	editor.py	/^    def connect_forms(self):$/;"	m	class:Editor
+show_item	editor.py	/^    def show_item(self, item):$/;"	m	class:Editor
+clear	editor.py	/^    def clear(self):$/;"	m	class:Editor
+set_active	editor.py	/^    def set_active(self, state):$/;"	m	class:Editor
+update_item	editor.py	/^    def update_item(self, _widget, form):$/;"	m	class:Editor
+on_enter	editor.py	/^    def on_enter(self, _event_controller_focus, current_form):$/;"	m	class:Editor
+on_leave	editor.py	/^    def on_leave(self, _event_controller_focus, current_form):$/;"	m	class:Editor
+HELP_TEXT	layout_manager.py	/^HELP_TEXT = """$/;"	v
+string_to_layout	layout_manager.py	/^def string_to_layout(string, window):$/;"	f
+TopToolbar	layout_manager.py	/^class TopToolbar(Gtk.CenterBox):$/;"	c
+__init__	layout_manager.py	/^    def __init__(self):$/;"	m	class:TopToolbar
+BottomToolbar	layout_manager.py	/^class BottomToolbar(Gtk.CenterBox):$/;"	c
+__init__	layout_manager.py	/^    def __init__(self):$/;"	m	class:BottomToolbar
+ScrolledTextview	layout_manager.py	/^class ScrolledTextview(Gtk.ScrolledWindow):$/;"	c
+__init__	layout_manager.py	/^    def __init__(self):$/;"	m	class:ScrolledTextview
+SideBar	layout_manager.py	/^class SideBar(Gtk.Box):$/;"	c
+__init__	layout_manager.py	/^    def __init__(self):$/;"	m	class:SideBar
+LayoutManagerWindow	layout_manager.py	/^class LayoutManagerWindow(Gtk.Window):$/;"	c
+__init__	layout_manager.py	/^    def __init__(self, main_window):$/;"	m	class:LayoutManagerWindow
+assemble	layout_manager.py	/^    def assemble(self):$/;"	m	class:LayoutManagerWindow
+get_entrytype	layout_manager.py	/^    def get_entrytype(self):$/;"	m	class:LayoutManagerWindow
+get_text	layout_manager.py	/^    def get_text(self):$/;"	m	class:LayoutManagerWindow
+set_text	layout_manager.py	/^    def set_text(self, text):$/;"	m	class:LayoutManagerWindow
+text_changed	layout_manager.py	/^    def text_changed(self, textview):$/;"	m	class:LayoutManagerWindow
+on_entrytype_changed	layout_manager.py	/^    def on_entrytype_changed(self, entrytype_box=None):$/;"	m	class:LayoutManagerWindow
+activate_preview	layout_manager.py	/^    def activate_preview(self):$/;"	m	class:LayoutManagerWindow
+deactivate_preview	layout_manager.py	/^    def deactivate_preview(self):$/;"	m	class:LayoutManagerWindow
+on_preview_toggled	layout_manager.py	/^    def on_preview_toggled(self, button):$/;"	m	class:LayoutManagerWindow
+on_help_toggled	layout_manager.py	/^    def on_help_toggled(self, button):$/;"	m	class:LayoutManagerWindow
+on_apply_clicked	layout_manager.py	/^    def on_apply_clicked(self, button):$/;"	m	class:LayoutManagerWindow
+on_default_clicked	layout_manager.py	/^    def on_default_clicked(self, button):$/;"	m	class:LayoutManagerWindow
+on_reset_clicked	layout_manager.py	/^    def on_reset_clicked(self, button):$/;"	m	class:LayoutManagerWindow
+pkgdatadir	meson.build	/^pkgdatadir = join_paths(get_option('prefix'), get_option('datadir'), meson.project_name())$/;"	V
+moduledir	meson.build	/^moduledir = join_paths(pkgdatadir, 'badabib')$/;"	V
+gnome	meson.build	/^gnome = import('gnome')$/;"	V
+python	meson.build	/^python = import('python')$/;"	V
+conf	meson.build	/^conf = configuration_data()$/;"	V
+badabib_sources	meson.build	/^badabib_sources = [$/;"	V
+PreferencesWindow	preferences.py	/^class PreferencesWindow(Adw.PreferencesWindow):$/;"	c
+__init__	preferences.py	/^    def __init__(self, main_window):$/;"	m	class:PreferencesWindow
+assemble_action_row	preferences.py	/^    def assemble_action_row(title, subtitle, state, callback):$/;"	m	class:PreferencesWindow
+assemble_indent_row	preferences.py	/^    def assemble_indent_row(self):$/;"	m	class:PreferencesWindow
+get_group_general	preferences.py	/^    def get_group_general(self):$/;"	m	class:PreferencesWindow
+get_group_source	preferences.py	/^    def get_group_source(self):$/;"	m	class:PreferencesWindow
+update_writer	preferences.py	/^    def update_writer(self):$/;"	m	class:PreferencesWindow
+on_theme_changed	preferences.py	/^    def on_theme_changed(_switch, dark):$/;"	m	class:PreferencesWindow
+on_backup_changed	preferences.py	/^    def on_backup_changed(_switch, state):$/;"	m	class:PreferencesWindow
+on_strings_changed	preferences.py	/^    def on_strings_changed(_switch, state):$/;"	m	class:PreferencesWindow
+on_align_changed	preferences.py	/^    def on_align_changed(self, _switch, state):$/;"	m	class:PreferencesWindow
+on_syntax_changed	preferences.py	/^    def on_syntax_changed(self, _switch, state):$/;"	m	class:PreferencesWindow
+on_indent_changed	preferences.py	/^    def on_indent_changed(self, spin_button):$/;"	m	class:PreferencesWindow
+on_parse_changed	preferences.py	/^    def on_parse_changed(self, _switch, state):$/;"	m	class:PreferencesWindow
+DELETED_EVENTS	watcher.py	/^DELETED_EVENTS = (Gio.FileMonitorEvent.MOVED_OUT, Gio.FileMonitorEvent.DELETED)$/;"	v
+CHANGED_EVENTS	watcher.py	/^CHANGED_EVENTS = (Gio.FileMonitorEvent.CHANGED, Gio.FileMonitorEvent.RENAMED)$/;"	v
+Watcher	watcher.py	/^class Watcher:$/;"	c
+__init__	watcher.py	/^    def __init__(self, main_widget, name):$/;"	m	class:Watcher
+on_changed	watcher.py	/^    def on_changed(self, file_monitor, _file, _other_file, event_type):$/;"	m	class:Watcher
+create_menu_item	menus.py	/^def create_menu_item(label, action, target=None):$/;"	f
+RecentFilesMenu	menus.py	/^class RecentFilesMenu(Gio.Menu):$/;"	c
+__init__	menus.py	/^    def __init__(self, recent_files):$/;"	m	class:RecentFilesMenu
+FormMenu	menus.py	/^class FormMenu(Gio.Menu):$/;"	c
+__init__	menus.py	/^    def __init__(self, field):$/;"	m	class:FormMenu
+MainMenu	menus.py	/^class MainMenu(Gtk.PopoverMenu):$/;"	c
+__init__	menus.py	/^    def __init__(self):$/;"	m	class:MainMenu
+FilterPopover	menus.py	/^class FilterPopover(Gtk.Popover):$/;"	c
+__init__	menus.py	/^    def __init__(self, button, itemlist):$/;"	m	class:FilterPopover
+assemble	menus.py	/^    def assemble(self):$/;"	m	class:FilterPopover
+on_switch_clicked	menus.py	/^    def on_switch_clicked(self, switch, state, entrytype):$/;"	m	class:FilterPopover
+SortPopover	menus.py	/^class SortPopover(Gtk.Popover):$/;"	c
+__init__	menus.py	/^    def __init__(self, sort_button, itemlist):$/;"	m	class:SortPopover
+assemble	menus.py	/^    def assemble(self):$/;"	m	class:SortPopover
+on_entrytype_clicked	menus.py	/^    def on_entrytype_clicked(self, radio_button, field):$/;"	m	class:SortPopover
+on_order_clicked	menus.py	/^    def on_order_clicked(self, radio_button, reverse):$/;"	m	class:SortPopover
+Spacer	window.py	/^class Spacer(Gtk.Separator):$/;"	c
+__init__	window.py	/^    def __init__(self):$/;"	m	class:Spacer
+BadaBibWindow	window.py	/^class BadaBibWindow(Adw.ApplicationWindow):$/;"	c
+__init__	window.py	/^    def __init__(self, **kwargs):$/;"	m	class:BadaBibWindow
+update_recent_file_menu	window.py	/^    def update_recent_file_menu(self):$/;"	m	class:BadaBibWindow
+clear_recent_file_menu	window.py	/^    def clear_recent_file_menu(self):$/;"	m	class:BadaBibWindow
+assemble_header_bar	window.py	/^    def assemble_header_bar(self):$/;"	m	class:BadaBibWindow
+do_close_request	window.py	/^    def do_close_request(self, window=None):$/;"	m	class:BadaBibWindow
+on_open	window.py	/^    def on_open(self, action=None, data=None):$/;"	m	class:BadaBibWindow
+on_open_clicked	window.py	/^    def on_open_clicked(self, _button=None):$/;"	m	class:BadaBibWindow
+on_open_response	window.py	/^    def on_open_response(self, dialog, response):$/;"	m	class:BadaBibWindow
+on_save_as_clicked	window.py	/^    def on_save_as_clicked(self, _button=None):$/;"	m	class:BadaBibWindow
+on_save_clicked	window.py	/^    def on_save_clicked(self, _button=None):$/;"	m	class:BadaBibWindow
+on_save_all_clicked	window.py	/^    def on_save_all_clicked(self, _button=None):$/;"	m	class:BadaBibWindow
+on_new_clicked	window.py	/^    def on_new_clicked(self, _button=None):$/;"	m	class:BadaBibWindow
+on_undo_clicked	window.py	/^    def on_undo_clicked(self, _button=None):$/;"	m	class:BadaBibWindow
+on_redo_clicked	window.py	/^    def on_redo_clicked(self, _button=None):$/;"	m	class:BadaBibWindow
+SessionManager	session_manager.py	/^class SessionManager:$/;"	c
+__init__	session_manager.py	/^    def __init__(self, main_widget):$/;"	m	class:SessionManager
+restore	session_manager.py	/^    def restore(self, arg_files=None):$/;"	m	class:SessionManager
+save	session_manager.py	/^    def save(self):$/;"	m	class:SessionManager
+restore_window_geom	session_manager.py	/^    def restore_window_geom(self):$/;"	m	class:SessionManager
+save_window_geom	session_manager.py	/^    def save_window_geom(self):$/;"	m	class:SessionManager
+restore_open_files	session_manager.py	/^    def restore_open_files(self, arg_files):$/;"	m	class:SessionManager
+save_open_files	session_manager.py	/^    def save_open_files(self):$/;"	m	class:SessionManager
+save_open_tab	session_manager.py	/^    def save_open_tab(self):$/;"	m	class:SessionManager
+restore_string_imports	session_manager.py	/^    def restore_string_imports(self):$/;"	m	class:SessionManager
+save_string_imports	session_manager.py	/^    def save_string_imports(self):$/;"	m	class:SessionManager
+BACKUP_TAG	store.py	/^BACKUP_TAG = "% Bada Bib! Backup File"$/;"	v
+has_backup_tag	store.py	/^def has_backup_tag(filename):$/;"	f
+backup_file	store.py	/^def backup_file(name):$/;"	f
+get_shortest_unique_names	store.py	/^def get_shortest_unique_names(files):$/;"	f
+BadaBibStore	store.py	/^class BadaBibStore:$/;"	c
+__init__	store.py	/^    def __init__(self):$/;"	m	class:BadaBibStore
+get_default_parser	store.py	/^    def get_default_parser():$/;"	m	class:BadaBibStore
+get_default_writer	store.py	/^    def get_default_writer():$/;"	m	class:BadaBibStore
+add_file	store.py	/^    def add_file(self, name):$/;"	m	class:BadaBibStore
+rename_file	store.py	/^    def rename_file(self, old_name, new_name):$/;"	m	class:BadaBibStore
+new_file	store.py	/^    def new_file(self):$/;"	m	class:BadaBibStore
+save_file	store.py	/^    def save_file(self, name):$/;"	m	class:BadaBibStore
+remove_file	store.py	/^    def remove_file(self, name):$/;"	m	class:BadaBibStore
+get_state_strings	store.py	/^    def get_state_strings(self):$/;"	m	class:BadaBibStore
+update_short_names	store.py	/^    def update_short_names(self):$/;"	m	class:BadaBibStore
+import_strings	store.py	/^    def import_strings(self, filename):$/;"	m	class:BadaBibStore
+update_global_strings	store.py	/^    def update_global_strings(self, bibfile=None):$/;"	m	class:BadaBibStore
+update_file_strings	store.py	/^    def update_file_strings(self, name, strings):$/;"	m	class:BadaBibStore
+row_indent	itemlist.py	/^row_indent = get_row_indent() * " "$/;"	v
+entrytypes	itemlist.py	/^entrytypes = list(entrytype_dict.keys()) + ["other"]$/;"	v
+MIN_MAX_CHAR	itemlist.py	/^MIN_MAX_CHAR = ('', chr(0x10FFFF))$/;"	v
+ROW_HEIGHT	itemlist.py	/^ROW_HEIGHT = 95$/;"	v
+ItemlistTabView	itemlist.py	/^class ItemlistTabView(Gtk.Box):$/;"	c
+__init__	itemlist.py	/^    def __init__(self):$/;"	m	class:ItemlistTabView
+contains_empty_file	itemlist.py	/^    def contains_empty_file(self):$/;"	m	class:ItemlistTabView
+next_page	itemlist.py	/^    def next_page(self, delta):$/;"	m	class:ItemlistTabView
+ItemlistPage	itemlist.py	/^class ItemlistPage(Gtk.Box):$/;"	c
+__init__	itemlist.py	/^    def __init__(self):$/;"	m	class:ItemlistPage
+add_itemlist	itemlist.py	/^    def add_itemlist(self, itemlist):$/;"	m	class:ItemlistPage
+remove_itemlist	itemlist.py	/^    def remove_itemlist(self):$/;"	m	class:ItemlistPage
+show_loading_screen	itemlist.py	/^    def show_loading_screen(self):$/;"	m	class:ItemlistPage
+show_error_screen	itemlist.py	/^    def show_error_screen(self, status):$/;"	m	class:ItemlistPage
+ItemlistInfoBar	itemlist.py	/^class ItemlistInfoBar(Gtk.InfoBar):$/;"	c
+__init__	itemlist.py	/^    def __init__(self, message):$/;"	m	class:ItemlistInfoBar
+show_text	itemlist.py	/^    def show_text(self, state):$/;"	m	class:ItemlistInfoBar
+reveal	itemlist.py	/^    def reveal(self):$/;"	m	class:ItemlistInfoBar
+on_response	itemlist.py	/^    def on_response(self, infobar, response):$/;"	m	class:ItemlistInfoBar
+ItemlistChangedBar	itemlist.py	/^class ItemlistChangedBar(Gtk.InfoBar):$/;"	c
+__init__	itemlist.py	/^    def __init__(self):$/;"	m	class:ItemlistChangedBar
+show_text	itemlist.py	/^    def show_text(self, state):$/;"	m	class:ItemlistChangedBar
+reveal	itemlist.py	/^    def reveal(self):$/;"	m	class:ItemlistChangedBar
+on_response	itemlist.py	/^    def on_response(self, infobar, response):$/;"	m	class:ItemlistChangedBar
+ItemlistSearchBar	itemlist.py	/^class ItemlistSearchBar(Gtk.SearchBar):$/;"	c
+__init__	itemlist.py	/^    def __init__(self):$/;"	m	class:ItemlistSearchBar
+ItemlistToolbar	itemlist.py	/^class ItemlistToolbar(Gtk.CenterBox):$/;"	c
+__init__	itemlist.py	/^    def __init__(self):$/;"	m	class:ItemlistToolbar
+assemble	itemlist.py	/^    def assemble(self):$/;"	m	class:ItemlistToolbar
+Row	itemlist.py	/^class Row(Gtk.ListBoxRow):$/;"	c
+__init__	itemlist.py	/^    def __init__(self, item):$/;"	m	class:Row
+assemble	itemlist.py	/^    def assemble(self):$/;"	m	class:Row
+disassemble	itemlist.py	/^    def disassemble(self):$/;"	m	class:Row
+update	itemlist.py	/^    def update(self):$/;"	m	class:Row
+update_field	itemlist.py	/^    def update_field(self, field):$/;"	m	class:Row
+update_id	itemlist.py	/^    def update_id(self):$/;"	m	class:Row
+update_author	itemlist.py	/^    def update_author(self):$/;"	m	class:Row
+update_title	itemlist.py	/^    def update_title(self):$/;"	m	class:Row
+update_journal	itemlist.py	/^    def update_journal(self):$/;"	m	class:Row
+update_publisher	itemlist.py	/^    def update_publisher(self):$/;"	m	class:Row
+update_link	itemlist.py	/^    def update_link(self):$/;"	m	class:Row
+Itemlist	itemlist.py	/^class Itemlist(Gtk.ListBox):$/;"	c
+__init__	itemlist.py	/^    def __init__(self, bibfile, state_string=None, change_buffer=None):$/;"	m	class:Itemlist
+unref	itemlist.py	/^    def unref(self):$/;"	m	class:Itemlist
+update_filename	itemlist.py	/^    def update_filename(self, unsaved=False, name=None):$/;"	m	class:Itemlist
+set_unsaved	itemlist.py	/^    def set_unsaved(self, unsaved):$/;"	m	class:Itemlist
+add_row	itemlist.py	/^    def add_row(self, item):$/;"	m	class:Itemlist
+add_rows	itemlist.py	/^    def add_rows(self, items):$/;"	m	class:Itemlist
+get_next_row	itemlist.py	/^    def get_next_row(self, row, increment):$/;"	m	class:Itemlist
+select_next_row	itemlist.py	/^    def select_next_row(self, row):$/;"	m	class:Itemlist
+focus_on_selected_items	itemlist.py	/^    def focus_on_selected_items(self, idx=None):$/;"	m	class:Itemlist
+reselect_rows	itemlist.py	/^    def reselect_rows(self, rows=None, adj=None):$/;"	m	class:Itemlist
+get_selected_items	itemlist.py	/^    def get_selected_items(self):$/;"	m	class:Itemlist
+refresh	itemlist.py	/^    def refresh(self):$/;"	m	class:Itemlist
+set_search_string	itemlist.py	/^    def set_search_string(self, search_entry):$/;"	m	class:Itemlist
+sort_by_field	itemlist.py	/^    def sort_by_field(self, row1, row2):$/;"	m	class:Itemlist
+filter_and_unselect	itemlist.py	/^    def filter_and_unselect(self, row):$/;"	m	class:Itemlist
+filter	itemlist.py	/^    def filter(self, row):$/;"	m	class:Itemlist
+state_to_string	itemlist.py	/^    def state_to_string(self):$/;"	m	class:Itemlist
+string_to_state	itemlist.py	/^    def string_to_state(self, text):$/;"	m	class:Itemlist
+expand	string_manager.py	/^from .bibitem import expand_pretty as expand$/;"	x	nameref:unknown:expand_pretty
+FileList	string_manager.py	/^class FileList(Gtk.ListBox):$/;"	c
+__init__	string_manager.py	/^    def __init__(self, filenames, shortnames=None):$/;"	m	class:FileList
+add_row	string_manager.py	/^    def add_row(self, filename, shortname=None):$/;"	m	class:FileList
+remove_row	string_manager.py	/^    def remove_row(self, row):$/;"	m	class:FileList
+add_rows	string_manager.py	/^    def add_rows(self, filenames, shortnames=None):$/;"	m	class:FileList
+add_loading_rows	string_manager.py	/^    def add_loading_rows(self, N):$/;"	m	class:FileList
+remove_loading_rows	string_manager.py	/^    def remove_loading_rows(self):$/;"	m	class:FileList
+select_file	string_manager.py	/^    def select_file(self, filename):$/;"	m	class:FileList
+FileRow	string_manager.py	/^class FileRow(Gtk.ListBoxRow):$/;"	c
+__init__	string_manager.py	/^    def __init__(self, filename, shortname=None):$/;"	m	class:FileRow
+StringList	string_manager.py	/^class StringList(Gtk.ListBox):$/;"	c
+__init__	string_manager.py	/^    def __init__(self, strings, toolbar, search_bar, editable=True):$/;"	m	class:StringList
+set_applicable	string_manager.py	/^    def set_applicable(self, applicable=None):$/;"	m	class:StringList
+add_top_space	string_manager.py	/^    def add_top_space(row, before):$/;"	m	class:StringList
+add_row	string_manager.py	/^    def add_row(self, macro, value, editable=True):$/;"	m	class:StringList
+new_row	string_manager.py	/^    def new_row(self, button):$/;"	m	class:StringList
+add_rows	string_manager.py	/^    def add_rows(self, strings, editable=True):$/;"	m	class:StringList
+delete_row	string_manager.py	/^    def delete_row(self, _button, row):$/;"	m	class:StringList
+delete_empty_rows	string_manager.py	/^    def delete_empty_rows(self):$/;"	m	class:StringList
+add_new_row_button	string_manager.py	/^    def add_new_row_button(self):$/;"	m	class:StringList
+to_dict	string_manager.py	/^    def to_dict(self):$/;"	m	class:StringList
+filter_by_search	string_manager.py	/^    def filter_by_search(self, row):$/;"	m	class:StringList
+StringRow	string_manager.py	/^class StringRow(Gtk.ListBoxRow):$/;"	c
+__init__	string_manager.py	/^    def __init__(self, string_list, macro, value, editable=True):$/;"	m	class:StringRow
+is_empty	string_manager.py	/^    def is_empty(self):$/;"	m	class:StringRow
+on_macro_changed	string_manager.py	/^    def on_macro_changed(self, entry):$/;"	m	class:StringRow
+on_value_changed	string_manager.py	/^    def on_value_changed(self, entry):$/;"	m	class:StringRow
+NewStringRow	string_manager.py	/^class NewStringRow(Gtk.ListBoxRow):$/;"	c
+__init__	string_manager.py	/^    def __init__(self):$/;"	m	class:NewStringRow
+StringToolbar	string_manager.py	/^class StringToolbar(Gtk.CenterBox):$/;"	c
+__init__	string_manager.py	/^    def __init__(self):$/;"	m	class:StringToolbar
+set_applicable	string_manager.py	/^    def set_applicable(self, applicable):$/;"	m	class:StringToolbar
+ImportToolbar	string_manager.py	/^class ImportToolbar(Gtk.Box):$/;"	c
+__init__	string_manager.py	/^    def __init__(self):$/;"	m	class:ImportToolbar
+StringManagerWindow	string_manager.py	/^class StringManagerWindow(Gtk.Window):$/;"	c
+__init__	string_manager.py	/^    def __init__(self, main_window):$/;"	m	class:StringManagerWindow
+assemble_left_pane	string_manager.py	/^    def assemble_left_pane(self):$/;"	m	class:StringManagerWindow
+assemble_right_pane	string_manager.py	/^    def assemble_right_pane(self):$/;"	m	class:StringManagerWindow
+on_search_changed	string_manager.py	/^    def on_search_changed(self, search_entry):$/;"	m	class:StringManagerWindow
+search_string_list	string_manager.py	/^    def search_string_list(self, _button=None):$/;"	m	class:StringManagerWindow
+on_open_file_selected	string_manager.py	/^    def on_open_file_selected(self, filelist, row):$/;"	m	class:StringManagerWindow
+on_import_file_selected	string_manager.py	/^    def on_import_file_selected(self, filelist, row):$/;"	m	class:StringManagerWindow
+show_local_string_list	string_manager.py	/^    def show_local_string_list(self, filename):$/;"	m	class:StringManagerWindow
+show_global_string_list	string_manager.py	/^    def show_global_string_list(self, filename):$/;"	m	class:StringManagerWindow
+add_local_string_list	string_manager.py	/^    def add_local_string_list(self, filename):$/;"	m	class:StringManagerWindow
+add_global_string_list	string_manager.py	/^    def add_global_string_list(self, filename):$/;"	m	class:StringManagerWindow
+update_local_strings	string_manager.py	/^    def update_local_strings(self, _button):$/;"	m	class:StringManagerWindow
+refresh_display	string_manager.py	/^    def refresh_display(file):$/;"	m	class:StringManagerWindow
+import_strings	string_manager.py	/^    def import_strings(self, _button):$/;"	m	class:StringManagerWindow
+on_import_response	string_manager.py	/^    def on_import_response(self, dialog, response):$/;"	m	class:StringManagerWindow
+import_strings_thread	string_manager.py	/^    def import_strings_thread(self, filenames):$/;"	m	class:StringManagerWindow
+remove_imported_strings	string_manager.py	/^    def remove_imported_strings(self, _button):$/;"	m	class:StringManagerWindow
+month_database	bibitem.py	/^month_database = BibDatabase()$/;"	v
+MAX_CHAR	bibitem.py	/^MAX_CHAR = chr(0x10FFFF)$/;"	v
+expand_pretty	bibitem.py	/^def expand_pretty(expression):$/;"	f
+expand_raw	bibitem.py	/^def expand_raw(expression):$/;"	f
+get_n_strings_expr	bibitem.py	/^def get_n_strings_expr(expression):$/;"	f
+get_n_strings_text	bibitem.py	/^def get_n_strings_text(text, bibstrings):$/;"	f
+text_to_expression	bibitem.py	/^def text_to_expression(text, database):$/;"	f
+entries_equal	bibitem.py	/^def entries_equal(entry1, entry2):$/;"	f
+BadaBibItem	bibitem.py	/^class BadaBibItem:$/;"	c
+__init__	bibitem.py	/^    def __init__(self, bibfile, idx):$/;"	m	class:BadaBibItem
+entry	bibitem.py	/^    def entry(self):$/;"	m	class:BadaBibItem
+max_field_width	bibitem.py	/^    def max_field_width(self):$/;"	m	class:BadaBibItem
+unref	bibitem.py	/^    def unref(self):$/;"	m	class:BadaBibItem
+pretty_field	bibitem.py	/^    def pretty_field(self, field):$/;"	m	class:BadaBibItem
+raw_field	bibitem.py	/^    def raw_field(self, field):$/;"	m	class:BadaBibItem
+bibstring_status	bibitem.py	/^    def bibstring_status(self, field):$/;"	m	class:BadaBibItem
+last_name_list	bibitem.py	/^    def last_name_list(self):$/;"	m	class:BadaBibItem
+lowercase_last_names	bibitem.py	/^    def lowercase_last_names(self):$/;"	m	class:BadaBibItem
+update_field	bibitem.py	/^    def update_field(self, field, value, update_bibtex=True):$/;"	m	class:BadaBibItem
+refresh	bibitem.py	/^    def refresh(self):$/;"	m	class:BadaBibItem
+update_entry	bibitem.py	/^    def update_entry(self, entry, update_bibtex=False):$/;"	m	class:BadaBibItem
+update_bibtex	bibitem.py	/^    def update_bibtex(self):$/;"	m	class:BadaBibItem
+update_sort_value	bibitem.py	/^    def update_sort_value(self, field):$/;"	m	class:BadaBibItem
+update_all_sort_values	bibitem.py	/^    def update_all_sort_values(self):$/;"	m	class:BadaBibItem
+UNDO_DELAY	change.py	/^UNDO_DELAY = get_undo_delay()$/;"	v
+Change	change.py	/^class Change:$/;"	c
+Generic	change.py	/^    class Generic:$/;"	c	class:Change
+main_widget	change.py	/^        def main_widget(self):$/;"	m	class:Change.Generic
+editor	change.py	/^        def editor(self):$/;"	m	class:Change.Generic
+bibfile	change.py	/^        def bibfile(self):$/;"	m	class:Change.Generic
+source_view	change.py	/^        def source_view(self):$/;"	m	class:Change.Generic
+Edit	change.py	/^    class Edit(Generic):$/;"	c	class:Change
+__init__	change.py	/^ 

@@ -39,6 +39,17 @@
     </provides>
 
     <releases>
+      <release version="0.8.1" date="2022-09-25">
+            <description>
+              <p>Bug fixes and code maintenance:</p>
+                <ul>
+                  <li>Display file name while loading</li>
+                  <li>Fix bug when pasting the same entry multiple times</li>
+                  <li>Fix potential crash when no editor is active</li>
+                  <li>Better code documentation</li>
+                </ul>
+            </description>
+      </release>
       <release version="0.8.0" date="2022-08-07">
             <description>
               <p>Use ADW TabView instead of GTK Notebook. This makes for a more consistent look and fixes a couple of minor bugs.</p>

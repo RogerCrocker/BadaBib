@@ -19,17 +19,12 @@ gi.require_version("Gtk", "4.0")
 gi.require_version("Adw", "1")
 gi.require_version("GtkSource", "5")
 
+import badabib.customization
+import badabib.forms
+
 from gi.repository import GLib, Gtk, Gio, Adw
 
 from sys import argv
-
-from .customization import title_case
-from .customization import upper_case
-from .customization import lower_case
-from .customization import protect_caps
-from .customization import convert_to_unicode
-from .customization import convert_to_latex
-from .customization import sanitize_range
 
 from .window import BadaBibWindow
 
@@ -40,10 +35,6 @@ from .string_manager import StringManagerWindow
 from .preferences import PreferencesWindow
 
 from .dialogs import AboutDialog
-
-from .forms import SingleLine
-from .forms import MultiLine
-from .forms import SourceView
 
 
 # Names of actions to customize fields
@@ -376,13 +367,13 @@ class Application(Adw.Application):
         if isinstance(widget, Gtk.Text):
             form = widget.get_parent()
             # single line entry
-            if isinstance(form, SingleLine):
+            if isinstance(form, badabib.forms.SingleLine):
                 return form, False
             # combo box entry
             return None, False
 
         # multiline entry
-        if isinstance(widget, MultiLine):
+        if isinstance(widget, badabib.forms.MultiLine):
             return widget, False
 
         # Otherwise action was invoked using a right-click menu.
@@ -390,7 +381,7 @@ class Application(Adw.Application):
 
         # source view
         widget = self.window.main_widget.outer_stack.get_visible_child()
-        if isinstance(widget, SourceView):
+        if isinstance(widget, badabib.forms.SourceView):
             return widget.form, True
 
         # editor/catch all - returns None is no form is active
@@ -427,11 +418,11 @@ class Application(Adw.Application):
             # Cycle through case types
             counter = form.change_case_counter
             if counter == 0:
-                form.apply(title_case)
+                form.apply(badabib.customization.title_case)
             elif counter == 1:
-                form.apply(upper_case)
+                form.apply(badabib.customization.upper_case)
             elif counter == 2:
-                form.apply(lower_case)
+                form.apply(badabib.customization.lower_case)
             if grab_focus:
                 form.grab_focus()
             form.change_case_counter += 1
@@ -439,31 +430,31 @@ class Application(Adw.Application):
 
     def on_title_case(self, action=None, data=None):
         """Handle title_case signal. See on_quit for parameters."""
-        self.apply_customization(title_case)
+        self.apply_customization(badabib.customization.title_case)
 
     def on_upper_case(self, action=None, data=None):
         """Handle upper_case signal. See on_quit for parameters."""
-        self.apply_customization(upper_case)
+        self.apply_customization(badabib.customization.upper_case)
 
     def on_lower_case(self, action=None, data=None):
         """Handle lower_case signal. See on_quit for parameters."""
-        self.apply_customization(lower_case)
+        self.apply_customization(badabib.customization.lower_case)
 
     def on_protect_caps(self, action=None, data=None):
         """Handle protect_caps signal. See on_quit for parameters."""
-        self.apply_customization(protect_caps)
+        self.apply_customization(badabib.customization.protect_caps)
 
     def on_sanitize_range(self, action=None, data=None):
         """Handle sanitize_range signal. See on_quit for parameters."""
-        self.apply_customization(sanitize_range)
+        self.apply_customization(badabib.customization.sanitize_range)
 
     def on_to_unicode(self, action=None, data=None):
         """Handle to_unicode signal. See on_quit for parameters."""
-        self.apply_customization(convert_to_unicode)
+        self.apply_customization(badabib.customization.convert_to_unicode)
 
     def on_to_latex(self, action=None, data=None):
         """Handle to_latex signal. See on_quit for parameters."""
-        self.apply_customization(convert_to_latex)
+        self.apply_customization(badabib.customization.convert_to_latex)
 
     def on_generate_key(self, action=None, data=None):
         """Handle generate_key signal. See on_quit for parameters."""

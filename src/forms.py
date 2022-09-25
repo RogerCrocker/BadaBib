@@ -25,29 +25,10 @@ from .config_manager import get_highlight_syntax
 from .menus import FormMenu
 
 
-has_entry = ["ENTRYTYPE", "month"]
-has_buffer = ["abstract"]
-is_not_entry = has_entry + has_buffer + ["separator"]
-is_entry = [field for field in field_dict if field not in is_not_entry]
-
-
-def fields_to_forms(fields, editor):
-    forms = []
-    for field in fields:
-        if field == "newrow":
-            form = None
-        elif field == "separator":
-            form = Separator()
-        elif field == "ENTRYTYPE":
-            form = EntrytypeBox(field, editor)
-        elif field == "month":
-            form = MonthBox(field, editor)
-        elif field == "abstract":
-            form = MultiLine(field, editor)
-        else:
-            form = SingleLine(field, editor)
-        forms.append(form)
-    return forms
+HAS_ENTRY = ["ENTRYTYPE", "month"]
+HAS_BUFFER = ["abstract"]
+IS_NOT_ENTRY = HAS_ENTRY + HAS_BUFFER + ["separator"]
+IS_ENTRY = [field for field in field_dict if field not in IS_NOT_ENTRY]
 
 
 class MultiLine(GtkSource.View):

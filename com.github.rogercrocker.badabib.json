@@ -38,8 +38,8 @@
 		},
 		{
 		    "type": "file",
-		    "url": "https://files.pythonhosted.org/packages/e9/c7/bd18cd33211592932f64e43588a36d2fe6b30f8fe4261e4b0eeb25bb3619/bibtexparser-1.3.0-py3-none-any.whl",
-		    "sha256": "d2886789566f2ecbecb5f44309d36ed96162530f29f0b0c07df11630adf17632"
+		    "url": "https://files.pythonhosted.org/packages/82/60/e4315ce9801daa4c95d4ae66cc684a1780cc041ba3c4eab67265ab08a038/bibtexparser-1.4.0.tar.gz",
+		    "sha256": "ca7ce2bc34e7c48a678dd49416429bb567441f26dbb13b3609082d8cd109ace6"
 		}
 	    ]
 	},
@@ -51,8 +51,8 @@
                 {
                     "type" : "git",
                     "url" : "https://github.com/RogerCrocker/BadaBib.git",
-                    "tag": "v0.8.0",
-                    "commit": "f2dcea2d7da11fabcc91de0bb93c36d08b0977a4"
+                    "tag": "v0.8.1",
+                    "commit": "88a2db263b090975276d53a25fce696cccaf1304"
                 }
             ]
         }

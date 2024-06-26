@@ -1,7 +1,7 @@
 {
     "app-id" : "com.github.rogercrocker.badabib",
     "runtime" : "org.gnome.Platform",
-    "runtime-version" : "42",
+    "runtime-version" : "46",
     "sdk" : "org.gnome.Sdk",
     "command" : "badabib",
     "finish-args" : [

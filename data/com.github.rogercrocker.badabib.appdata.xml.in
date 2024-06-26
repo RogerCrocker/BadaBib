@@ -33,6 +33,8 @@
 
     <url type="homepage">https://github.com/RogerCrocker/BadaBib/</url>
     <url type="bugtracker">https://github.com/RogerCrocker/BadaBib/issues</url>
+    <url type="vcs-browser">https://github.com/RogerCrocker/BadaBib/</url>
+    <developer_name>RogerCrocker</developer_name>
 
     <provides>
         <mediatype>application/x-bibtex</mediatype>

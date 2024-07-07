@@ -50,6 +50,7 @@ field_dict = {
     "author": "Author",
     "editor": "Editor",
     "title": "Title",
+    "shorttitle" : "Short Title", # This is needed for the Chicago Manual of Style.
     "journal": "Journal",
     "booktitle": "Book Title",
     "chapter": "Chapter",

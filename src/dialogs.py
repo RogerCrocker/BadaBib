@@ -14,8 +14,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-from platform import python_version
-
 from gi.repository import Gtk
 
 
@@ -192,29 +190,3 @@ class SaveDialog(Gtk.FileChooserDialog):
 
         self.set_current_name(filename)  # Suggest name
         add_filters(self)
-
-
-class AboutDialog(Gtk.AboutDialog):
-    """
-    About Bada Bib!
-    """
-    def __init__(self, window):
-        """
-        window: Gtk.Window
-            Parent window of the dialog
-        """
-        super().__init__(modal=True, transient_for=window)
-
-        # Print name and version of Bada Bib!
-        self.set_program_name(self.get_program_name() + " " + window.app.version)
-
-        # Print Python and GTK version
-        gtk_version = f"{Gtk.get_major_version()}.{Gtk.get_minor_version()}.{Gtk.get_micro_version()}"
-        self.set_version(f"Python {python_version()}, GTK {gtk_version}")
-
-        # App details
-        self.set_comments("View, search and edit your BibTeX files")
-        self.set_logo_icon_name("com.github.rogercrocker.badabib")
-        self.set_website("https://github.com/RogerCrocker/BadaBib")
-        self.set_website_label("GitHub Repository")
-        self.set_license_type(Gtk.License.GPL_3_0)

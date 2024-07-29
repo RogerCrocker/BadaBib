@@ -15,40 +15,29 @@
 
 
 from gi.repository import Gtk, Gdk, GLib, Gio
-
+from os.path import split
 from time import sleep
 
-from os.path import split
-
+from .bibitem import entries_equal
+from .change import Change
 from .config_manager import add_to_recent
-from .config_manager import remove_from_recent
+from .config_manager import get_default_entrytype
 from .config_manager import get_editor_layout
 from .config_manager import get_parse_on_fly
-from .config_manager import get_default_entrytype
-
-from .layout_manager import string_to_layout
-
-from .bibitem import entries_equal
-
-from .forms import SourceView
-
-from .change import Change
-
+from .config_manager import remove_from_recent
+from .dialogs import SaveChangesDialog
+from .dialogs import SaveDialog
+from .dialogs import ConfirmSaveDialog
 from .editor import Editor
-
-from .watcher import Watcher
-
+from .forms import SourceView
 from .itemlist import Itemlist
 from .itemlist import ItemlistPage
 from .itemlist import ItemlistTabView
 from .itemlist import ItemlistToolbar
-
+from .layout_manager import string_to_layout
 from .menus import FilterPopover
 from .menus import SortPopover
-
-from .dialogs import SaveChangesDialog
-from .dialogs import SaveDialog
-from .dialogs import ConfirmSaveDialog
+from .watcher import Watcher
 
 
 DEFAULT_EDITOR = get_default_entrytype()
@@ -428,40 +417,94 @@ class MainWidget(Gtk.Paned):
         self.watchers.pop(name)
 
     def close_files(self, bibfiles, force=False, close_app=False):
-        # make sure 'bibfiles' is a list
+        """
+        Close selected files.
+
+        bibfiles: BadaBibFile | list(BadaBibFile)
+            bib file or list of bib files to close
+        force: bool
+            Close file irrespective of unsaved changes
+        close_app: bool
+            True if app is being closed, False if individual files are being closed
+        """
         if not isinstance(bibfiles, list):
             bibfiles = [bibfiles]
-        self.close_files_dialog(None, Gtk.ResponseType.CLOSE, bibfiles, 0, force, close_app)
+        self.close_files_dialog(None, "close", bibfiles, 0, force, close_app)
 
     def handle_close_response(self, dialog, response, bibfiles, n, force, close_app):
+        """
+        Handle user response when closing a file with unsaved changes. If the dialog
+        parameter is set, the user response is obtained from the dialog.
+        Otherwise the response parameter is used directly.
+
+        Parameters
+        ----------
+        dialog: Adw.AlertDialog | None
+            Dialog the user interacted with
+        response: Gio.AsyncResult | str
+            User selection
+        bibfiles: list(BadaBibFile)
+            List of bib files being closed
+        n: int
+            Number of files being closed
+        force: bool
+            Close file irrespective of unsaved changes
+        close_app: bool
+            True if app is being closed, False if individual files are being closed
+
+        Returns
+        -------
+        bool: True if user saves or cancels, False if user closes without saving
+        """
         if dialog:
-            dialog.destroy()
-        if response == Gtk.ResponseType.CANCEL:
+            response = dialog.choose_finish(response)
+        if response == "cancel":
             return True
-        if response == Gtk.ResponseType.OK:
+        if response == "save":
             self.save_and_close(bibfiles, n-1, force, close_app)
             return True
         return False
 
     def close_files_dialog(self, dialog, response, bibfiles, n, force, close_app):
+        """
+        Recursively check files that are being closed for unsaved changes
+        and ask for user input if necessary.
+
+        Parameters
+        ----------
+        dialog: Adw.AlertDialog | None
+            Dialog the user interacted with
+        response: Gio.AsyncResult | str
+            User selection
+        bibfiles: list(BadaBibFile)
+            List of bib files being closed
+        n: int
+            Number of files being closed
+        force: bool
+            Close file irrespective of unsaved changes or other issues
+        close_app: bool
+            True if app is being closed, False if individual files are being closed
+        """
+        # Prompt user how to handle current file, return if user decides not to close file
         handled = self.handle_close_response(dialog, response, bibfiles, n, force, close_app)
         if handled:
             return None
 
+        # Go to next file
         bibfile = bibfiles[n]
         if bibfile.unsaved and not force:
+            # Prompt user to save changes if necessary
             self.tabbox.tabview.set_selected_page(bibfile.itemlist.page.tabview_page)
-            dialog = SaveChangesDialog(self.get_root(), bibfile.name)
+            dialog = SaveChangesDialog(bibfile.name)
             if n < len(bibfiles) - 1:
-                dialog.connect("response", self.close_files_dialog, bibfiles, n+1, force, close_app)
+                dialog.choose(self.get_root(), None, self.close_files_dialog, bibfiles, n+1, force, close_app)
             else:
-                dialog.connect("response", self.close_files_finalize, bibfiles, n+1, force, close_app)
-            dialog.show()
+                dialog.choose(self.get_root(), None, self.close_files_finalize, bibfiles, n+1, force, close_app)
         else:
             if n < len(bibfiles) - 1:
-                self.close_files_dialog(None, Gtk.ResponseType.CLOSE, bibfiles, n+1, force, close_app)
+                self.close_files_dialog(None, "close", bibfiles, n+1, force, close_app)
             else:
-                self.close_files_finalize(None, Gtk.ResponseType.CLOSE, bibfiles, n+1, force, close_app)
+                self.close_files_finalize(None, "close", bibfiles, n+1, force, close_app)
         return None
 
     def close_files_finalize(self, dialog, response, bibfiles, n, force, close_app):
@@ -523,38 +566,81 @@ class MainWidget(Gtk.Paned):
         return None
 
     def confirm_save_dialog(self, bibfile, new_name, close_data):
+        """
+        Confirm that user wants to save file despite empty or duplicate keys.
+
+        Parameters
+        ----------
+        bibfile: BadaBibFile
+            File being saved
+        new_name: str | None
+            If set, save file under this name
+        close_data: Tuple(List(BadaBibFile), int, bool, bool) | None
+            Parameters passed to close_files_dialog when saving file under new name
+        """
         has_empty_keys = bibfile.has_empty_keys()
         duplicate_keys = bibfile.get_duplicate_keys()
         if has_empty_keys or duplicate_keys:
-            dialog = ConfirmSaveDialog(self.get_root(), bibfile.name, has_empty_keys, duplicate_keys)
-            dialog.connect("response", self.save_file_dialog, bibfile, new_name, close_data)
-            dialog.show()
+            dialog = ConfirmSaveDialog(bibfile.name, has_empty_keys, duplicate_keys)
+            dialog.choose(self.get_root(), None, self.save_file_dialog, bibfile, new_name, close_data)
         else:
-            self.save_file_dialog(None, Gtk.ResponseType.YES, bibfile, new_name, close_data)
+            self.save_file_dialog(None, None, bibfile, new_name, close_data)
 
     def save_file_dialog(self, dialog, response, bibfile, new_name, close_data):
-        if dialog:
-            dialog.destroy()
+        """
+        Prompt user to select name and folder when saving file.
 
-        if response != Gtk.ResponseType.YES:
+        Parameters
+        ----------
+        dialog: Adw.AlertDialog | None
+            Dialog the user interacted with
+        response: Gio.AsyncResult | str
+            User selection
+        bibfile: BadaBibFile
+            File being saved
+        new_name: str | None
+            If set, save file under this name
+        close_data: Tuple(List(BadaBibFile), int, bool, bool) | None
+            Parameters passed to close_files_dialog when saving file under new name
+        """
+        if dialog:
+            response = dialog.choose_finish(response)
+
+        if response == "no":
             return None
 
         if not new_name:
-            dialog = SaveDialog(self.get_root(), bibfile.base_name)
-            dialog.connect("response", self.save_file_as_finalize, bibfile, new_name, close_data)
-            dialog.show()
+            dialog = SaveDialog(bibfile.base_name)
+            dialog.save(self.get_root(), None, self.save_file_as_finalize, bibfile, new_name, close_data)
         else:
             self.save_file_as_finalize(None, None, bibfile, new_name, close_data)
 
-    def save_file_as_finalize(self, dialog, response, bibfile, new_name, close_data):
+    def save_file_as_finalize(self, dialog, task, bibfile, new_name, close_data):
+        """
+        Save file, possibly under new name. At this point, the file has already
+        been checked for issues and the user might have provided input via a dialog.
+        In this case, the dialog and the user response are passed to this function.
+
+        Parameters
+        ----------
+        dialog: Adw.AlertDialog | None
+            Dialog the user interacted with
+        task: Gio.AsyncResult | None
+            User selection
+        bibfile: BadaBibFile
+            File being saved
+        new_name: str | None
+            If set, save file under this name
+        close_data: Tuple(List(BadaBibFile), int, bool, bool) | None
+            Parameters passed to close_files_dialog when saving file under new name
+        """
         if dialog:
-            dialog.destroy()
-            if response == Gtk.ResponseType.ACCEPT:
-                new_name = dialog.get_file().get_path()
-                new_name = new_name.strip()
+            try:
+                gfile = dialog.save_finish(task)
+                new_name = gfile.get_path().strip()
                 if new_name[-4:] != ".bib":
-                    new_name = new_name + ".bib"
-            else:
+                    new_name += ".bib"
+            except GLib.GError:
                 return None
 
         if new_name != bibfile.name:
@@ -585,4 +671,4 @@ class MainWidget(Gtk.Paned):
         bibfile.set_unsaved(False)
 
         if close_data is not None:
-            self.close_files_dialog(None, Gtk.ResponseType.CLOSE, *close_data)
+            self.close_files_dialog(None, "close", *close_data)

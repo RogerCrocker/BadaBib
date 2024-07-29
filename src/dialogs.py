@@ -14,7 +14,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-from gi.repository import Adw, Gtk
+from gi.repository import Adw, Gio, Gtk
 
 
 def add_filters(dialog):
@@ -23,17 +23,20 @@ def add_filters(dialog):
 
     Parameters
     ----------
-    dialog: Gtk.FileChooserDialog
+    dialog: Gtk.FileDialog
     """
     filter_bibtex = Gtk.FileFilter()
     filter_bibtex.set_name("BibTeX files")
     filter_bibtex.add_pattern("*.bib")
-    dialog.add_filter(filter_bibtex)
 
     filter_all = Gtk.FileFilter()
     filter_all.set_name("All files")
     filter_all.add_pattern("*")
-    dialog.add_filter(filter_all)
+
+    filters = Gio.ListStore.new(Gtk.FileFilter)
+    filters.append(filter_bibtex)
+    filters.append(filter_all)
+    dialog.set_filters(filters)
 
 
 class WarningDialog(Adw.AlertDialog):
@@ -63,45 +66,33 @@ class WarningDialog(Adw.AlertDialog):
     def close(dialog, response):
         """Close dialog, irrespective of response."""
         dialog.choose_finish(response)
-        return None
 
 
-class SaveChangesDialog(Gtk.MessageDialog):
+class SaveChangesDialog(Adw.AlertDialog):
     """
     Alert user that file contains unsaved changes.
     """
-    def __init__(self, window, filename):
+    def __init__(self, filename):
         """
-        window: Gtk.Window
-            Parent window of the dialog
         filename: str
             Name of file with unsaved changes
         """
-        super().__init__(
-            transient_for=window,
-            message_type=Gtk.MessageType.QUESTION,
-            buttons=Gtk.ButtonsType.NONE,
-            text=f"Save changes to file '{filename}' before closing?",
-            title="Bada Bib! - Unsaved Changes",
-        )
-        self.add_buttons(
-            "Close without saving", Gtk.ResponseType.CLOSE,
-            "Cancel", Gtk.ResponseType.CANCEL,
-            "Save", Gtk.ResponseType.OK,
-        )
-        self.set_default_response(Gtk.ResponseType.CANCEL)
-        self.set_modal(True)
+        super().__init__()
+        self.set_heading("Bada Bib! - Unsaved Changes")
+        self.set_body(f"Save changes to file '{filename}' before closing?")
+        self.add_response("close", "Close without saving")
+        self.add_response("cancel", "Cancel")
+        self.add_response("save", "Save")
+        self.set_close_response("cancel")
 
 
-class ConfirmSaveDialog(Gtk.MessageDialog):
+class ConfirmSaveDialog(Adw.AlertDialog):
     """
     Confirm that user wants to save file, although it contains empty and/or
     duplicate keys.
     """
-    def __init__(self, window, filename, has_empty_keys, duplicate_keys):
+    def __init__(self, filename, has_empty_keys, duplicate_keys):
         """
-        window: Gtk.Window
-            Parent window of the dialog
         filename: str
             Name of file with empty/duplicate keys
         has_empty_keys: bool
@@ -128,63 +119,33 @@ class ConfirmSaveDialog(Gtk.MessageDialog):
             + "Save anyhow?"
         )
 
-        super().__init__(
-            transient_for=window,
-            message_type=Gtk.MessageType.QUESTION,
-            text=text,
-            title="Bada Bib! - Warning",
-        )
-
-        self.add_buttons(
-            "No", Gtk.ResponseType.NO,
-            "Yes", Gtk.ResponseType.YES,
-        )
-
-        self.props.use_markup = True
-        self.set_modal(True)
+        super().__init__()
+        self.set_heading("Bada Bib! - Warning")
+        self.set_body(text)
+        self.set_body_use_markup(True)
+        self.add_response("no", "No")
+        self.add_response("yes", "Yes")
+        self.set_close_response("no")
 
 
-class FileChooser(Gtk.FileChooserDialog):
+class FileChooser(Gtk.FileDialog):
     """
-    Customized file chooser.
+    Customized file dialog.
     """
-    def __init__(self, window):
-        """
-        window: Gtk.Window
-            Parent window of the dialog
-        """
-        super().__init__(
-            title="Bada Bib! - Please choose a file",
-            transient_for=window,
-            action=Gtk.FileChooserAction.OPEN
-        )
-        self.add_button("Cancel", Gtk.ResponseType.CANCEL)
-        accept_button = self.add_button("Open", Gtk.ResponseType.ACCEPT)
-        accept_button.get_style_context().add_class("suggested-action")
-
-        self.set_select_multiple(True)  # Allow selecting multiple files
+    def __init__(self):
+        super().__init__(title="Bada Bib! - Please choose a file")
         add_filters(self)
 
 
-class SaveDialog(Gtk.FileChooserDialog):
+class SaveDialog(Gtk.FileDialog):
     """
     Customized save dialog.
     """
-    def __init__(self, window, filename):
+    def __init__(self, filename):
         """
-        window: Gtk.Window
-            Parent window of the dialog
         filename: str
             File to be saved
         """
-        super().__init__(
-            title="Bada Bib! - Please choose a file name",
-            transient_for=window,
-            action=Gtk.FileChooserAction.SAVE,
-        )
-        self.add_button("Cancel", Gtk.ResponseType.CANCEL)
-        accept_button = self.add_button("Save", Gtk.ResponseType.ACCEPT)
-        accept_button.get_style_context().add_class("suggested-action")
-
-        self.set_current_name(filename)  # Suggest name
+        super().__init__(title="Bada Bib! - Please choose a file name")
+        self.set_initial_name(filename)  # Suggest name
         add_filters(self)

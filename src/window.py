@@ -14,21 +14,16 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-from gi.repository import Gtk, Adw
+from gi.repository import Adw, GLib, Gtk
 
 from .config_manager import get_recent_files
 from .config_manager import set_recent_files
-
 from .dialogs import FileChooser
-
-from .menus import RecentFilesMenu
-from .menus import MainMenu
-
-from .store import BadaBibStore
-
 from .main_widget import MainWidget
-
+from .menus import MainMenu
+from .menus import RecentFilesMenu
 from .session_manager import SessionManager
+from .store import BadaBibStore
 
 
 class Spacer(Gtk.Separator):
@@ -123,16 +118,35 @@ class BadaBibWindow(Adw.ApplicationWindow):
         self.on_open_clicked()
 
     def on_open_clicked(self, _button=None):
-        dialog = FileChooser(self)
-        dialog.connect("response", self.on_open_response)
-        dialog.show()
+        """
+        Have user select one or multiple files.
 
-    def on_open_response(self, dialog, response):
-        if response == Gtk.ResponseType.ACCEPT:
-            gfiles = dialog.get_files()
-            open_files = [gfile.get_path() for gfile in gfiles]
-            self.main_widget.open_files(open_files)
-        dialog.destroy()
+        Parameters
+        ----------
+        _button: Adw.SplitButton | None
+            Button clicked by user, None if keyboard shortcut was used. Unused.
+        """
+        dialog = FileChooser()
+        dialog.open_multiple(self, None, self.on_open_response)
+
+    def on_open_response(self, dialog, task):
+        """
+        Open selected files.
+
+        Parameters
+        ----------
+        dialog: Gtk.FileDialog
+            File dialog the user interacted with
+        task: Gio.AsyncResult
+            User selection
+        """
+        try:
+            gfiles = dialog.open_multiple_finish(task)
+        except GLib.GError:
+            return None
+        if gfiles:
+            files = [gfile.get_path() for gfile in gfiles]
+            self.main_widget.open_files(files)
 
     def on_save_as_clicked(self, _button=None):
         self.main_widget.save_file_as()

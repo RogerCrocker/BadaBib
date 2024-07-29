@@ -147,6 +147,7 @@ class BadaBibWindow(Adw.ApplicationWindow):
         if gfiles:
             files = [gfile.get_path() for gfile in gfiles]
             self.main_widget.open_files(files)
+        return None
 
     def on_save_as_clicked(self, _button=None):
         self.main_widget.save_file_as()

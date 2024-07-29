@@ -485,7 +485,7 @@ class MainWidget(Gtk.Paned):
         close_app: bool
             True if app is being closed, False if individual files are being closed
         """
-        # Prompt user how to handle current file, return if user decides not to close file
+        # Prompt user how to handle current file
         handled = self.handle_close_response(dialog, response, bibfiles, n, force, close_app)
         if handled:
             return None

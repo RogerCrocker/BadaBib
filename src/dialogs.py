@@ -14,7 +14,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-from gi.repository import Gtk
+from gi.repository import Adw, Gtk
 
 
 def add_filters(dialog):
@@ -36,7 +36,7 @@ def add_filters(dialog):
     dialog.add_filter(filter_all)
 
 
-class WarningDialog(Gtk.MessageDialog):
+class WarningDialog(Adw.AlertDialog):
     """
     A dialog that displays a warning message. The user can only acknowledge
     the message.
@@ -50,22 +50,20 @@ class WarningDialog(Gtk.MessageDialog):
         title: str, optional
             Dialog title. The default is "Bada Bib! - Warning".
         """
-        super().__init__(
-            transient_for=window,
-            message_type=Gtk.MessageType.WARNING,
-            buttons=Gtk.ButtonsType.OK,
-            text=text,
-            title=title,
-        )
-        self.set_modal(True)
-        self.props.use_markup = True
-        self.connect("response", self.close)
-        self.show()
+        super().__init__()
+        self.set_heading(title)
+        self.set_body(text)
+        self.set_body_use_markup(True)
+        self.add_response("ok", "OK")
+        self.set_close_response("ok")
+
+        self.choose(window, None, self.close)
 
     @staticmethod
-    def close(dialog, _response):
+    def close(dialog, response):
         """Close dialog, irrespective of response."""
-        dialog.destroy()
+        dialog.choose_finish(response)
+        return None
 
 
 class SaveChangesDialog(Gtk.MessageDialog):

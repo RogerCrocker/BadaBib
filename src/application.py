@@ -22,19 +22,13 @@ gi.require_version("GtkSource", "5")
 import badabib.customization
 import badabib.forms
 
-from gi.repository import GLib, Gtk, Gio, Adw
-
+from gi.repository import Adw, Gio, GLib, Gtk
 from sys import argv
 
-from .window import BadaBibWindow
-
 from .layout_manager import LayoutManagerWindow
-
-from .string_manager import StringManagerWindow
-
 from .preferences import PreferencesWindow
-
-from .dialogs import AboutDialog
+from .string_manager import StringManagerWindow
+from .window import BadaBibWindow
 
 
 # Names of actions to customize fields
@@ -246,8 +240,14 @@ class Application(Adw.Application):
 
     def on_show_about(self, action=None, data=None):
         """Show about dialog. See on_quit for parameters."""
-        dialog = AboutDialog(self.window)
-        dialog.show()
+        dialog = Adw.AboutDialog.new()
+        dialog.set_application_icon("com.github.rogercrocker.badabib")
+        dialog.set_application_name("Bada Bib!")
+        dialog.set_version(self.version)
+        dialog.set_website("https://github.com/RogerCrocker/BadaBib")
+        dialog.set_issue_url("https://github.com/RogerCrocker/BadaBib/issues")
+        dialog.set_license_type(Gtk.License.GPL_3_0)
+        dialog.present()
 
     def on_custom_editor(self, action=None, data=None):
         """Show editor layout manager. See on_quit for parameters."""
